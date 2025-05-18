@@ -1,10 +1,9 @@
-
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <DHT.h>
 #include <time.h>
-//#include <Arduino.h>
+#include "melodies.h"
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -45,14 +44,16 @@ struct Alarm {
 Alarm alarms[3], tempAlarm;
 int selectedAlarmIndex = 0;
 AlarmField selectedField = ALARM_TYPE;
-bool editingField = false;
 int currentRepeatDayIndex = 0;
 UIState uiState = IDLE_SCREEN;
 unsigned long lastInteractionTime = 0;
 unsigned long lastModePress = 0, lastAdjustPress = 0, lastConfirmPress = 0;
-const unsigned long debounceDelay = 200;
+unsigned long modeButtonPressTime = 0;
+int lastTriggerMinute = -1;
+bool alarmActive = false;
 
-const char* melodyNames[] = {"Mario", "Birthday", "Xmas"};
+
+const char* melodyNames[] = {"Mario", "Birthday", "SilentNight"};
 const char* weekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
 bool isFieldVisible(AlarmType type, AlarmField field) {
@@ -63,7 +64,7 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
 
 void connectToWiFi() {
   WiFi.begin("Wokwi-GUEST", "", 6);
-  while (WiFi.status() != WL_CONNECTED) { delay(100); }
+  while (WiFi.status() != WL_CONNECTED) delay(100);
   configTzTime("AEST-10AEDT,M10.1.0,M4.1.0/3", "pool.ntp.org");
 }
 
@@ -87,13 +88,16 @@ void drawIdleScreen() {
   display.setTextSize(2);
   display.setCursor(0, 0);
   display.print(getFormattedTime());
+
   display.setTextSize(1);
   display.setCursor(0, 20);
   display.printf("T:%.1fC H:%.1f%%", dht.readTemperature(), dht.readHumidity());
+
   display.setCursor(0, 32);
   bool enabled = false;
   for (int i = 0; i < 3; i++) if (alarms[i].enabled) enabled = true;
   display.print(enabled ? "Alarm ON" : "Alarm OFF");
+
   display.setCursor(0, 52);
   display.print(getFormattedDate());
   display.display();
@@ -118,16 +122,20 @@ void drawAlarmConfig() {
   int y = 0;
   display.setCursor(0, y); y += 10;
   display.printf("Config A%d", selectedAlarmIndex + 1);
+
   if (isFieldVisible(a.type, ALARM_TYPE)) {
     display.setCursor(0, y); y += 10;
     display.printf("%sType: %s", selectedField == ALARM_TYPE ? ">" : " ", a.type == ONE_TIME ? "Once" : a.type == SPECIFIC_DATE ? "Date" : "Repeat");
   }
+
   display.setCursor(0, y); y += 10;
   display.printf("%sTime: %02d:%02d", (selectedField == ALARM_TIME_HOUR || selectedField == ALARM_TIME_MIN) ? ">" : " ", a.hour, a.minute);
+
   if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
     display.setCursor(0, y); y += 10;
     display.printf("%sDate: %04d-%02d-%02d", (selectedField == ALARM_DATE_YEAR || selectedField == ALARM_DATE_MONTH || selectedField == ALARM_DATE_DAY) ? ">" : " ", a.year, a.month, a.day);
   }
+
   if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) {
     display.setCursor(0, y); y += 10;
     display.print(selectedField == ALARM_REPEAT_DAYS ? ">Days: " : " Days: ");
@@ -139,15 +147,48 @@ void drawAlarmConfig() {
       display.print(" ");
     }
   }
+
   display.setCursor(0, y); y += 10;
   display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
+
   display.setCursor(0, y);
   display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
   display.display();
 }
 
+void checkAndTriggerAlarms() {
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) return;
+
+  for (int i = 0; i < 3; i++) {
+    Alarm &a = alarms[i];
+    if (!a.enabled) continue;
+    if (a.hour != timeinfo.tm_hour || a.minute != timeinfo.tm_min) continue;
+    if (timeinfo.tm_min == lastTriggerMinute) continue;
+
+    bool shouldTrigger = false;
+
+    if (a.type == ONE_TIME) {
+      shouldTrigger = true;
+      a.enabled = false;
+    } else if (a.type == SPECIFIC_DATE) {
+      if (a.year == (timeinfo.tm_year + 1900) && a.month == (timeinfo.tm_mon + 1) && a.day == timeinfo.tm_mday)
+        shouldTrigger = true;
+    } else if (a.type == REPEATED) {
+      int weekday = timeinfo.tm_wday == 0 ? 6 : timeinfo.tm_wday - 1;
+      if (a.repeatDays[weekday]) shouldTrigger = true;
+    }
+
+    if (shouldTrigger) {
+      alarmActive = true;
+      lastTriggerMinute = timeinfo.tm_min;
+      playMelody(a.melody, BUZZER_PIN);
+      break;
+    }
+  }
+}
+
 void setup() {
-  //debug_init();
   Serial.begin(115200);
   Wire.begin(SDA_PIN, SCL_PIN);
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
@@ -162,31 +203,40 @@ void setup() {
 
 void loop() {
   unsigned long now = millis();
+  checkAndTriggerAlarms();
 
- if (digitalRead(MODE_BUTTON_PIN) == LOW && now - lastModePress > debounceDelay) {
-  lastModePress = now;
+  // MODE button: Short press to toggle screens / long press to clear repeat days
+  bool modePressed = digitalRead(MODE_BUTTON_PIN) == LOW;
 
-  if (uiState == ALARM_CONFIG) {
-    // Cancel/save exit
-    if (selectedField == ALARM_SAVE_EXIT) {
-      uiState = ALARM_OVERVIEW;  // or IDLE_SCREEN if preferred
-    } else {
-      // Advance to next visible field
-      do {
-        selectedField = (AlarmField)((selectedField + 1) % 10);
-      } while (!isFieldVisible(tempAlarm.type, selectedField));
-    }
-  } else {
-    // Cycle between IDLE <-> ALARM_OVERVIEW
-    uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
+  if (modePressed && modeButtonPressTime == 0) {
+    modeButtonPressTime = now;
   }
 
-  lastInteractionTime = now;
-}
+  if (!modePressed && modeButtonPressTime > 0) {
+    unsigned long pressDuration = now - modeButtonPressTime;
 
-  if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > debounceDelay) {
+    if (uiState == ALARM_CONFIG) {
+      if (selectedField == ALARM_REPEAT_DAYS && pressDuration > 1000) {
+        for (int i = 0; i < 7; i++) tempAlarm.repeatDays[i] = false;
+      } else {
+        do {
+          selectedField = (AlarmField)((selectedField + 1) % 10);
+        } while (!isFieldVisible(tempAlarm.type, selectedField));
+      }
+    } else {
+      uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
+    }
+
+    lastInteractionTime = now;
+    modeButtonPressTime = 0;
+  }
+
+
+  // ADJUST button
+  if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
+
     if (uiState == ALARM_OVERVIEW) {
       selectedAlarmIndex = (selectedAlarmIndex + 1) % 3;
     } else if (uiState == ALARM_CONFIG) {
@@ -206,8 +256,10 @@ void loop() {
     lastInteractionTime = now;
   }
 
-  if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > debounceDelay) {
+  // CONFIRM button
+  if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
     lastConfirmPress = now;
+
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
       uiState = ALARM_CONFIG;
@@ -223,10 +275,12 @@ void loop() {
     lastInteractionTime = now;
   }
 
+  // Timeout → return to idle
   if (now - lastInteractionTime > UI_TIMEOUT_MS && uiState != IDLE_SCREEN) {
     uiState = IDLE_SCREEN;
   }
 
+  // Render current screen
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
