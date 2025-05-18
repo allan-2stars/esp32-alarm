@@ -4,6 +4,7 @@
 #include <Adafruit_SSD1306.h>
 #include <DHT.h>
 #include <time.h>
+//#include <Arduino.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -146,6 +147,7 @@ void drawAlarmConfig() {
 }
 
 void setup() {
+  //debug_init();
   Serial.begin(115200);
   Wire.begin(SDA_PIN, SCL_PIN);
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
