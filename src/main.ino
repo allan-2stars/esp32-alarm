@@ -129,11 +129,21 @@ void drawAlarmConfig() {
   }
 
   display.setCursor(0, y); y += 10;
-  display.printf("%sTime: %02d:%02d", (selectedField == ALARM_TIME_HOUR || selectedField == ALARM_TIME_MIN) ? ">" : " ", a.hour, a.minute);
+  display.printf(" Time: %s%02d%s:%s%02d%s",
+  selectedField == ALARM_TIME_HOUR ? "[" : "",  a.hour,
+  selectedField == ALARM_TIME_HOUR ? "]" : "",  selectedField == ALARM_TIME_MIN ? "[" : "",
+  a.minute,
+  selectedField == ALARM_TIME_MIN ? "]" : "");
+
 
   if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
     display.setCursor(0, y); y += 10;
-    display.printf("%sDate: %04d-%02d-%02d", (selectedField == ALARM_DATE_YEAR || selectedField == ALARM_DATE_MONTH || selectedField == ALARM_DATE_DAY) ? ">" : " ", a.year, a.month, a.day);
+    display.printf(" Date: %s%04d%s-%s%02d%s-%s%02d%s",
+  selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "",
+  selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "",
+  selectedField == ALARM_DATE_DAY ? "[" : "", a.day, selectedField == ALARM_DATE_DAY ? "]" : ""
+  );
+
   }
 
   if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) {
