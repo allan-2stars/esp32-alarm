@@ -2,8 +2,7 @@
 #define UI_H
 
 #include "alarm.h"
-
-#define UI_TIMEOUT_MS 60000
+#include "config.h"
 
 enum UIState { IDLE_SCREEN, ALARM_OVERVIEW, ALARM_CONFIG };
 extern UIState uiState;

@@ -1,6 +1,8 @@
 #include <Adafruit_SSD1306.h>
 #include "ui.h"
 #include "alarm.h"
+#include "icons.h"
+#include "config.h"
 
 extern Adafruit_SSD1306 display;
 extern Alarm alarms[3];
@@ -32,22 +34,33 @@ String getFormattedDate() {
 
 void drawIdleScreen() {
   display.clearDisplay();
-  display.setTextColor(SSD1306_WHITE);
+  display.setTextColor(TEXT_COLOR);
   display.setTextSize(2);
-  display.setCursor(0, 0);  
+  display.setCursor(0, HEADER_HEIGHT); 
   display.print(getFormattedTime());
 
   display.setTextSize(1);
-  display.setCursor(0, 20);
+  display.setCursor(0, HEADER_HEIGHT + 22);
   display.printf("T:%.1fC H:%.1f%%", 24.0, 50.0); // Placeholder for actual sensor values
 
-  display.setCursor(0, 32);
+  // display.setCursor(0, HEADER_HEIGHT + 22);
+  // bool enabled = false;
+
+  display.setCursor(0, HEADER_HEIGHT + 32);
   bool enabled = false;
   for (int i = 0; i < 3; i++) if (alarms[i].enabled) enabled = true;
   display.print(enabled ? "Alarm ON" : "Alarm OFF");
 
+  display.setCursor(0, SCREEN_HEIGHT - 12);  // Date line
+  display.print(getFormattedDate());
+
   display.setCursor(0, 52);
   display.print(getFormattedDate());
+
+  // Draw icons
+  drawWifiIcon(display, 0, 0);             // top-left
+  drawBtIcon(display, SCREEN_WIDTH - 10, 0);  // top-right
+
   display.display();
 }
 
@@ -55,11 +68,18 @@ void drawAlarmOverview() {
   display.clearDisplay();
   display.setCursor(0, 0); display.print("Alarms");
   for (int i = 0; i < 3; i++) {
-    display.setCursor(0, 12 + i * 16);
-    display.printf("%sA%d: %02d:%02d %s",
+    int yPos = 12 + i * 16;
+    display.setCursor(0, yPos);
+    display.printf("%sA%d: %02d:%02d",
       i == selectedAlarmIndex ? ">" : " ",
-      i + 1, alarms[i].hour, alarms[i].minute,
-      alarms[i].enabled ? "ON" : "OFF");
+      i + 1, alarms[i].hour, alarms[i].minute);
+
+    // Draw bell or slashed bell
+    if (alarms[i].enabled) {
+      drawBellIcon(display, SCREEN_WIDTH - 10, yPos);
+    } else {
+      drawBellSlashIcon(display, SCREEN_WIDTH - 10, yPos);
+    }
   }
   display.display();
 }

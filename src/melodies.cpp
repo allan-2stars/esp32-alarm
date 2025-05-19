@@ -1,4 +1,5 @@
 #include "melodies.h"
+#include "config.h"
 
 void playNotes(const int* melody, int length, uint8_t tempo, int buzzerPin) {
   uint16_t wholenote = (60000 * 4) / tempo;

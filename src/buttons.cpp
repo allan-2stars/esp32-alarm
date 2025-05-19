@@ -4,6 +4,7 @@
 #include "ui.h"
 #include "melodies.h"
 #include "utils.h"
+#include "config.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;

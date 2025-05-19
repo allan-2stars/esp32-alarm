@@ -3,8 +3,7 @@
 #include "melodies.h"
 #include "alarm.h"
 #include "buttons.h"  // for BUZZER_PIN
-
-
+#include "config.h"
 
 
 // External variables (defined in main.cpp or shared)

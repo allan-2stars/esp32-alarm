@@ -1,5 +1,6 @@
 #include <time.h>
 #include "utils.h"
+#include "config.h"
 
 int getCurrentYear() {
   struct tm timeinfo;
