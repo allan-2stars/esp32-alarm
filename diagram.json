@@ -41,7 +41,9 @@
       "left": -113.4,
       "attrs": { "volume": "0.1" }
     }
+    
   ],
+  
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
     [ "esp:RX", "$serialMonitor:TX", "", [] ],
@@ -68,5 +70,10 @@
     [ "bz1:1", "dht1:GND", "black", [ "v28.8", "h-86.4", "v-124.8" ] ],
     [ "bb1:7b.f", "esp:15", "gray", [ "v0" ] ]
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "serialMonitor": {
+  "display": "auto",
+  "newline": "lf",
+  "convertEol": false
+  }
 }
