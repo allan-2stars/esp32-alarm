@@ -11,7 +11,6 @@
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 Alarm alarms[3];
-
 Alarm tempAlarm;
 
 int selectedAlarmIndex = 0;
@@ -33,14 +32,6 @@ void setup() {
   display.clearDisplay();
   display.display();
 
-  // ensures all alarms[i] start with the correct date and default time.
-  for (int i = 0; i < 3; i++) {
-    alarms[i].enabled = false;
-    alarms[i].type = ONE_TIME;
-    setAlarmToCurrentTime(alarms[i]);
-  }
-
-
   // Connect Wi-Fi
   WiFi.begin("Wokwi-GUEST", "", 6);
   while (WiFi.status() != WL_CONNECTED) {
@@ -59,8 +50,8 @@ void setup() {
     Serial.println("Waiting for time sync...");
   }
   Serial.println("Time synced!");
-  
-  // after NTP wait
+
+  // after NTP wait make sure alarm time is synced
   for (int i = 0; i < 3; i++) {
     alarms[i].enabled = false;
     alarms[i].type = ONE_TIME;
@@ -68,7 +59,6 @@ void setup() {
   }
 
 }
-
 
 void loop() {
   handleButtons();          // input + screen update
