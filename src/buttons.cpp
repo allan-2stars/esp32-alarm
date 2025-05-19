@@ -3,6 +3,7 @@
 #include "alarm.h"
 #include "ui.h"
 #include "melodies.h"
+#include "utils.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -63,9 +64,20 @@ void handleButtons() {
         case ALARM_TYPE: a.type = (AlarmType)((a.type + 1) % 3); break;
         case ALARM_TIME_HOUR: a.hour = (a.hour + 1) % 24; break;
         case ALARM_TIME_MIN: a.minute = (a.minute + 1) % 60; break;
-        case ALARM_DATE_YEAR: a.year = (a.year < 2035) ? a.year + 1 : 2025; break;
-        case ALARM_DATE_MONTH: a.month = (a.month % 12) + 1; break;
-        case ALARM_DATE_DAY: a.day = (a.day % 31) + 1; break;
+        case ALARM_DATE_YEAR:{
+          int currentYear = getCurrentYear();
+          Serial.println("Current year: ");
+          Serial.print(currentYear);
+          a.year = (a.year >= currentYear + 10) ? currentYear : a.year + 1;
+        }break;
+        case ALARM_DATE_MONTH:
+          a.month = (a.month % 12) + 1;
+          break;
+        case ALARM_DATE_DAY:  {
+          int maxDay = getMaxDay(a.year, a.month);
+          a.day = (a.day % maxDay) + 1;
+        }break;
+
         case ALARM_REPEAT_DAYS: currentRepeatDayIndex = (currentRepeatDayIndex + 1) % 7; break;
         case ALARM_ENABLED: a.enabled = !a.enabled; break;
         case ALARM_MELODY: a.melody = (a.melody + 1) % 6; break;
@@ -80,6 +92,10 @@ void handleButtons() {
     lastConfirmPress = now;
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
+      
+    if ((tempAlarm.year == 0 || tempAlarm.month == 0 || tempAlarm.day == 0) && isTimeAvailable()) {
+      setAlarmToCurrentTime(tempAlarm);
+    }
       uiState = ALARM_CONFIG;
       selectedField = ALARM_TYPE;
     } else if (uiState == ALARM_CONFIG) {

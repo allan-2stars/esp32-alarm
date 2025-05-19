@@ -17,17 +17,20 @@ const char* weekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
 String getFormattedTime() {
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) return "Time Err";
-  char buf[6]; strftime(buf, sizeof(buf), "%H:%M", &timeinfo);
+  if (!getLocalTime(&timeinfo)) return "07:00";  // fallback
+  char buf[6];
+  strftime(buf, sizeof(buf), "%H:%M", &timeinfo);
   return String(buf);
 }
 
 String getFormattedDate() {
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) return "Date Err";
-  char buf[20]; strftime(buf, sizeof(buf), "%a %Y-%m-%d", &timeinfo);
+  if (!getLocalTime(&timeinfo)) return "Today";
+  char buf[20];
+  strftime(buf, sizeof(buf), "%a %Y-%m-%d", &timeinfo);
   return String(buf);
 }
+
 
 
 void drawIdleScreen() {
@@ -92,7 +95,9 @@ void drawAlarmConfig() {
 
   if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) {
     display.setCursor(0, y); y += 10;
-    display.print(selectedField == ALARM_REPEAT_DAYS ? ">Days: " : " Days: ");
+    display.print(selectedField == ALARM_REPEAT_DAYS ? ">Days:" : " Days:");
+    display.setCursor(0, y); y += 10;
+
     for (int i = 0; i < 7; i++) {
       if (i == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("[");
       display.print(weekDays[i][0]);
@@ -101,6 +106,7 @@ void drawAlarmConfig() {
       display.print(" ");
     }
   }
+
 
   display.setCursor(0, y); y += 10;
   display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
