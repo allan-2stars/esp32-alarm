@@ -2,7 +2,7 @@
 #include "buttons.h"
 #include "alarm.h"
 #include "ui.h"
-#include "melodies.h"
+#include "melody_engine.h"
 #include "utils.h"
 #include "config.h"
 

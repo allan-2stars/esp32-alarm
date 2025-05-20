@@ -3,6 +3,7 @@
 #include "alarm.h"
 #include "icons.h"
 #include "config.h"
+#include "melody_engine.h"
 
 extern Adafruit_SSD1306 display;
 extern Alarm alarms[3];
@@ -128,6 +129,12 @@ void drawAlarmConfig() {
   display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
 
   display.setCursor(0, y);
-  display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
+
+  if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
+    display.setCursor(0, SCREEN_HEIGHT - 10);
+    display.setTextColor(TEXT_COLOR);
+    display.print("Previewing...");
+  }
+
   display.display();
 }

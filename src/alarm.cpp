@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <time.h>
-#include "melodies.h"
+#include "melody_engine.h"
 #include "alarm.h"
 #include "buttons.h"  // for BUZZER_PIN
 #include "config.h"
