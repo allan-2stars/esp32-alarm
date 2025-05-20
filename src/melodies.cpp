@@ -191,38 +191,40 @@ extern const int melodySilentNight[] = {
 const int melodySilentNightLength = sizeof(melodySilentNight) / sizeof(melodySilentNight[0]) / 2;
 
 
+const int* melodyDataList[MELODY_COUNT] = {
+  melodyWeWishYou,
+  melodyWhiteChristmas,
+  melodyJingleBells,
+  melodyRudolfTheRedNosed,
+  melodySantaClausIsComin,
+  melodySilentNight
+};
+
+int melodyLengthList[MELODY_COUNT] = {
+  melodyWeWishYouLength,
+  melodyWhiteChristmasLength,
+  melodyJingleBellsLength,
+  melodyRudolfTheRedNosedLength,
+  melodySantaClausIsCominLength,
+  melodySilentNightLength
+};
+
+int melodyTempoList[MELODY_COUNT] = {
+  160, 155, 180, 150, 137, 130
+};
+
 const int* getMelodyData(int id) {
-  switch (id) {
-    case 0: return melodyWeWishYou;
-    case 1: return melodyWhiteChristmas;
-    case 2: return melodyJingleBells;
-    case 3: return melodyRudolfTheRedNosed;
-    case 4: return melodySantaClausIsComin;
-    case 5: return melodySilentNight;
-    default: return nullptr;
-  }
+  if (id >= 0 && id < MELODY_COUNT) return melodyDataList[id];
+  return nullptr;
 }
 
 int getMelodyLength(int id) {
-  switch (id) {
-    case 0: return melodyWeWishYouLength;
-    case 1: return melodyWhiteChristmasLength;
-    case 2: return melodyJingleBellsLength;
-    case 3: return melodyRudolfTheRedNosedLength;
-    case 4: return melodySantaClausIsCominLength;
-    case 5: return melodySilentNightLength;
-    default: return 0;
-  }
+  if (id >= 0 && id < MELODY_COUNT) return melodyLengthList[id];
+  return 0;
 }
 
 int getMelodyTempo(int id) {
-  switch (id) {
-    case 0: return 160;
-    case 1: return 155;
-    case 2: return 180;
-    case 3: return 150;
-    case 4: return 137;
-    case 5: return 130;
-    default: return 120;
-  }
+  if (id >= 0 && id < MELODY_COUNT) return melodyTempoList[id];
+  return 120;  // default tempo
 }
+

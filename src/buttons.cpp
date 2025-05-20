@@ -3,6 +3,7 @@
 #include "alarm.h"
 #include "ui.h"
 #include "melody_engine.h"
+#include "melodies.h"
 #include "utils.h"
 #include "config.h"
 
@@ -101,7 +102,8 @@ void handleButtons() {
       }
     }
     else if (uiState == MELODY_PREVIEW) {
-      previewMelodyIndex = (previewMelodyIndex + 1) % 6;
+      previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
+;
       drawMelodyPreview(previewMelodyIndex);
       startMelodyPreview(
         getMelodyData(previewMelodyIndex),

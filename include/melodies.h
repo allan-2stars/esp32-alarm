@@ -1,6 +1,8 @@
 #ifndef MELODIES_H
 #define MELODIES_H
 
+#define MELODY_COUNT 6 // when update the numbers of melody, modify the number.
+
 extern const int melodyWeWishYou[];
 extern const int melodyWeWishYouLength;
 
@@ -22,5 +24,6 @@ extern const int melodySilentNightLength;
 const int* getMelodyData(int id);
 int getMelodyLength(int id);
 int getMelodyTempo(int id);
+
 
 #endif
