@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <time.h>
-#include "melodies.h"
+#include "melody_engine.h"
 #include "alarm.h"
 #include "buttons.h"  // for BUZZER_PIN
 #include "config.h"
@@ -39,7 +39,13 @@ void checkAndTriggerAlarms() {
     if (shouldTrigger) {
       alarmActive = true;
       lastTriggerMinute = timeinfo.tm_min;
-      playMelody(a.melody, BUZZER_PIN);
+
+      startMelodyPreview(
+        getMelodyData(a.melody),
+        getMelodyLength(a.melody),
+        getMelodyTempo(a.melody),
+        BUZZER_PIN
+      );
       break;
     }
   }

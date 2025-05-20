@@ -3,6 +3,8 @@
 #include "alarm.h"
 #include "icons.h"
 #include "config.h"
+#include "melody_engine.h"
+#include "melodies.h"
 
 extern Adafruit_SSD1306 display;
 extern Alarm alarms[3];
@@ -12,7 +14,12 @@ extern AlarmField selectedField;
 extern int currentRepeatDayIndex;
 extern UIState uiState;
 
-const char* melodyNames[] = {"Wish", "White", "Jingle", "Rudolf", "Santa", "Silent"};
+int scrollOffset = 0;
+const int visibleMelodyCount = 4;
+
+const char* melodyNames[MELODY_COUNT] = {
+  "We Wish You", "White Xmas", "Jingle Bell", "Rudolf Red Nosed", "Santa Coming", "Silent Night"
+};
 const char* weekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
 #include <time.h>
@@ -129,5 +136,41 @@ void drawAlarmConfig() {
 
   display.setCursor(0, y);
   display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
+
+  if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
+    display.clearDisplay();
+    display.setCursor(0, SCREEN_HEIGHT - 20);
+    display.setTextColor(TEXT_COLOR);
+    display.print("Previewing...");
+  }
+  
   display.display();
 }
+
+
+void drawMelodyPreview(int selectedIndex) {
+  const int melodyCount = MELODY_COUNT;
+
+  // Adjust scroll if selection is outside view
+  if (selectedIndex < scrollOffset) scrollOffset = selectedIndex;
+  if (selectedIndex >= scrollOffset + visibleMelodyCount) {
+    scrollOffset = selectedIndex - visibleMelodyCount + 1;
+  }
+
+  display.clearDisplay();
+  display.setTextColor(TEXT_COLOR);
+  display.setCursor(0, 0);
+  display.print("Select Melody:");
+
+  for (int i = 0; i < visibleMelodyCount && (i + scrollOffset) < melodyCount; i++) {
+    display.setCursor(0, 12 + i * 10);
+    int actualIndex = i + scrollOffset;
+    display.print(actualIndex == selectedIndex ? "> " : "  ");
+    display.print(melodyNames[actualIndex]);
+  }
+
+  display.setCursor(0, SCREEN_HEIGHT - 10);
+  display.print("Mod:Abort, Cmf:OK");
+  display.display();
+}
+
