@@ -96,15 +96,21 @@ void handleButtons() {
         case ALARM_ENABLED: a.enabled = !a.enabled; break;
         case ALARM_MELODY:
           uiState = MELODY_PREVIEW;
-          
+            previewMelodyIndex = alarms[selectedAlarmIndex].melody;
+            // Start melody playback for first entry
+            startMelodyPreview(
+              getMelodyData(previewMelodyIndex),
+              getMelodyLength(previewMelodyIndex),
+              getMelodyTempo(previewMelodyIndex),
+              BUZZER_PIN);
           lastAdjustPress = millis();  // avoid double-trigger
           break;
       }
     }
     else if (uiState == MELODY_PREVIEW) {
       previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
-;
-      drawMelodyPreview(previewMelodyIndex);
+            Serial.println("else if index:");
+      Serial.println(previewMelodyIndex);
       startMelodyPreview(
         getMelodyData(previewMelodyIndex),
         getMelodyLength(previewMelodyIndex),
@@ -157,7 +163,7 @@ void handleButtons() {
     case MELODY_PREVIEW:
       Serial.println("case switch index:");
       Serial.println(previewMelodyIndex);
-     drawMelodyPreview(previewMelodyIndex); break;
+      drawMelodyPreview(previewMelodyIndex); break;
   }
 }
 

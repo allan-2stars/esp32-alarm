@@ -18,7 +18,7 @@ int scrollOffset = 0;
 const int visibleMelodyCount = 4;
 
 const char* melodyNames[MELODY_COUNT] = {
-  "Wish", "White", "Jingle", "Rudolf", "Santa", "Silent"
+  "We Wish You", "White Xmas", "Jingle Bell", "Rudolf Red Nosed", "Santa Coming", "Silent Night"
 };
 const char* weekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
