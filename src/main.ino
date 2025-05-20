@@ -2,6 +2,7 @@
 #include "alarm.h"
 #include "ui.h"
 #include "buttons.h"
+#include "melodies.h"
 #include "utils.h"
 #include "config.h"
 #include <WiFi.h>
@@ -80,5 +81,6 @@ void setup() {
 void loop() {
   handleButtons();          // input + screen update
   checkAndTriggerAlarms();  // time match + melody
+  updateMelodyPlayback();
   delay(50);
 }

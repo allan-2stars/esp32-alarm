@@ -94,6 +94,22 @@
 #define REST        0
 
 
+static const int* currentMelody = nullptr;
+static int melodyLength = 0;
+static int melodyTempo = 120;
+static int melodyIndex = 0;
+static unsigned long lastNoteTime = 0;
+static int buzzerPin = 0;
+static bool melodyPlaying = false;
+
 void playMelody(int id, int buzzerPin);
+void startMelodyPreview(const int* melody, int length, int tempo, int pin);
+void updateMelodyPlayback();
+bool isMelodyPlaying();
+const int* getMelodyData(int id);
+int getMelodyLength(int id);
+int getMelodyTempo(int id);
+void stopMelody();
+
 
 #endif

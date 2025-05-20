@@ -26,12 +26,18 @@ void handleButtons() {
   unsigned long now = millis();
 
   // MODE button with short/long press support
+  //Checks if the button is currently being pressed (active LOW logic)
   bool modePressed = digitalRead(MODE_BUTTON_PIN) == LOW;
+  //Detects the moment the button is first pressed down
   if (modePressed && modeButtonPressTime == 0) {
+    //Starts a timer (using millis()) to track how long the button is held
     modeButtonPressTime = now;
   }
+  //Detects the moment the button is released
   if (!modePressed && modeButtonPressTime > 0) {
+    //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
+    stopMelody();
 
     if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS && duration > 1000) {
@@ -51,6 +57,7 @@ void handleButtons() {
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
+    stopMelody();
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -81,7 +88,14 @@ void handleButtons() {
 
         case ALARM_REPEAT_DAYS: currentRepeatDayIndex = (currentRepeatDayIndex + 1) % 7; break;
         case ALARM_ENABLED: a.enabled = !a.enabled; break;
-        case ALARM_MELODY: a.melody = (a.melody + 1) % 6; break;
+        case ALARM_MELODY: 
+          a.melody = (a.melody + 1) % 6; 
+          drawAlarmConfig();  // update screen before playing
+
+          // Start non-blocking preview
+          startMelodyPreview(getMelodyData(a.melody), getMelodyLength(a.melody), getMelodyTempo(a.melody), BUZZER_PIN);
+          lastAdjustPress = millis();  // avoid double-trigger
+          break;
         default: break;
       }
     }
@@ -90,6 +104,7 @@ void handleButtons() {
 
   // CONFIRM button
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
+    stopMelody();
     lastConfirmPress = now;
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
@@ -122,3 +137,5 @@ void handleButtons() {
     case ALARM_CONFIG: drawAlarmConfig(); break;
   }
 }
+
+

@@ -1,17 +1,6 @@
 #include "melodies.h"
 #include "config.h"
 
-void playNotes(const int* melody, int length, uint8_t tempo, int buzzerPin) {
-  uint16_t wholenote = (60000 * 4) / tempo;
-  for (int i = 0; i < length * 2; i += 2) {
-    int divider = melody[i + 1];
-    int noteDuration = (divider > 0) ? wholenote / divider : wholenote / abs(divider) * 1.5;
-    if (melody[i] != REST)
-      tone(buzzerPin, melody[i], noteDuration * 0.9);
-    delay(noteDuration);
-    noTone(buzzerPin);
-  }
-}
 
 const int melodyWeWishYou[] = {
   NOTE_D4, 4, NOTE_G4, 4, NOTE_G4, 4, NOTE_A4, 4,
@@ -104,38 +93,86 @@ extern const int melodySilentNight[] = {
   NOTE_C4,-2
 };
 
-void weWishYou(uint8_t tempo, int buzzerPin) {
-  playNotes(melodyWeWishYou, sizeof(melodyWeWishYou) / sizeof(melodyWeWishYou[0]) / 2, tempo, buzzerPin);
-}
-void whiteChristmas(uint8_t tempo, int buzzerPin) {
-  playNotes(melodyWhiteChristmas, sizeof(melodyWhiteChristmas) / sizeof(melodyWhiteChristmas[0]) / 2, tempo, buzzerPin);
-}
-void jingleBells(uint8_t tempo, int buzzerPin) {
-  playNotes(melodyJingleBells, sizeof(melodyJingleBells) / sizeof(melodyJingleBells[0]) / 2, tempo, buzzerPin);
-}
-void rudolfTheRedNosed(uint8_t tempo, int buzzerPin) {
-  playNotes(melodyRudolfTheRedNosed, sizeof(melodyRudolfTheRedNosed) / sizeof(melodyRudolfTheRedNosed[0]) / 2, tempo, buzzerPin);
-}
-void santaClausIsComin(uint8_t tempo, int buzzerPin) {
-  playNotes(melodySantaClausIsComin, sizeof(melodySantaClausIsComin) / sizeof(melodySantaClausIsComin[0]) / 2, tempo, buzzerPin);
-}
-void playSilentNight(uint8_t tempo, int buzzerPin) {
-  playNotes(melodySilentNight, sizeof(melodySilentNight) / sizeof(melodySilentNight[0]) / 2, tempo, buzzerPin);
+
+void startMelodyPreview(const int* melody, int length, int tempo, int pin) {
+  currentMelody = melody;
+  melodyLength = length;
+  melodyTempo = tempo;
+  melodyIndex = 0;
+  lastNoteTime = 0;
+  buzzerPin = pin;
+  melodyPlaying = true;
 }
 
-void playMelody(int id, int buzzerPin) {
-  switch (id) {
-    case 0: weWishYou(160, buzzerPin); break;
-    case 1: whiteChristmas(155, buzzerPin); break;
-    case 2: jingleBells(180, buzzerPin); break;
-    case 3: rudolfTheRedNosed(150, buzzerPin); break;
-    case 4: santaClausIsComin(137, buzzerPin); break;
-    case 5: playSilentNight(130, buzzerPin); break;
-    default:
-      tone(buzzerPin, NOTE_C5, 300); delay(300);
-      noTone(buzzerPin); break;
+void updateMelodyPlayback() {
+  if (!melodyPlaying || !currentMelody) {
+    return;  // nothing to do
+  }
+
+  unsigned long now = millis();
+  if (now >= lastNoteTime) { //It advances the melody based on time
+    int note = currentMelody[melodyIndex * 2];
+    int duration = currentMelody[melodyIndex * 2 + 1];
+    int wholenote = (60000 * 4) / melodyTempo;
+    int noteDuration = (duration > 0) ? wholenote / duration : (wholenote / abs(duration)) * 1.5;
+
+    if (note > 0) {
+      tone(buzzerPin, note, noteDuration * 0.9);  // play tone for ~90% duration
+    } else {
+      noTone(buzzerPin);  // rest
+    }
+
+    lastNoteTime = now + noteDuration;
+    melodyIndex++;
+
+    if (melodyIndex >= melodyLength) {
+      melodyPlaying = false;
+      noTone(buzzerPin);  // stop at end of melody
+    }
   }
 }
 
+
+const int* getMelodyData(int id) {
+  switch (id) {
+    case 0: return melodyWeWishYou;
+    case 1: return melodyWhiteChristmas;
+    case 2: return melodyJingleBells;
+    case 3: return melodyRudolfTheRedNosed;
+    case 4: return melodySantaClausIsComin;
+    case 5: return melodySilentNight;
+    default: return nullptr;
+  }
+}
+
+int getMelodyLength(int id) {
+  switch (id) {
+    case 0: return sizeof(melodyWeWishYou) / sizeof(melodyWeWishYou[0]) / 2;
+    case 1: return sizeof(melodyWhiteChristmas) / sizeof(melodyWhiteChristmas[0]) / 2;
+    case 2: return sizeof(melodyJingleBells) / sizeof(melodyJingleBells[0]) / 2;
+    case 3: return sizeof(melodyRudolfTheRedNosed) / sizeof(melodyRudolfTheRedNosed[0]) / 2;
+    case 4: return sizeof(melodySantaClausIsComin) / sizeof(melodySantaClausIsComin[0]) / 2;
+    case 5: return sizeof(melodySilentNight) / sizeof(melodySilentNight[0]) / 2;
+    default: return 0;
+  }
+}
+
+int getMelodyTempo(int id) {
+  switch (id) {
+    case 0: return 160;
+    case 1: return 155;
+    case 2: return 180;
+    case 3: return 150;
+    case 4: return 137;
+    case 5: return 130;
+    default: return 120;
+  }
+}
+
+void stopMelody() {
+  melodyPlaying = false;
+  noTone(buzzerPin);
+  Serial.println("Stop melody");
+}
 
 
