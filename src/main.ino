@@ -21,7 +21,7 @@ UIState uiState = IDLE_SCREEN;
 
 void setup() {
   Serial.begin(115200);
-  Wire.begin(16, 17);
+  Wire.begin(SDA_PIN, SCL_PIN);
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
   pinMode(ADJUST_BUTTON_PIN, INPUT_PULLUP);
   pinMode(CONFIRM_BUTTON_PIN, INPUT_PULLUP);
@@ -45,11 +45,28 @@ void setup() {
 
   // ⏱️ Wait for NTP sync
   struct tm timeinfo;
-  while (!getLocalTime(&timeinfo) || timeinfo.tm_year + 1900 < 2024) {
+
+  unsigned long startTime = millis();
+  bool timeSynced = false;
+  while (millis() - startTime < 10000) {
+    if (getLocalTime(&timeinfo) && timeinfo.tm_year + 1900 >= 2024) {
+      timeSynced = true;
+      break;
+    }
     delay(200);
-    Serial.println("Waiting for time sync...");
+    Serial.println("Waiting for NTP sync...");
   }
-  Serial.println("Time synced!");
+  if (timeSynced) {
+    Serial.println("Time synced!");
+  } else {
+    Serial.println("NTP timeout — using fallback time.");
+  }
+
+  // while (!getLocalTime(&timeinfo) || timeinfo.tm_year + 1900 < 2024) {
+  //   delay(200);
+  //   Serial.println("Waiting for time sync...");
+  // }
+  // Serial.println("Time synced!");
 
   // after NTP wait make sure alarm time is synced
   for (int i = 0; i < 3; i++) {

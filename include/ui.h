@@ -2,7 +2,6 @@
 #define UI_H
 
 #include "alarm.h"
-#include "config.h"
 
 enum UIState { IDLE_SCREEN, ALARM_OVERVIEW, ALARM_CONFIG };
 extern UIState uiState;
