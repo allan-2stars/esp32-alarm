@@ -18,6 +18,7 @@ unsigned long lastAdjustPress = 0;
 unsigned long lastConfirmPress = 0;
 unsigned long modeButtonPressTime = 0;
 unsigned long lastInteractionTime = 0;
+int previewMelodyIndex = 0;
 
 int lastTriggerMinute = -1;
 bool alarmActive = false;
@@ -47,6 +48,10 @@ void handleButtons() {
           selectedField = (AlarmField)((selectedField + 1) % 10);
         } while (!isFieldVisible(tempAlarm.type, selectedField));
       }
+    } else if(uiState == MELODY_PREVIEW) {
+      uiState = ALARM_CONFIG;
+      selectedField = ALARM_MELODY;
+      drawAlarmConfig();
     } else {
       uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
     }
@@ -57,7 +62,7 @@ void handleButtons() {
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    stopMelody();
+    //stopMelody();
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -88,17 +93,23 @@ void handleButtons() {
 
         case ALARM_REPEAT_DAYS: currentRepeatDayIndex = (currentRepeatDayIndex + 1) % 7; break;
         case ALARM_ENABLED: a.enabled = !a.enabled; break;
-        case ALARM_MELODY: 
-          a.melody = (a.melody + 1) % 6; 
-          drawAlarmConfig();  // update screen before playing
-
-          // Start non-blocking preview
-          startMelodyPreview(getMelodyData(a.melody), getMelodyLength(a.melody), getMelodyTempo(a.melody), BUZZER_PIN);
+        case ALARM_MELODY:
+          uiState = MELODY_PREVIEW;
+          
           lastAdjustPress = millis();  // avoid double-trigger
           break;
-        default: break;
       }
     }
+    else if (uiState == MELODY_PREVIEW) {
+      previewMelodyIndex = (previewMelodyIndex + 1) % 6;
+      drawMelodyPreview(previewMelodyIndex);
+      startMelodyPreview(
+        getMelodyData(previewMelodyIndex),
+        getMelodyLength(previewMelodyIndex),
+        getMelodyTempo(previewMelodyIndex),
+        BUZZER_PIN);
+    }
+
     lastInteractionTime = now;
   }
 
@@ -117,11 +128,17 @@ void handleButtons() {
     } else if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS) {
         tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
-      } else {
+      }else {
         alarms[selectedAlarmIndex] = tempAlarm;
         uiState = IDLE_SCREEN;
       }
+    } else if (uiState == MELODY_PREVIEW) {
+      tempAlarm.melody = previewMelodyIndex;
+      uiState = ALARM_CONFIG;
+      selectedField = ALARM_MELODY;
+      drawAlarmConfig();
     }
+
     lastInteractionTime = now;
   }
 
@@ -135,6 +152,10 @@ void handleButtons() {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
+    case MELODY_PREVIEW:
+      Serial.println("case switch index:");
+      Serial.println(previewMelodyIndex);
+     drawMelodyPreview(previewMelodyIndex); break;
   }
 }
 

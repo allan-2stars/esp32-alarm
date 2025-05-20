@@ -129,12 +129,36 @@ void drawAlarmConfig() {
   display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
 
   display.setCursor(0, y);
+  display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
 
   if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
-    display.setCursor(0, SCREEN_HEIGHT - 10);
+    display.clearDisplay();
+    display.setCursor(0, SCREEN_HEIGHT - 20);
     display.setTextColor(TEXT_COLOR);
     display.print("Previewing...");
   }
+  
+  display.display();
+}
+
+void drawMelodyPreview(int selectedIndex) {
+  Serial.println(selectedIndex);
+  display.clearDisplay();
+  display.setTextColor(TEXT_COLOR);
+  display.setCursor(0, 0);
+  display.print("Select Melody:");
+
+  for (int i = 0; i < 6; i++) {
+    display.setCursor(0, 12 + i * 10);
+    if (i == selectedIndex) display.print("> ");
+    else display.print("  ");
+    display.print(melodyNames[i]);
+  }
+
+  // display.setCursor(0, SCREEN_HEIGHT - 10);
+  // display.setTextColor(TEXT_COLOR);
+  // display.print("Mode: Cancel   Confirm: OK");
 
   display.display();
 }
+
