@@ -4,6 +4,7 @@
 #include "alarm.h"
 #include "buttons.h"  // for BUZZER_PIN
 #include "config.h"
+#include "ui.h"
 
 
 // External variables (defined in main.cpp or shared)
@@ -46,6 +47,7 @@ void checkAndTriggerAlarms() {
         getMelodyTempo(a.melody),
         BUZZER_PIN
       );
+      uiState = ALARM_RINGING;
       break;
     }
   }

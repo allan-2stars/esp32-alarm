@@ -7,7 +7,8 @@ enum UIState {
   IDLE_SCREEN,
   ALARM_OVERVIEW,
   ALARM_CONFIG,
-  MELODY_PREVIEW    // new screen state
+  MELODY_PREVIEW,
+  ALARM_RINGING  // New Ringing Screen
 };
 
 extern UIState uiState;

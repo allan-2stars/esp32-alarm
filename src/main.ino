@@ -5,6 +5,7 @@
 #include "melody_engine.h"
 #include "utils.h"
 #include "config.h"
+#include "draw_bell.h"
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -17,6 +18,8 @@ Alarm tempAlarm;
 int selectedAlarmIndex = 0;
 AlarmField selectedField = ALARM_TYPE;
 int currentRepeatDayIndex = 0;
+extern unsigned long lastInteractionTime;
+extern int previewMelodyIndex;
 
 UIState uiState = IDLE_SCREEN;
 
@@ -82,5 +85,22 @@ void loop() {
   handleButtons();          // input + screen update
   checkAndTriggerAlarms();  // time match + melody
   updateMelodyPlayback();
+
+    // Auto timeout
+  if (uiState != IDLE_SCREEN && millis() - lastInteractionTime > UI_TIMEOUT_MS) {
+    //stopMelody();
+    alarmActive = false;
+    uiState = IDLE_SCREEN;
+  }
+    // Update display
+  switch (uiState) {
+    case IDLE_SCREEN: drawIdleScreen(); break;
+    case ALARM_OVERVIEW: drawAlarmOverview(); break;
+    case ALARM_CONFIG: drawAlarmConfig(); break;
+    case MELODY_PREVIEW:
+      drawMelodyPreview(previewMelodyIndex); break;
+    case ALARM_RINGING: drawBellRinging(display); break;
+  }
+
   delay(50);
 }

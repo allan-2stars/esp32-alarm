@@ -117,7 +117,6 @@ void handleButtons() {
         getMelodyTempo(previewMelodyIndex),
         BUZZER_PIN);
     }
-
     lastInteractionTime = now;
   }
 
@@ -145,6 +144,10 @@ void handleButtons() {
       uiState = ALARM_CONFIG;
       selectedField = ALARM_MELODY;
       drawAlarmConfig();
+    }else if (uiState == ALARM_RINGING) {
+      alarmActive = false;
+      stopMelody();
+      uiState = IDLE_SCREEN;  // or go back to previous state
     }
 
     lastInteractionTime = now;
@@ -155,16 +158,7 @@ void handleButtons() {
     uiState = IDLE_SCREEN;
   }
 
-  // Update display
-  switch (uiState) {
-    case IDLE_SCREEN: drawIdleScreen(); break;
-    case ALARM_OVERVIEW: drawAlarmOverview(); break;
-    case ALARM_CONFIG: drawAlarmConfig(); break;
-    case MELODY_PREVIEW:
-      Serial.println("case switch index:");
-      Serial.println(previewMelodyIndex);
-      drawMelodyPreview(previewMelodyIndex); break;
-  }
+
 }
 
 
