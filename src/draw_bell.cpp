@@ -37,8 +37,8 @@ void drawBellRinging(Adafruit_SSD1306 &display) {
 
   // Draw "Snooze" prompt
   display.setTextColor(TEXT_COLOR);
-  display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT - 10);
-  display.print("Press to Snooze");
+  display.setCursor((SCREEN_WIDTH - 90) / 2, SCREEN_HEIGHT - 10);
+  display.print("Mod:Abort, Cmf:OK");
 
   display.display();
 }

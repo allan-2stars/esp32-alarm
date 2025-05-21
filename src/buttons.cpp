@@ -6,6 +6,7 @@
 #include "melodies.h"
 #include "utils.h"
 #include "config.h"
+#include "globals.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -19,10 +20,11 @@ unsigned long lastAdjustPress = 0;
 unsigned long lastConfirmPress = 0;
 unsigned long modeButtonPressTime = 0;
 unsigned long lastInteractionTime = 0;
-int previewMelodyIndex = 0;
+//int previewMelodyIndex = 0;
 
 int lastTriggerMinute = -1;
 bool alarmActive = false;
+unsigned int snoozeDurationSec = 600;  // 10 minutes snooze time
 
 void handleButtons() {
   unsigned long now = millis();
@@ -53,9 +55,17 @@ void handleButtons() {
       uiState = ALARM_CONFIG;
       selectedField = ALARM_MELODY;
       drawAlarmConfig();
-    } else {
+    } else if (uiState == ALARM_RINGING) {
+      alarmActive = false;
+      stopMelody();
+      lastSnoozed = true;
+      snoozeUntil = time(nullptr) + snoozeDurationSec;
+      uiState = ALARM_SNOOZE_MESSAGE;
+      messageDisplayStart = millis();
+    }else {
       uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
     }
+
 
     lastInteractionTime = now;
     modeButtonPressTime = 0;
@@ -117,6 +127,15 @@ void handleButtons() {
         getMelodyTempo(previewMelodyIndex),
         BUZZER_PIN);
     }
+    else if (uiState == ALARM_RINGING) {
+      alarmActive = false;
+      stopMelody();
+      lastSnoozed = true;
+      snoozeUntil = time(nullptr) + snoozeDurationSec;
+      uiState = ALARM_SNOOZE_MESSAGE;
+      messageDisplayStart = millis();
+    }
+
     lastInteractionTime = now;
   }
 
@@ -147,8 +166,12 @@ void handleButtons() {
     }else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
-      uiState = IDLE_SCREEN;  // or go back to previous state
+      lastSnoozed = false;
+      uiState = ALARM_SNOOZE_MESSAGE;
+      messageDisplayStart = millis();
+
     }
+
 
     lastInteractionTime = now;
   }
