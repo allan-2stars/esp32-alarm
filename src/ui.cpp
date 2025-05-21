@@ -13,6 +13,7 @@ extern int selectedAlarmIndex;
 extern AlarmField selectedField;
 extern int currentRepeatDayIndex;
 extern UIState uiState;
+extern bool lastSnoozed;
 
 int scrollOffset = 0;
 const int visibleMelodyCount = 4;
@@ -174,3 +175,14 @@ void drawMelodyPreview(int selectedIndex) {
   display.display();
 }
 
+void drawSnoozeMessage(bool wasSnoozed) {
+  display.clearDisplay();
+
+  display.setTextSize(1);
+  display.setTextColor(TEXT_COLOR);
+  display.setCursor((SCREEN_WIDTH - 100) / 2, (SCREEN_HEIGHT / 2) - 4);
+  display.print(wasSnoozed ? "Snooze for 10 mins" : "Alarm STOPPED");
+
+  display.display();
+  delay(3000);
+}

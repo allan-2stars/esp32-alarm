@@ -5,20 +5,25 @@
 #include "melody_engine.h"
 #include "utils.h"
 #include "config.h"
+#include "draw_bell.h"
+#include "globals.h"
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
+//####
+UIState uiState = IDLE_SCREEN;
 Alarm alarms[3];
 Alarm tempAlarm;
-
 int selectedAlarmIndex = 0;
 AlarmField selectedField = ALARM_TYPE;
 int currentRepeatDayIndex = 0;
-
-UIState uiState = IDLE_SCREEN;
+int previewMelodyIndex = 0;
+bool lastSnoozed = false;
+unsigned long messageDisplayStart = 0;
+time_t snoozeUntil = 0;
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+//####
 
 void setup() {
   Serial.begin(115200);
@@ -82,5 +87,24 @@ void loop() {
   handleButtons();          // input + screen update
   checkAndTriggerAlarms();  // time match + melody
   updateMelodyPlayback();
+
+  // if (uiState == ALARM_SNOOZE_MESSAGE && millis() - messageDisplayStart > 3000) {
+  //   uiState = IDLE_SCREEN;
+  // }
+
+    // Update display
+  switch (uiState) {
+    case IDLE_SCREEN: drawIdleScreen(); break;
+    case ALARM_OVERVIEW: drawAlarmOverview(); break;
+    case ALARM_CONFIG: drawAlarmConfig(); break;
+    case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
+    case ALARM_RINGING: drawBellRinging(display); break;
+    // if lastSnoozed is true, then show snooze message, otherwise, show stop message.
+    case ALARM_SNOOZE_MESSAGE: {
+      drawSnoozeMessage(lastSnoozed); 
+      uiState = IDLE_SCREEN;break;
+    }
+  }
+
   delay(50);
 }
