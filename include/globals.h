@@ -28,5 +28,8 @@ extern Adafruit_SSD1306 display;
 // Snooze timeout
 extern unsigned int snoozeDurationSec;
 
+// store and display the actual message
+extern String errorMessage;
+
 
 #endif

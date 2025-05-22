@@ -25,7 +25,7 @@ enum AlarmField {
 
 struct Alarm {
   bool enabled;
-  uint16_t version = DEFAULT_ALARM_VERSION;
+  uint16_t version = SCREEN_ALARM_VERSION;
   AlarmType type;
   int hour, minute, year, month, day;
   bool repeatDays[7];

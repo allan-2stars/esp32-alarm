@@ -7,6 +7,7 @@
 #define OLED_RESET -1
 #define SDA_PIN 16
 #define SCL_PIN 17
+#define RESET_BUTTON_PIN 32
 
 #define DHTPIN 14
 #define DHTTYPE DHT22
@@ -22,6 +23,8 @@
 
 #define MAX_SCREEN_ALARMS 3
 #define MAX_TOTAL_ALARMS 10
-#define DEFAULT_ALARM_VERSION 0xA1A1
+#define SCREEN_ALARM_VERSION 0xA1A1
+#define WEB_ALARM_VERSION    0xB2B2
+
 
 #endif

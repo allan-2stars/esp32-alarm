@@ -157,7 +157,7 @@ void handleButtons() {
         tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
       }else {
         alarms[selectedAlarmIndex] = tempAlarm;
-        alarms[selectedAlarmIndex].version = DEFAULT_ALARM_VERSION;
+        alarms[selectedAlarmIndex].version = SCREEN_ALARM_VERSION;
         saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
         uiState = IDLE_SCREEN;
       }
