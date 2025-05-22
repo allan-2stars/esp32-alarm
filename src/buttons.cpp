@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "config.h"
 #include "globals.h"
+#include "alarm_storage.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -156,6 +157,8 @@ void handleButtons() {
         tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
       }else {
         alarms[selectedAlarmIndex] = tempAlarm;
+        alarms[selectedAlarmIndex].version = DEFAULT_ALARM_VERSION;
+        saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
         uiState = IDLE_SCREEN;
       }
     } else if (uiState == MELODY_PREVIEW) {

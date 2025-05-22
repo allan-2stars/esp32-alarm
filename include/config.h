@@ -20,6 +20,8 @@
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
 
-
+#define MAX_SCREEN_ALARMS 3
+#define MAX_TOTAL_ALARMS 10
+#define DEFAULT_ALARM_VERSION 0xA1A1
 
 #endif

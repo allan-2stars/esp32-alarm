@@ -7,6 +7,7 @@
 #include "config.h"
 #include "draw_bell.h"
 #include "globals.h"
+#include "alarm_storage.h"
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -67,14 +68,13 @@ void setup() {
   } else {
     Serial.println("NTP timeout — using fallback time.");
   }
-
-  // while (!getLocalTime(&timeinfo) || timeinfo.tm_year + 1900 < 2024) {
-  //   delay(200);
-  //   Serial.println("Waiting for time sync...");
-  // }
-  // Serial.println("Time synced!");
-
   // after NTP wait make sure alarm time is synced
+  // Alarms read from memory
+  for (int i = 0; i < MAX_SCREEN_ALARMS; i++) {
+    loadAlarm(alarms[i], i);
+  }
+
+  // Alarm fall back if reading from memory failed
   for (int i = 0; i < 3; i++) {
     alarms[i].enabled = false;
     alarms[i].type = ONE_TIME;
