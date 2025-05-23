@@ -17,7 +17,7 @@
 #define CONFIRM_BUTTON_PIN  4
 #define BUZZER_PIN          15
 
-#define UI_TIMEOUT_MS       60000  // 1 minute
+#define UI_TIMEOUT_MS  30000  // half minute
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
 
