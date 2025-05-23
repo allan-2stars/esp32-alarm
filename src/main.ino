@@ -7,6 +7,7 @@
 #include "config.h"
 #include "draw_bell.h"
 #include "globals.h"
+#include "led.h"
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -32,20 +33,18 @@ void setup() {
   pinMode(ADJUST_BUTTON_PIN, INPUT_PULLUP);
   pinMode(CONFIRM_BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
+  setupRGBLed();
   digitalWrite(BUZZER_PIN, LOW);
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
-  display.display();
 
   // Connect Wi-Fi
   WiFi.begin("Wokwi-GUEST", "", 6);
   while (WiFi.status() != WL_CONNECTED) {
+    setLedMode(LED_WIFI);  // make blinking work during Wi-Fi wait
     delay(100);
-    Serial.print(".");
   }
-  Serial.println(" WiFi connected");
-
   // Set timezone and NTP
   configTzTime("AEST-10AEDT,M10.1.0,M4.1.0/3", "pool.ntp.org");
 
@@ -80,19 +79,18 @@ void setup() {
     alarms[i].type = ONE_TIME;
     setAlarmToCurrentTime(alarms[i]);
   }
-
 }
 
 void loop() {
   handleButtons();          // input + screen update
   checkAndTriggerAlarms();  // time match + melody
   updateMelodyPlayback();
-
-  // if (uiState == ALARM_SNOOZE_MESSAGE && millis() - messageDisplayStart > 3000) {
-  //   uiState = IDLE_SCREEN;
-  // }
-
-    // Update display
+  if (isMelodyPlaying()) {
+    setLedMode(LED_MELODY);
+  }
+  else{
+    setLedMode(LED_OFF);
+  }
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;

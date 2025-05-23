@@ -20,6 +20,8 @@
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
 
-
+#define RED_PIN    18
+#define GREEN_PIN  19
+#define BLUE_PIN   23
 
 #endif
