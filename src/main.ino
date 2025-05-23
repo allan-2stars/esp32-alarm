@@ -9,11 +9,13 @@
 #include "globals.h"
 #include "alarm_storage.h"
 #include "led.h"
+#include "web_server.h"
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <nvs_flash.h>
 #include "Preferences.h"
+
 Preferences prefs;
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -111,6 +113,9 @@ void setup() {
     }
     alarms[i] = a;
   }
+
+  //After all above, start Web Server
+  startWebServer();
 }
 
 
