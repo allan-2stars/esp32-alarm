@@ -26,5 +26,8 @@
 #define SCREEN_ALARM_VERSION 0xA1A1
 #define WEB_ALARM_VERSION    0xB2B2
 
+#define RED_PIN    18
+#define GREEN_PIN  19
+#define BLUE_PIN   23
 
 #endif

@@ -8,6 +8,7 @@
 #include "draw_bell.h"
 #include "globals.h"
 #include "alarm_storage.h"
+#include "led.h"
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -36,6 +37,7 @@ void setup() {
   pinMode(CONFIRM_BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+  setupRGBLed();
   digitalWrite(BUZZER_PIN, LOW);
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -48,17 +50,16 @@ void setup() {
   unsigned long wifiStart = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - wifiStart < 6000) {
     delay(100);
+    setLedMode(LED_WIFI);  // make blinking work during Wi-Fi wait
     Serial.print(".");
   }
-
   if (WiFi.status() != WL_CONNECTED) {
     errorMessage = "Connection failed.\n Check your WiFi.";
     uiState = ERROR_SCREEN;
     return;
   }
   Serial.println("WiFi connected");
-
-  // Configure timezone and try to get time
+   // Configure timezone and try to get time
   configTzTime("AEST-10AEDT,M10.1.0,M4.1.0/3", "pool.ntp.org");
 
   struct tm timeinfo;
@@ -117,8 +118,14 @@ void loop() {
   handleButtons();          // input + screen update
   checkAndTriggerAlarms();  // time match + melody
   updateMelodyPlayback();
-
+  
   // Update display
+  if (isMelodyPlaying()) {
+    setLedMode(LED_MELODY);
+  }
+  else{
+    setLedMode(LED_OFF);
+  }
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;

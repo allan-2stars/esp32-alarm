@@ -6,6 +6,8 @@
 #include "config.h"
 #include "ui.h"
 #include "globals.h"
+#include "led.h"
+#include "melodies.h"
 
 
 // External variables (defined in main.cpp or shared)
@@ -42,7 +44,7 @@ void checkAndTriggerAlarms() {
     if (shouldTrigger) {
       alarmActive = true;
       lastTriggerMinute = timeinfo.tm_min;
-
+      // Melody start playing
       startMelodyPreview(
         getMelodyData(a.melody),
         getMelodyLength(a.melody),
