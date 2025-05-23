@@ -3,11 +3,12 @@
 #include "alarm.h"
 #include "icons.h"
 #include "config.h"
+#include "globals.h"
 #include "melody_engine.h"
 #include "melodies.h"
 
 extern Adafruit_SSD1306 display;
-extern Alarm alarms[3];
+extern Alarm alarms[MAX_SCREEN_ALARMS];
 extern Alarm tempAlarm;
 extern int selectedAlarmIndex;
 extern AlarmField selectedField;
@@ -75,7 +76,7 @@ void drawIdleScreen() {
 void drawAlarmOverview() {
   display.clearDisplay();
   display.setCursor(0, 0); display.print("Alarms");
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < MAX_SCREEN_ALARMS; i++) {
     int yPos = 12 + i * 16;
     display.setCursor(0, yPos);
     display.printf("%sA%d: %02d:%02d",
@@ -186,3 +187,24 @@ void drawSnoozeMessage(bool wasSnoozed) {
   display.display();
   delay(3000);
 }
+
+void drawErrorScreen() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(TEXT_COLOR);
+
+  int y = 10;
+  int start = 0;
+  while (start < errorMessage.length()) {
+    int nl = errorMessage.indexOf('\n', start);
+    if (nl == -1) nl = errorMessage.length();
+    String line = errorMessage.substring(start, nl);
+    display.setCursor(10, y);
+    display.println(line);
+    y += 8;
+    start = nl + 2;
+  }
+
+  display.display();
+}
+

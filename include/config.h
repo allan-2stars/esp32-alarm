@@ -7,6 +7,7 @@
 #define OLED_RESET -1
 #define SDA_PIN 16
 #define SCL_PIN 17
+#define RESET_BUTTON_PIN 32
 
 #define DHTPIN 14
 #define DHTTYPE DHT22
@@ -19,6 +20,11 @@
 #define UI_TIMEOUT_MS       60000  // 1 minute
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
+
+#define MAX_SCREEN_ALARMS 3
+#define MAX_TOTAL_ALARMS 10
+#define SCREEN_ALARM_VERSION 0xA1A1
+#define WEB_ALARM_VERSION    0xB2B2
 
 #define RED_PIN    18
 #define GREEN_PIN  19
