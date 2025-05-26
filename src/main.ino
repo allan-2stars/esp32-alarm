@@ -50,7 +50,7 @@ void setup() {
 
   initNTP();
   initAlarmStorage();
-  initFirebase();
+  //initFirebase();
 
 }
 
@@ -82,6 +82,6 @@ void loop() {
       break;
   }
 
-  getDataFromFirebase();
+  //getDataFromFirebase();
   delay(50);
 }

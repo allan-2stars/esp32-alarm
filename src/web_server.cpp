@@ -140,13 +140,13 @@ void processData(AsyncResult &aResult) {
 //
 void initFirebase() {
   // 🌐 Sync system time using NTP (required for Firebase SSL)
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
-  Serial.print("⏳ Waiting for NTP time sync");
-  while (time(nullptr) < 100000) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("\n✅ Time synced");
+  // configTime(0, 0, "pool.ntp.org", "time.nist.gov"); // need to modify the timezone
+  // Serial.print("⏳ Waiting for NTP time sync");
+  // while (time(nullptr) < 100000) {
+  //   Serial.print(".");
+  //   delay(500);
+  // }
+  // Serial.println("\n✅ Time synced");
 
   // 💡 Setup LED PWM
   ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
