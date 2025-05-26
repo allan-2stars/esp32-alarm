@@ -27,6 +27,22 @@ int lastTriggerMinute = -1;
 bool alarmActive = false;
 unsigned int snoozeDurationSec = 600;  // 10 minutes snooze time
 
+// Initiliase Buttons on main.ino setup()
+void initButtons() {
+  pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(ADJUST_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(CONFIRM_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+}
+
+void resetESP32() {
+  // This is the Test button, will be removed for real project.
+  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+    delay(50);  // simple debounce
+    ESP.restart();
+  }
+}
+
 void handleButtons() {
   unsigned long now = millis();
 

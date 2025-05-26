@@ -1,6 +1,12 @@
 #include <time.h>
 #include "utils.h"
 #include "config.h"
+#include "led.h"
+#include "ui.h"
+#include <WiFi.h>
+#include <WiFiManager.h>
+
+String errorMessage = "";
 
 int getCurrentYear() {
   struct tm timeinfo;
@@ -33,10 +39,74 @@ void setAlarmToCurrentTime(Alarm &a) {
     a.month = timeinfo.tm_mon + 1;
     a.day = timeinfo.tm_mday;
   } else {
+    // Fallback default time if NTP fails
     a.hour = 9;
     a.minute = 9;
     a.year = 2020;
     a.month = 9;
     a.day = 9;
   }
+
+  // Unified default alarm settings
+  a.enabled = false;
+  a.type = ONE_TIME;
+  a.melody = 0;
+  a.version = SCREEN_ALARM_VERSION;  // Assign current version
+}
+
+
+String getFormattedTime() { 
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) return "Time Err";
+  char buf[9];  // Enough space for "HH:MM:SS"
+  strftime(buf, sizeof(buf), "%H:%M:%S", &timeinfo); 
+  return String(buf);
+}
+
+
+String getFormattedDate() {
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) return "Date Err";
+  char buf[20]; strftime(buf, sizeof(buf), "%a %Y-%m-%d", &timeinfo);
+  return String(buf);
+}
+
+bool connectWifi() {
+  Serial.println("🔌 Starting Wi-Fi connection...");
+
+  WiFiManager wm;
+
+  // Optional: reset settings if needed for debugging
+  // wm.resetSettings();
+
+  // Auto-connect or open config portal
+  // For Wokwi Wifi 
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  if (!wm.autoConnect("ESP32_Config", "config123")) {
+    Serial.println("⚠️ AutoConnect failed. Starting config portal...");
+    wm.startConfigPortal("ESP32_Config", "config123");
+  }
+
+  // Wait for Wi-Fi to connect (with timeout)
+  unsigned long startAttemptTime = millis();
+  const unsigned long timeout = 6000;
+
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+    delay(100);
+    Serial.print(".");
+    setLedMode(LED_WIFI);  // blink LED while waiting
+  }
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("\n❌ Wi-Fi connection failed.");
+    errorMessage = "Connection failed.\nCheck your WiFi.";
+    uiState = ERROR_SCREEN;
+    return false;
+  }
+
+  Serial.println("\n✅ Wi-Fi connected!");
+  Serial.print("📶 IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  return true;
 }
