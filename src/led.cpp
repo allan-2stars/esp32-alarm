@@ -1,4 +1,3 @@
-
 #include "led.h"
 #include "config.h"
 
@@ -7,6 +6,23 @@ static bool ledOn = false;
 static unsigned long blinkInterval = 500;
 static uint8_t blinkR = 0, blinkG = 0, blinkB = 0;
 static LedMode currentMode = LED_OFF;
+
+
+// LED PWM setup
+void initRGBLed() {
+  ledcSetup(CHANNEL_RED, 5000, 8);   // 5kHz, 8-bit
+  ledcSetup(CHANNEL_GREEN, 5000, 8);
+  ledcSetup(CHANNEL_BLUE, 5000, 8);
+
+  ledcAttachPin(RED_PIN, CHANNEL_RED);
+  ledcAttachPin(GREEN_PIN, CHANNEL_GREEN);
+  ledcAttachPin(BLUE_PIN, CHANNEL_BLUE);
+
+  // Turn off initially
+  ledcWrite(CHANNEL_RED, 100);
+  ledcWrite(CHANNEL_GREEN, 180);
+  ledcWrite(CHANNEL_BLUE, 60);
+}
 
 void setLedMode(LedMode mode) {
   if (mode != currentMode) {
@@ -27,14 +43,6 @@ void initLED() {
 }
 
 
-void setupRGBLed() {
-  pinMode(RED_PIN, OUTPUT);
-  pinMode(GREEN_PIN, OUTPUT);
-  pinMode(BLUE_PIN, OUTPUT);
-  digitalWrite(RED_PIN, LOW);
-  digitalWrite(GREEN_PIN, LOW);
-  digitalWrite(BLUE_PIN, LOW);
-}
 
 void setLedColor(uint8_t r, uint8_t g, uint8_t b) {
   analogWrite(RED_PIN, r);

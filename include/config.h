@@ -46,6 +46,10 @@
 #define PWM_FREQ 5000
 #define PWM_RESOLUTION 8
 
+#define CHANNEL_RED    0
+#define CHANNEL_GREEN  1
+#define CHANNEL_BLUE   2
+
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 #include <FirebaseClient.h>

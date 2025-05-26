@@ -41,14 +41,8 @@
       "left": -113.4,
       "attrs": { "volume": "0.1" }
     },
-    { "type": "wokwi-rgb-led", "id": "rgb1", "top": -207.2, "left": 135.5, "attrs": {} },
-    {
-      "type": "wokwi-pushbutton-6mm",
-      "id": "btn4",
-      "top": 17,
-      "left": 182.4,
-      "attrs": { "color": "green", "xray": "1" }
-    }
+    { "type": "wokwi-rgb-led", "id": "rgb1", "top": -207.2, "left": 135.5,   
+      "attrs": {"common": "cathode"} }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -82,9 +76,7 @@
     [ "rgb1:G", "bb1:8t.a", "green", [ "v0" ] ],
     [ "rgb1:B", "bb1:9t.a", "green", [ "v0" ] ],
     [ "bb1:6t.c", "esp:18", "red", [ "v249.6" ] ],
-    [ "bb1:7t.c", "esp:19", "green", [ "v0" ] ],
-    [ "esp:32", "btn4:2.l", "violet", [ "h-38.25", "v-86.8" ] ],
-    [ "btn4:1.r", "bb1:2b.i", "black", [ "v-19.2", "h-114.4" ] ]
+    [ "bb1:8t.e", "esp:19", "green", [ "v220.8" ] ]
   ],
   "dependencies": {}
 }

@@ -13,6 +13,7 @@
 #include "secrets.h"
 #include "sensor.h"
 #include "alarm_storage.h"
+#include "animations.h"
 //#include <Adafruit_GFX.h>
 
 
@@ -38,7 +39,7 @@ void setup() {
   initBuzzer();
   //
   initLED();
-  // check if sensor is ready.
+  initRGBLed();
   initAHT10();
   //
   initDisplay(display);
@@ -59,6 +60,7 @@ void loop() {
   checkAndTriggerAlarms();  // time match + melody
   updateMelodyPlayback();
   resetESP32(); // only trigger by press the reset button.
+  updateAnimations();
   
   // Update display
   if (isMelodyPlaying()) {
