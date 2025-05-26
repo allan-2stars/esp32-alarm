@@ -7,17 +7,28 @@
 #define OLED_RESET -1
 #define SDA_PIN 16
 #define SCL_PIN 17
-#define RESET_BUTTON_PIN 32
 
-#define DHTPIN 14
-#define DHTTYPE DHT22
+//
+// ####### Config For Wokwi / Real ESP32 #######
+//
+//#define RESET_BUTTON_PIN 14   // Real ESP32
+#define RESET_BUTTON_PIN 32  // Wokwi
+#define DHTPIN 14 // Wokwi
+#define DHTTYPE DHT22 // Wokwi
+#define WIFI_SSID  "Wokwi-GUEST" // Wokwi
+#define WIFI_PASSWORD ""  //Wokwi
+#define DHTPIN 14   //Wokwi
+#define DHTTYPE DHT22   //Wokwi
+/// ###############################
+//
 
 #define MODE_BUTTON_PIN     33
 #define ADJUST_BUTTON_PIN   5
 #define CONFIRM_BUTTON_PIN  4
-#define BUZZER_PIN          15
+#define BUZZER_PIN          22
 
 #define UI_TIMEOUT_MS  30000  // half minute
+#define CHECK_INTERVAL 5000 //check connection timeout
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
 
@@ -29,5 +40,40 @@
 #define RED_PIN    18
 #define GREEN_PIN  19
 #define BLUE_PIN   23
+
+#define LED_PIN 12
+#define PWM_CHANNEL 0
+#define PWM_FREQ 5000
+#define PWM_RESOLUTION 8
+
+#define ENABLE_USER_AUTH
+#define ENABLE_DATABASE
+#include <FirebaseClient.h>
+
+// in case you need them below for Firebase
+// ENABLE_DATABASE // For RTDB compilation
+// ENABLE_FIRESTORE // For Firestore compilation
+// ENABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
+// ENABLE_MESSAGING // For Firebase Cloud Messaging compilation
+// ENABLE_STORAGE // For Firebase Storage compilation
+// ENABLE_CLOUD_STORAGE // For Google Cloud Storage compilation
+// ENABLE_FUNCTIONS // For Google Cloud Functions compilation
+// ENABLE_RULESETS // For RuleSets compilation
+// ENABLE_PSRAM // For enabling PSRAM support
+// ENABLE_OTA // For enabling OTA updates support
+// ENABLE_FS // For enabling Flash filesystem support
+
+// FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit (number).
+// FIREBASE_PRINTF_PORT // For Firebase.printf debug port class object.
+// FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size.
+
+// // For enabling authentication and token
+// ENABLE_SERVICE_AUTH
+// ENABLE_CUSTOM_AUTH
+// ENABLE_USER_AUTH
+// ENABLE_ACCESS_TOKEN
+// ENABLE_CUSTOM_TOKEN
+// ENABLE_ID_TOKEN
+// ENABLE_LEGACY_TOKEN
 
 #endif

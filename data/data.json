@@ -1,0 +1,9 @@
+{
+  "led": {
+    "on": true,
+    "brightness": 0.7
+  },
+  "message":{
+    "Hello World!"
+  }
+}

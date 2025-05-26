@@ -6,6 +6,9 @@
 #include "globals.h"
 #include "melody_engine.h"
 #include "melodies.h"
+#include "utils.h"
+#include "sensor.h"
+#include <time.h>
 
 extern Adafruit_SSD1306 display;
 extern Alarm alarms[MAX_SCREEN_ALARMS];
@@ -24,53 +27,91 @@ const char* melodyNames[MELODY_COUNT] = {
 };
 const char* weekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
-#include <time.h>
+String lastTimeShown = "";
+float lastTempShown = -1000;   // impossible value to force first update
+float lastHumShown = -1000;
 
-String getFormattedTime() {
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) return "Time Err";
-  char buf[6]; strftime(buf, sizeof(buf), "%H:%M", &timeinfo);
-  return String(buf);
+
+void initDisplay(Adafruit_SSD1306 &display) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("❌ SSD1306 allocation failed");
+    while (true) delay(10);
+  }
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(TEXT_COLOR);
+  display.display();
 }
 
-String getFormattedDate() {
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) return "Date Err";
-  char buf[20]; strftime(buf, sizeof(buf), "%a %Y-%m-%d", &timeinfo);
-  return String(buf);
-}
 
 
 void drawIdleScreen() {
+  String currentTime = getFormattedTime();  // HH:MM:SS
+  String currentDate = getFormattedDate();
+
+
+  // get temp & hum value
+  float temp = getTemperature();
+  float hum = getHumidity();
+
+  bool shouldUpdate = false;
+  display.setTextColor(TEXT_COLOR);
+
+  // Detect time change
+  if (currentTime != lastTimeShown) {
+    lastTimeShown = currentTime;
+    shouldUpdate = true;
+  }
+
+  if (abs(temp - lastTempShown) > 0.1 || abs(hum - lastHumShown) > 0.1) {
+    lastTempShown = temp;
+    lastHumShown = hum;
+    shouldUpdate = true;
+    //
+    display.fillRect(0, HEADER_HEIGHT + 22, SCREEN_WIDTH, 10, SSD1306_BLACK);  // clear only sensor area
+    display.setTextSize(1);
+    display.setCursor(0, HEADER_HEIGHT + 22);
+    display.printf("T:%s H:%s",
+    isnan(lastTempShown) ? "--" : String(lastTempShown, 1).c_str(),
+    isnan(lastHumShown) ? "--" : String(lastHumShown, 1).c_str()
+    );
+    //display.printf("T:%.1fC H:%.1f%%", lastTempShown, lastHumShown);
+  }
+
+  if (!shouldUpdate) return;  // no need to update screen
+
+  // If we reached here, something changed
   display.clearDisplay();
   display.setTextColor(TEXT_COLOR);
-  display.setTextSize(2);
-  display.setCursor(0, HEADER_HEIGHT); 
-  display.print(getFormattedTime());
-
-  display.setTextSize(1);
-  display.setCursor(0, HEADER_HEIGHT + 22);
-  display.printf("T:%.1fC H:%.1f%%", 24.0, 50.0); // Placeholder for actual sensor values
-
-  // display.setCursor(0, HEADER_HEIGHT + 22);
-  // bool enabled = false;
-
-  display.setCursor(0, HEADER_HEIGHT + 32);
-  bool enabled = false;
-  for (int i = 0; i < 3; i++) if (alarms[i].enabled) enabled = true;
-  display.print(enabled ? "Alarm ON" : "Alarm OFF");
-
-  display.setCursor(0, SCREEN_HEIGHT - 12);  // Date line
-  display.print(getFormattedDate());
-
-  display.setCursor(0, 52);
-  display.print(getFormattedDate());
 
   // Draw icons
-  drawWifiIcon(display, 0, 0);             // top-left
+  drawWifiIcon(display, 0, 0);  // top-left
   drawBtIcon(display, SCREEN_WIDTH - 10, 0);  // top-right
 
-  display.display();
+  // Time (always shown if updated)
+  display.setTextSize(2);
+  display.setCursor(0, HEADER_HEIGHT);
+  display.print(currentTime);
+
+  // Temp + Humidity
+  display.setTextSize(1);
+  display.setCursor(0, HEADER_HEIGHT + 22);
+  display.printf("T:%s H:%s",
+    isnan(lastTempShown) ? "--" : String(lastTempShown, 1).c_str(),
+    isnan(lastHumShown) ? "--" : String(lastHumShown, 1).c_str()
+  );
+
+  // Alarm status
+  bool enabled = false;
+  for (int i = 0; i < 3; i++) if (alarms[i].enabled) enabled = true;
+  display.setCursor(0, HEADER_HEIGHT + 32);
+  display.print(enabled ? "Alarm ON" : "Alarm OFF");
+
+  // Date
+  display.setCursor(0, SCREEN_HEIGHT - 12);
+  display.print(currentDate);
+
+  display.display();  // push to screen
 }
 
 void drawAlarmOverview() {

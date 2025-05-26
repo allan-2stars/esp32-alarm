@@ -4,10 +4,14 @@
 #include <time.h>
 #include <Adafruit_SSD1306.h>
 #include "alarm.h"
+#include "ui.h"
+#include <Preferences.h>
+#include <WiFiClientSecure.h>
+#include <FirebaseClient.h>
 
 // Shared system state
 extern UIState uiState;
-extern Alarm alarms[3];
+extern Alarm alarms[MAX_SCREEN_ALARMS];
 extern Alarm tempAlarm;
 extern int selectedAlarmIndex;
 extern AlarmField selectedField;
@@ -31,5 +35,16 @@ extern unsigned int snoozeDurationSec;
 // store and display the actual message
 extern String errorMessage;
 
+// store alarms in memory
+extern Preferences prefs;
+
+// Firebase
+// Declare external shared objects (defined in main.ino or globals.cpp)
+extern WiFiClientSecure ssl_client;
+extern AsyncClientClass aClient;
+extern FirebaseApp app;
+extern RealtimeDatabase Database;
+extern UserAuth user_auth;
+extern unsigned long lastDataCheck;
 
 #endif

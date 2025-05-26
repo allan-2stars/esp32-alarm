@@ -20,6 +20,13 @@ void setLedMode(LedMode mode) {
   }
 }
 
+void initLED() {
+  ledcSetup(0, 5000, 8);       // channel 0, 5kHz, 8-bit resolution
+  ledcAttachPin(LED_PIN, 0);   // LED_PIN from config
+  ledcWrite(0, 0);             // Start off
+}
+
+
 void setupRGBLed() {
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);

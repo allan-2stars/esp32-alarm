@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "alarm.h"
+//#include "alarm.h"
 
 enum UIState {
   IDLE_SCREEN,
@@ -10,7 +10,8 @@ enum UIState {
   MELODY_PREVIEW,
   ALARM_RINGING,
   ALARM_SNOOZE_MESSAGE,
-  ERROR_SCREEN, // New Error Screen
+  ERROR_SCREEN,
+  MESSAGE_DISPLAY, // New Message display screen
 };
 
 extern UIState uiState;
@@ -21,5 +22,9 @@ void drawAlarmConfig();
 void drawMelodyPreview(int selectedIndex);
 void drawSnoozeMessage(bool wasSnoozed);
 void drawErrorScreen();
+#pragma once
+#include <Adafruit_SSD1306.h>
+void initNTP();
+void initDisplay(Adafruit_SSD1306 &display);
 
 #endif

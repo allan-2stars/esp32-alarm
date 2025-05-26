@@ -16,5 +16,6 @@ void setupRGBLed();
 void setLedColor(uint8_t r, uint8_t g, uint8_t b);
 void blinkLed(uint8_t r, uint8_t g, uint8_t b, unsigned long intervalMs);
 void updateLed();
+void initLED();
 
 #endif
