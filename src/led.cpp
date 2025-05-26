@@ -19,9 +19,9 @@ void initRGBLed() {
   ledcAttachPin(BLUE_PIN, CHANNEL_BLUE);
 
   // Turn off initially
-  ledcWrite(CHANNEL_RED, 100);
-  ledcWrite(CHANNEL_GREEN, 180);
-  ledcWrite(CHANNEL_BLUE, 60);
+  ledcWrite(CHANNEL_RED, 0);
+  ledcWrite(CHANNEL_GREEN, 0);
+  ledcWrite(CHANNEL_BLUE, 0);
 }
 
 void setLedMode(LedMode mode) {

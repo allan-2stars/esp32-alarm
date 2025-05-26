@@ -8,7 +8,6 @@
 #include "melodies.h"
 #include "utils.h"
 #include "sensor.h"
-#include "led.h"
 #include <time.h>
 
 extern Adafruit_SSD1306 display;
@@ -102,10 +101,7 @@ void drawIdleScreen() {
   // Animate Sun or Moon (top-right)
   struct tm timeinfo;
   getLocalTime(&timeinfo);
-  int hour = timeinfo.tm_hour;
-  // Sync LED with moon fade
-  updateMoonLedFade(hour < 6 || hour >= 16);  // Only fade at 
-  
+  int hour = timeinfo.tm_hour;  
   if (hour >= 6 && hour < 18) {
     if (millis() - lastSunAnimTime > 200) {
       sunFrameIndex = (sunFrameIndex + 1) % 5;

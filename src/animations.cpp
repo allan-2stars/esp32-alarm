@@ -19,25 +19,25 @@ void updateAnimations() {
   bool isNight = (hour < 6 || hour >= 18);
 
   switch (uiState) {
-    case UIState::IDLE_SCREEN:
+    case IDLE_SCREEN:
       updateMoonLedFade(isNight);
       break;
 
-    case UIState::ALARM_RINGING:
+    case ALARM_RINGING:
       // TODO: Pulse RGB LED red or rainbow (alarm style)
       // updateAlarmLedPulse();
       break;
 
-    case UIState::MELODY_PREVIEW:
+    case MELODY_PREVIEW:
       // TODO: Flash LED or cycle colors with preview
       // updateMelodyLedEffect();
       break;
 
-    case UIState::ALARM_SNOOZE_MESSAGE:
-    case UIState::ALARM_OVERVIEW:
-    case UIState::ALARM_CONFIG:
-    case UIState::MESSAGE_DISPLAY:
-    case UIState::ERROR_SCREEN:
+    case ALARM_SNOOZE_MESSAGE:
+    case ALARM_OVERVIEW:
+    case ALARM_CONFIG:
+    case MESSAGE_DISPLAY:
+    case ERROR_SCREEN:
     default:
       // No LED animation during these states for now
       updateMoonLedFade(false);  // make sure moon LED is off

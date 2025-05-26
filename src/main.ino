@@ -63,12 +63,12 @@ void loop() {
   updateAnimations();
   
   // Update display
-  if (isMelodyPlaying()) {
-    setLedMode(LED_MELODY);
-  }
-  else{
-    setLedMode(LED_OFF);
-  }
+  // if (isMelodyPlaying()) {
+  //   setLedMode(LED_MELODY);
+  // }
+  // else{
+  //   setLedMode(LED_OFF);
+  // }
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
