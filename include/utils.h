@@ -11,5 +11,6 @@ String getFormattedTime();
 String getFormattedDate();
 
 bool connectWifi();
+int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems);    
 
 #endif
