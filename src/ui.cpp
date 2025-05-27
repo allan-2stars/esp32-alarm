@@ -48,16 +48,34 @@ int getSelectedFieldIndex(const std::vector<AlarmField> &visibleFields) {
   return 0;
 }
 
+// void initDisplay(Adafruit_SSD1306 &display) {
+//   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+//     Serial.println("❌ SSD1306 allocation failed");
+//     while (true) delay(10);
+//   }
+//   display.clearDisplay();
+//   display.setTextSize(1);
+//   display.setTextColor(TEXT_COLOR);
+//   display.display();
+// }
+
 void initDisplay(Adafruit_SSD1306 &display) {
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("❌ SSD1306 allocation failed");
     while (true) delay(10);
   }
+
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(TEXT_COLOR);
+  display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT / 2 - 8);
+  display.print("OLED Initialized");
+  display.display();
+  delay(1000);  // Show message briefly
+  display.clearDisplay();
   display.display();
 }
+
 
 void drawIdleScreen() {
   String currentTime = getFormattedTime();  // HH:MM:SS
@@ -180,8 +198,6 @@ void drawAlarmConfig() {
   visibleFields.push_back(ALARM_TIME_HOUR);
   if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
     visibleFields.push_back(ALARM_DATE_YEAR);
-    visibleFields.push_back(ALARM_DATE_MONTH);
-    visibleFields.push_back(ALARM_DATE_DAY);
   }
   if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) visibleFields.push_back(ALARM_REPEAT_DAYS);
   visibleFields.push_back(ALARM_ENABLED);
@@ -208,23 +224,20 @@ void drawAlarmConfig() {
         display.printf("%sType: %s", selectedField == ALARM_TYPE ? ">" : " ",
           a.type == ONE_TIME ? "Once" : a.type == SPECIFIC_DATE ? "Date" : "Repeat");
         break;
+
       case ALARM_TIME_HOUR:
         display.printf(" Time: %s%02d%s:%s%02d%s",
           selectedField == ALARM_TIME_HOUR ? "[" : "", a.hour, selectedField == ALARM_TIME_HOUR ? "]" : "",
           selectedField == ALARM_TIME_MIN ? "[" : "", a.minute, selectedField == ALARM_TIME_MIN ? "]" : "");
         break;
+
       case ALARM_DATE_YEAR:
-        display.printf(" Date: %s%04d%s-",
-          selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "");
-        break;
-      case ALARM_DATE_MONTH:
-        display.printf("%s%02d%s-",
-          selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "");
-        break;
-      case ALARM_DATE_DAY:
-        display.printf("%s%02d%s",
+        display.printf(" Date: %s%04d%s-%s%02d%s-%s%02d%s",
+          selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "",
+          selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "",
           selectedField == ALARM_DATE_DAY ? "[" : "", a.day, selectedField == ALARM_DATE_DAY ? "]" : "");
         break;
+
       case ALARM_REPEAT_DAYS: {
         display.printf("%sDays:", selectedField == ALARM_REPEAT_DAYS ? ">" : " ");
         drawLine++;
@@ -241,12 +254,15 @@ void drawAlarmConfig() {
         }
         break;
       }
+
       case ALARM_ENABLED:
         display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
         break;
+
       case ALARM_MELODY:
         display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
         break;
+
       default:
         break;
     }
@@ -257,6 +273,12 @@ void drawAlarmConfig() {
     display.clearDisplay();
     display.setCursor(0, SCREEN_HEIGHT - 20);
     display.print("Previewing...");
+  }
+
+  // Draw scroll indicator if there are more lines below
+  if (scrollOffset + maxVisibleLines < totalFields) {
+    display.setCursor(SCREEN_WIDTH - 6, SCREEN_HEIGHT - 8);
+    display.print("~");  // Down arrow indicator
   }
 
   display.display();
