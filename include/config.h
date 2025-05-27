@@ -50,6 +50,8 @@
 #define CHANNEL_GREEN  1
 #define CHANNEL_BLUE   2
 
+#define INACTIVITY_TIMEOUT 6000 //10 mins then timeout
+
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 #include <FirebaseClient.h>
