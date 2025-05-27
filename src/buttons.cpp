@@ -2,8 +2,12 @@
 #include "buttons.h"
 #include "alarm.h"
 #include "ui.h"
+#include "melody_engine.h"
 #include "melodies.h"
 #include "utils.h"
+#include "config.h"
+#include "globals.h"
+#include "alarm_storage.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -17,20 +21,44 @@ unsigned long lastAdjustPress = 0;
 unsigned long lastConfirmPress = 0;
 unsigned long modeButtonPressTime = 0;
 unsigned long lastInteractionTime = 0;
+//int previewMelodyIndex = 0;
 
 int lastTriggerMinute = -1;
 bool alarmActive = false;
+unsigned int snoozeDurationSec = 600;  // 10 minutes snooze time
+
+// Initiliase Buttons on main.ino setup()
+void initButtons() {
+  pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(ADJUST_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(CONFIRM_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+}
+
+void resetESP32() {
+  // This is the Test button, will be removed for real project.
+  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+    delay(50);  // simple debounce
+    ESP.restart();
+  }
+}
 
 void handleButtons() {
   unsigned long now = millis();
 
   // MODE button with short/long press support
+  //Checks if the button is currently being pressed (active LOW logic)
   bool modePressed = digitalRead(MODE_BUTTON_PIN) == LOW;
+  //Detects the moment the button is first pressed down
   if (modePressed && modeButtonPressTime == 0) {
+    //Starts a timer (using millis()) to track how long the button is held
     modeButtonPressTime = now;
   }
+  //Detects the moment the button is released
   if (!modePressed && modeButtonPressTime > 0) {
+    //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
+    stopMelody();
 
     if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS && duration > 1000) {
@@ -40,9 +68,21 @@ void handleButtons() {
           selectedField = (AlarmField)((selectedField + 1) % 10);
         } while (!isFieldVisible(tempAlarm.type, selectedField));
       }
-    } else {
+    } else if(uiState == MELODY_PREVIEW) {
+      uiState = ALARM_CONFIG;
+      selectedField = ALARM_MELODY;
+      drawAlarmConfig();
+    } else if (uiState == ALARM_RINGING) {
+      alarmActive = false;
+      stopMelody();
+      lastSnoozed = true;
+      snoozeUntil = time(nullptr) + snoozeDurationSec;
+      uiState = ALARM_SNOOZE_MESSAGE;
+      messageDisplayStart = millis();
+    }else {
       uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
     }
+
 
     lastInteractionTime = now;
     modeButtonPressTime = 0;
@@ -50,6 +90,7 @@ void handleButtons() {
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
+    //stopMelody();
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -80,15 +121,44 @@ void handleButtons() {
 
         case ALARM_REPEAT_DAYS: currentRepeatDayIndex = (currentRepeatDayIndex + 1) % 7; break;
         case ALARM_ENABLED: a.enabled = !a.enabled; break;
-        case ALARM_MELODY: a.melody = (a.melody + 1) % 6; break;
-        default: break;
+        case ALARM_MELODY:
+          uiState = MELODY_PREVIEW;
+            previewMelodyIndex = alarms[selectedAlarmIndex].melody;
+            // Start melody playback for first entry
+            startMelodyPreview(
+              getMelodyData(previewMelodyIndex),
+              getMelodyLength(previewMelodyIndex),
+              getMelodyTempo(previewMelodyIndex),
+              BUZZER_PIN);
+          lastAdjustPress = millis();  // avoid double-trigger
+          break;
       }
     }
+    else if (uiState == MELODY_PREVIEW) {
+      previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
+            Serial.println("else if index:");
+      Serial.println(previewMelodyIndex);
+      startMelodyPreview(
+        getMelodyData(previewMelodyIndex),
+        getMelodyLength(previewMelodyIndex),
+        getMelodyTempo(previewMelodyIndex),
+        BUZZER_PIN);
+    }
+    else if (uiState == ALARM_RINGING) {
+      alarmActive = false;
+      stopMelody();
+      lastSnoozed = true;
+      snoozeUntil = time(nullptr) + snoozeDurationSec;
+      uiState = ALARM_SNOOZE_MESSAGE;
+      messageDisplayStart = millis();
+    }
+
     lastInteractionTime = now;
   }
 
   // CONFIRM button
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
+    stopMelody();
     lastConfirmPress = now;
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
@@ -101,11 +171,27 @@ void handleButtons() {
     } else if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS) {
         tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
-      } else {
+      }else {
         alarms[selectedAlarmIndex] = tempAlarm;
+        alarms[selectedAlarmIndex].version = SCREEN_ALARM_VERSION;
+        saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
         uiState = IDLE_SCREEN;
       }
+    } else if (uiState == MELODY_PREVIEW) {
+      tempAlarm.melody = previewMelodyIndex;
+      uiState = ALARM_CONFIG;
+      selectedField = ALARM_MELODY;
+      drawAlarmConfig();
+    }else if (uiState == ALARM_RINGING) {
+      alarmActive = false;
+      stopMelody();
+      lastSnoozed = false;
+      uiState = ALARM_SNOOZE_MESSAGE;
+      messageDisplayStart = millis();
+
     }
+
+
     lastInteractionTime = now;
   }
 
@@ -114,10 +200,7 @@ void handleButtons() {
     uiState = IDLE_SCREEN;
   }
 
-  // Update display
-  switch (uiState) {
-    case IDLE_SCREEN: drawIdleScreen(); break;
-    case ALARM_OVERVIEW: drawAlarmOverview(); break;
-    case ALARM_CONFIG: drawAlarmConfig(); break;
-  }
+
 }
+
+

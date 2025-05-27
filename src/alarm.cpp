@@ -1,16 +1,20 @@
 #include <Arduino.h>
 #include <time.h>
-#include "melodies.h"
+#include "melody_engine.h"
 #include "alarm.h"
 #include "buttons.h"  // for BUZZER_PIN
-
-
+#include "config.h"
+#include "ui.h"
+#include "globals.h"
+#include "led.h"
+#include "melodies.h"
 
 
 // External variables (defined in main.cpp or shared)
 extern Alarm alarms[3];
 extern int lastTriggerMinute;
 extern bool alarmActive;
+extern int selectedAlarmIndex;
 
 void checkAndTriggerAlarms() {
   struct tm timeinfo;
@@ -36,13 +40,34 @@ void checkAndTriggerAlarms() {
       int weekday = timeinfo.tm_wday == 0 ? 6 : timeinfo.tm_wday - 1;
       if (a.repeatDays[weekday]) shouldTrigger = true;
     }
-
+    
     if (shouldTrigger) {
       alarmActive = true;
       lastTriggerMinute = timeinfo.tm_min;
-      playMelody(a.melody, BUZZER_PIN);
+      // Melody start playing
+      startMelodyPreview(
+        getMelodyData(a.melody),
+        getMelodyLength(a.melody),
+        getMelodyTempo(a.melody),
+        BUZZER_PIN
+      );
+      uiState = ALARM_RINGING;
       break;
     }
+  }
+  // Check if snooze is active and time reached
+  if (snoozeUntil > 0 && time(nullptr) >= snoozeUntil) {
+    snoozeUntil = 0;
+    alarmActive = true;
+    uiState = ALARM_RINGING;
+
+    // Optional: reuse previously snoozed alarm melody
+    startMelodyPreview(
+      getMelodyData(alarms[selectedAlarmIndex].melody),
+      getMelodyLength(alarms[selectedAlarmIndex].melody),
+      getMelodyTempo(alarms[selectedAlarmIndex].melody),
+      BUZZER_PIN
+    );
   }
 }
 
@@ -53,4 +78,3 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
     return false;
   return true;
 }
-

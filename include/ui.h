@@ -1,15 +1,30 @@
 #ifndef UI_H
 #define UI_H
 
-#include "alarm.h"
+//#include "alarm.h"
 
-#define UI_TIMEOUT_MS 60000
+enum UIState {
+  IDLE_SCREEN,
+  ALARM_OVERVIEW,
+  ALARM_CONFIG,
+  MELODY_PREVIEW,
+  ALARM_RINGING,
+  ALARM_SNOOZE_MESSAGE,
+  ERROR_SCREEN,
+  MESSAGE_DISPLAY, // New Message display screen
+};
 
-enum UIState { IDLE_SCREEN, ALARM_OVERVIEW, ALARM_CONFIG };
 extern UIState uiState;
 
 void drawIdleScreen();
 void drawAlarmOverview();
 void drawAlarmConfig();
+void drawMelodyPreview(int selectedIndex);
+void drawSnoozeMessage(bool wasSnoozed);
+void drawErrorScreen();
+#pragma once
+#include <Adafruit_SSD1306.h>
+void initNTP();
+void initDisplay(Adafruit_SSD1306 &display);
 
 #endif
