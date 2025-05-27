@@ -32,6 +32,15 @@ float lastTempShown = -1000;   // impossible value to force first update
 float lastHumShown = -1000;
 
 
+unsigned long lastWifiAnimTime = 0;
+int wifiAnimFrame = 0;
+
+unsigned long lastSunAnimTime = 0;
+int sunFrameIndex = 0;
+
+unsigned long lastMoonAnimTime = 0;
+bool moonVisible = true;
+
 void initDisplay(Adafruit_SSD1306 &display) {
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("❌ SSD1306 allocation failed");
@@ -43,14 +52,11 @@ void initDisplay(Adafruit_SSD1306 &display) {
   display.display();
 }
 
-
-
 void drawIdleScreen() {
   String currentTime = getFormattedTime();  // HH:MM:SS
   String currentDate = getFormattedDate();
 
-
-  // get temp & hum value
+  // Get temperature and humidity
   float temp = getTemperature();
   float hum = getHumidity();
 
@@ -63,30 +69,54 @@ void drawIdleScreen() {
     shouldUpdate = true;
   }
 
+  // Detect temp/hum changes
   if (abs(temp - lastTempShown) > 0.1 || abs(hum - lastHumShown) > 0.1) {
     lastTempShown = temp;
     lastHumShown = hum;
     shouldUpdate = true;
-    //
+
     display.fillRect(0, HEADER_HEIGHT + 22, SCREEN_WIDTH, 10, SSD1306_BLACK);  // clear only sensor area
     display.setTextSize(1);
     display.setCursor(0, HEADER_HEIGHT + 22);
     display.printf("T:%s H:%s",
-    isnan(lastTempShown) ? "--" : String(lastTempShown, 1).c_str(),
-    isnan(lastHumShown) ? "--" : String(lastHumShown, 1).c_str()
+      isnan(lastTempShown) ? "--" : String(lastTempShown, 1).c_str(),
+      isnan(lastHumShown) ? "--" : String(lastHumShown, 1).c_str()
     );
-    //display.printf("T:%.1fC H:%.1f%%", lastTempShown, lastHumShown);
   }
 
-  if (!shouldUpdate) return;  // no need to update screen
+  if (!shouldUpdate) return;
 
   // If we reached here, something changed
   display.clearDisplay();
   display.setTextColor(TEXT_COLOR);
 
-  // Draw icons
-  drawWifiIcon(display, 0, 0);  // top-left
-  drawBtIcon(display, SCREEN_WIDTH - 10, 0);  // top-right
+  // Animate Wi-Fi (top-left)
+  if (millis() - lastWifiAnimTime > 1000) {
+    wifiAnimFrame = (wifiAnimFrame + 1) % 3;
+    lastWifiAnimTime = millis();
+  }
+  const unsigned char* wifiFrames[] = {wifi_1, wifi_2, wifi_3};
+  display.drawBitmap(0, 0, wifiFrames[wifiAnimFrame], 8, 8, TEXT_COLOR);
+
+  // Animate Sun or Moon (top-right)
+  struct tm timeinfo;
+  getLocalTime(&timeinfo);
+  int hour = timeinfo.tm_hour;  
+  if (hour >= 6 && hour < 18) {
+    if (millis() - lastSunAnimTime > 200) {
+      sunFrameIndex = (sunFrameIndex + 1) % 5;
+      lastSunAnimTime = millis();
+    }
+    display.drawBitmap(SCREEN_WIDTH - 16, 0, sun_frames[sunFrameIndex], 16, 16, TEXT_COLOR);
+  } else {
+    if (millis() - lastMoonAnimTime > 500) {
+      moonVisible = !moonVisible;
+      lastMoonAnimTime = millis();
+    }
+    if (moonVisible) {
+      display.drawBitmap(SCREEN_WIDTH - 16, 0, moon_icon, 16, 16, TEXT_COLOR);
+    }
+  }
 
   // Time (always shown if updated)
   display.setTextSize(2);
