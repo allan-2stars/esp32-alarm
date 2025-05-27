@@ -110,3 +110,13 @@ bool connectWifi() {
 
   return true;
 }
+
+// if the list cannot be displayed in the screen, scroll down.
+int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems) {
+    if (selectedIndex < visibleStart) {
+        return selectedIndex;
+    } else if (selectedIndex >= visibleStart + maxVisible) {
+        return selectedIndex - maxVisible + 1;
+    }
+    return visibleStart;
+}

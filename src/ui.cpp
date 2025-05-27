@@ -41,6 +41,13 @@ int sunFrameIndex = 0;
 unsigned long lastMoonAnimTime = 0;
 bool moonVisible = true;
 
+int getSelectedFieldIndex(const std::vector<AlarmField> &visibleFields) {
+  for (size_t i = 0; i < visibleFields.size(); ++i) {
+    if (visibleFields[i] == selectedField) return i;
+  }
+  return 0;
+}
+
 void initDisplay(Adafruit_SSD1306 &display) {
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("❌ SSD1306 allocation failed");
@@ -165,61 +172,95 @@ void drawAlarmOverview() {
 }
 
 void drawAlarmConfig() {
-  //Alarm &a = alarms[selectedAlarmIndex];
   Alarm &a = tempAlarm;
   display.clearDisplay();
-  int y = 0;
-  display.setCursor(0, y); y += 10;
+
+  std::vector<AlarmField> visibleFields;
+  if (isFieldVisible(a.type, ALARM_TYPE)) visibleFields.push_back(ALARM_TYPE);
+  visibleFields.push_back(ALARM_TIME_HOUR);
+  if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
+    visibleFields.push_back(ALARM_DATE_YEAR);
+    visibleFields.push_back(ALARM_DATE_MONTH);
+    visibleFields.push_back(ALARM_DATE_DAY);
+  }
+  if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) visibleFields.push_back(ALARM_REPEAT_DAYS);
+  visibleFields.push_back(ALARM_ENABLED);
+  visibleFields.push_back(ALARM_MELODY);
+
+  int totalFields = visibleFields.size();
+  const int maxVisibleLines = SCREEN_HEIGHT / 10 - 2;
+
+  int selectedIndex = getSelectedFieldIndex(visibleFields);
+  scrollOffset = adjustVisibleStart(selectedIndex, scrollOffset, maxVisibleLines, totalFields);
+
+  display.setCursor(0, 0);
   display.printf("Config A%d", selectedAlarmIndex + 1);
 
-  if (isFieldVisible(a.type, ALARM_TYPE)) {
-    display.setCursor(0, y); y += 10;
-    display.printf("%sType: %s", selectedField == ALARM_TYPE ? ">" : " ", a.type == ONE_TIME ? "Once" : a.type == SPECIFIC_DATE ? "Date" : "Repeat");
-  }
+  int drawLine = 0;
+  for (int i = 0; i < totalFields; ++i) {
+    if (i < scrollOffset || i >= scrollOffset + maxVisibleLines) continue;
+    int y = 12 + drawLine * 10;
+    AlarmField field = visibleFields[i];
 
-  display.setCursor(0, y); y += 10;
-  display.printf(" Time: %s%02d%s:%s%02d%s",
-    selectedField == ALARM_TIME_HOUR ? "[" : "", a.hour, selectedField == ALARM_TIME_HOUR ? "]" : "",
-    selectedField == ALARM_TIME_MIN ? "[" : "", a.minute, selectedField == ALARM_TIME_MIN ? "]" : "");
-
-  if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
-    display.setCursor(0, y); y += 10;
-    display.printf(" Date: %s%04d%s-%s%02d%s-%s%02d%s",
-      selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "",
-      selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "",
-      selectedField == ALARM_DATE_DAY ? "[" : "", a.day, selectedField == ALARM_DATE_DAY ? "]" : "");
-  }
-
-  if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) {
-    display.setCursor(0, y); y += 10;
-    display.print(selectedField == ALARM_REPEAT_DAYS ? ">Days:" : " Days:");
-    display.setCursor(0, y); y += 10; // add a line to display 7 days
-
-    for (int i = 0; i < 7; i++) {
-      if (i == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("[");
-      display.print(weekDays[i][0]);
-      display.print(a.repeatDays[i] ? "*" : " ");
-      if (i == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("]");
-      display.print(" ");
+    display.setCursor(0, y);
+    switch (field) {
+      case ALARM_TYPE:
+        display.printf("%sType: %s", selectedField == ALARM_TYPE ? ">" : " ",
+          a.type == ONE_TIME ? "Once" : a.type == SPECIFIC_DATE ? "Date" : "Repeat");
+        break;
+      case ALARM_TIME_HOUR:
+        display.printf(" Time: %s%02d%s:%s%02d%s",
+          selectedField == ALARM_TIME_HOUR ? "[" : "", a.hour, selectedField == ALARM_TIME_HOUR ? "]" : "",
+          selectedField == ALARM_TIME_MIN ? "[" : "", a.minute, selectedField == ALARM_TIME_MIN ? "]" : "");
+        break;
+      case ALARM_DATE_YEAR:
+        display.printf(" Date: %s%04d%s-",
+          selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "");
+        break;
+      case ALARM_DATE_MONTH:
+        display.printf("%s%02d%s-",
+          selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "");
+        break;
+      case ALARM_DATE_DAY:
+        display.printf("%s%02d%s",
+          selectedField == ALARM_DATE_DAY ? "[" : "", a.day, selectedField == ALARM_DATE_DAY ? "]" : "");
+        break;
+      case ALARM_REPEAT_DAYS: {
+        display.printf("%sDays:", selectedField == ALARM_REPEAT_DAYS ? ">" : " ");
+        drawLine++;
+        y = 12 + drawLine * 10;
+        if (y < SCREEN_HEIGHT - 8) {
+          display.setCursor(0, y);
+          for (int j = 0; j < 7; j++) {
+            if (j == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("[");
+            display.print(weekDays[j][0]);
+            display.print(a.repeatDays[j] ? "*" : " ");
+            if (j == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("]");
+            display.print(" ");
+          }
+        }
+        break;
+      }
+      case ALARM_ENABLED:
+        display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
+        break;
+      case ALARM_MELODY:
+        display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
+        break;
+      default:
+        break;
     }
+    drawLine++;
   }
-
-  display.setCursor(0, y); y += 10;
-  display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
-
-  display.setCursor(0, y);
-  display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
 
   if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
     display.clearDisplay();
     display.setCursor(0, SCREEN_HEIGHT - 20);
-    display.setTextColor(TEXT_COLOR);
     display.print("Previewing...");
   }
-  
+
   display.display();
 }
-
 
 void drawMelodyPreview(int selectedIndex) {
   const int melodyCount = MELODY_COUNT;
