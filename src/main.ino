@@ -85,5 +85,6 @@ void loop() {
   }
 
   //getDataFromFirebase();
-  delay(50);
+  checkIdleAndSleep();  // ✅ Inserted here to handle idle timeout + sleep
+  delay(50); // Small delay to prevent CPU overload
 }

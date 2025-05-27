@@ -7,6 +7,7 @@
 #include <WiFiManager.h>
 
 String errorMessage = "";
+unsigned long lastInteraction = 0;
 
 int getCurrentYear() {
   struct tm timeinfo;
@@ -119,4 +120,8 @@ int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int 
         return selectedIndex - maxVisible + 1;
     }
     return visibleStart;
+}
+
+void recordInteraction() {
+  lastInteraction = millis();
 }

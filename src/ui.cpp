@@ -41,9 +41,6 @@ int sunFrameIndex = 0;
 unsigned long lastMoonAnimTime = 0;
 bool moonVisible = true;
 
-
-unsigned long lastInteraction = 0;
-
 int getSelectedFieldIndex(const std::vector<AlarmField> &visibleFields) {
   for (size_t i = 0; i < visibleFields.size(); ++i) {
     if (visibleFields[i] == selectedField) return i;

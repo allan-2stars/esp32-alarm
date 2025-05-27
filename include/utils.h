@@ -11,6 +11,9 @@ String getFormattedTime();
 String getFormattedDate();
 
 bool connectWifi();
-int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems);    
+int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems);
+
+extern unsigned long lastInteraction;
+void recordInteraction();
 
 #endif
