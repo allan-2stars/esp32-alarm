@@ -25,6 +25,8 @@ int currentRepeatDayIndex = 0;
 int previewMelodyIndex = 0;
 bool lastSnoozed = false;
 unsigned long messageDisplayStart = 0;
+unsigned long lastInteractionTime = 0;
+
 
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
