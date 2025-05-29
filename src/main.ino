@@ -53,7 +53,7 @@ void setup() {
   initNTP();
   initAlarmStorage();
   initAlarmLights();
-  //initFirebase();
+  initFirebase();
 }
 
 void loop() {
@@ -85,7 +85,8 @@ void loop() {
       drawErrorScreen();
       break;
   }
-
- // getDataFromFirebase(); // uncomment this when use firebase
-  delay(50);
+  getDataFromFirebase();
+  checkIdleAndSleep();  // ✅ Inserted here to handle idle timeout + sleep
+  delay(50); // Small delay to prevent CPU overload
 }
+

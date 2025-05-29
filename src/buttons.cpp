@@ -21,8 +21,6 @@ unsigned long lastModePress = 0;
 unsigned long lastAdjustPress = 0;
 unsigned long lastConfirmPress = 0;
 unsigned long modeButtonPressTime = 0;
-unsigned long lastInteractionTime = 0;
-//int previewMelodyIndex = 0;
 
 int lastTriggerMinute = -1;
 bool alarmActive = false;
@@ -86,8 +84,7 @@ void handleButtons() {
       uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
     }
 
-
-    lastInteractionTime = now;
+    recordInteraction();
     modeButtonPressTime = 0;
   }
 
@@ -159,7 +156,7 @@ void handleButtons() {
       messageDisplayStart = millis();
     }
 
-    lastInteractionTime = now;
+    recordInteraction();
   }
 
   // CONFIRM button
@@ -198,11 +195,12 @@ void handleButtons() {
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
     }
+    recordInteraction();
     lastInteractionTime = now;
   }
 
   // Timeout to Idle
-  if (now - lastInteractionTime > UI_TIMEOUT_MS && uiState != IDLE_SCREEN) {
+  if (now - lastInteraction > UI_TIMEOUT_MS && uiState != IDLE_SCREEN) {
     uiState = IDLE_SCREEN;
   }
 

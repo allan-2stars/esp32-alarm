@@ -1,6 +1,6 @@
 #ifndef UI_H
 #define UI_H
-
+#pragma once
 //#include "alarm.h"
 
 enum UIState {
@@ -22,9 +22,10 @@ void drawAlarmConfig();
 void drawMelodyPreview(int selectedIndex);
 void drawSnoozeMessage(bool wasSnoozed);
 void drawErrorScreen();
-#pragma once
+
 #include <Adafruit_SSD1306.h>
 void initNTP();
 void initDisplay(Adafruit_SSD1306 &display);
+void checkIdleAndSleep();
 
 #endif

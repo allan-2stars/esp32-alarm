@@ -28,7 +28,7 @@
 #define CONFIRM_BUTTON_PIN  4
 
 
-#define UI_TIMEOUT_MS  30000  // half minute
+#define UI_TIMEOUT_MS  3000  // half minute (if not 30000, then for testing)
 #define CHECK_INTERVAL 5000 //check connection timeout
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
@@ -52,9 +52,12 @@
 #define CHANNEL_GREEN  1
 #define CHANNEL_BLUE   2
 
+#define INACTIVITY_TIMEOUT 300000 //5 mins then timeout (if not 600000, for testing)
+
 #define CHANNEL_LEFT_LED   3
 #define CHANNEL_TOP_LED  4
 #define CHANNEL_RIGHT_LED  5
+
 
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
