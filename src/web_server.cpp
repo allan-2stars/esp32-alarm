@@ -96,19 +96,15 @@ void processData(AsyncResult &aResult) {
     // 🔘 Process LED ON/OFF state
     if (uid == "get_led_on") {
       bool newState = strcmp(aResult.c_str(), "true") == 0;
-      Serial.println("out of if");
-      Serial.println(newState);
-            Serial.println("cStr");
-                    Serial.println(aResult.c_str());    
-
-      //bool newState = bool(aResult.c_str());
-
       if (newState != lastLedState) {
-         Serial.println("in if");
         lastLedState = newState;
-        Serial.printf("🔘 LED is now %s\n", newState ? "ON" : "OFF");
-        Serial.println(newState);
-        digitalWrite(LED_PIN, newState ? HIGH : LOW);
+        if (newState) {
+          // LED ON → use last known brightness
+          ledcWrite(PWM_CHANNEL, lastBrightness);
+        } else {
+          // LED OFF → force PWM to 0
+          ledcWrite(PWM_CHANNEL, 0);
+        }
       }
     }
 
@@ -121,9 +117,16 @@ void processData(AsyncResult &aResult) {
       if (brightness != lastBrightness) {
         lastBrightness = brightness;
         Serial.printf("💡 Brightness set to %.2f (%d/255)\n", brightnessRatio, brightness);
-        ledcWrite(0, brightness);
+        
+        // ✅ Only set PWM if LED is ON
+        if (lastLedState) {
+          ledcWrite(PWM_CHANNEL, brightness);
+          Serial.println("if last state changed, new brightness is ");
+          Serial.println(brightness);
+        }
       }
     }
+
 
     // 📨 Display new message
     else if (uid == "get_message") {
@@ -139,20 +142,6 @@ void processData(AsyncResult &aResult) {
 
 //
 void initFirebase() {
-  // 🌐 Sync system time using NTP (required for Firebase SSL)
-  // configTime(0, 0, "pool.ntp.org", "time.nist.gov"); // need to modify the timezone
-  // Serial.print("⏳ Waiting for NTP time sync");
-  // while (time(nullptr) < 100000) {
-  //   Serial.print(".");
-  //   delay(500);
-  // }
-  // Serial.println("\n✅ Time synced");
-
-  // 💡 Setup LED PWM
-  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
-  ledcAttachPin(LED_PIN, PWM_CHANNEL);
-  ledcWrite(PWM_CHANNEL, 0);  // Start off
-
   // 🔒 Disable SSL cert validation for Firebase (for testing only)
   ssl_client.setInsecure();
 

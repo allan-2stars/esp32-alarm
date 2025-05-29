@@ -3,6 +3,7 @@
 #include "led.h"
 #include "ui.h"
 #include "config.h"
+#include "light_control.h"
 
 // This should be defined externally and updated by your UI system
 extern UIState uiState;
@@ -26,6 +27,7 @@ void updateAnimations() {
     case ALARM_RINGING:
       // TODO: Pulse RGB LED red or rainbow (alarm style)
       // updateAlarmLedPulse();
+      //resetAlarmLights();
       break;
 
     case MELODY_PREVIEW:

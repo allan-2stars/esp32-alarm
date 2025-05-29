@@ -14,8 +14,7 @@
 #include "sensor.h"
 #include "alarm_storage.h"
 #include "animations.h"
-//#include <Adafruit_GFX.h>
-
+#include "light_control.h"
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -30,61 +29,64 @@ unsigned long messageDisplayStart = 0;
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-
 void setup() {
   Serial.begin(115200);
   Wire.begin(SDA_PIN, SCL_PIN);
   //
   initButtons();
   initBuzzer();
-  //
   initLED();
   initRGBLed();
   initAHT10();
-  //
   initDisplay(display);
 
   // Connect to Wifi
   if(!connectWifi()){
+    display.clearDisplay();
+    display.setTextColor(TEXT_COLOR);
+    display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT / 2 - 8);
+    display.print("Internet connection failed!");
+    display.display(); // make a dedicated display error message;
     return;
   }
 
   initNTP();
   initAlarmStorage();
-  //initFirebase();
-
+  initAlarmLights();
+  initFirebase();
 }
 
 void loop() {
-  handleButtons();          // input + screen update
-  checkAndTriggerAlarms();  // time match + melody
+  handleButtons();
+  checkAndTriggerAlarms();
   updateMelodyPlayback();
-  resetESP32(); // only trigger by press the reset button.
+  resetESP32();
   updateAnimations();
-  
-  // Update display
-  // if (isMelodyPlaying()) {
-  //   setLedMode(LED_MELODY);
-  // }
-  // else{
-  //   setLedMode(LED_OFF);
-  // }
+
+  // ✅ Force uiState to ALARM_RINGING while active
+  if (alarmActive) {
+    uiState = ALARM_RINGING;
+  }
+
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
-    case ALARM_RINGING: drawBellRinging(display); break;
-    // if lastSnoozed is true, then show snooze message, otherwise, show stop message.
-    case ALARM_SNOOZE_MESSAGE: {
-      drawSnoozeMessage(lastSnoozed); 
-      uiState = IDLE_SCREEN;break;}
+    case ALARM_RINGING:
+      drawBellRinging(display);
+      updateAlarmLights();
+      break;
+    case ALARM_SNOOZE_MESSAGE:
+      drawSnoozeMessage(lastSnoozed);
+      uiState = IDLE_SCREEN;
+      break;
     case ERROR_SCREEN:
       drawErrorScreen();
       break;
   }
-
-  //getDataFromFirebase();
+  getDataFromFirebase();
   checkIdleAndSleep();  // ✅ Inserted here to handle idle timeout + sleep
   delay(50); // Small delay to prevent CPU overload
 }
+

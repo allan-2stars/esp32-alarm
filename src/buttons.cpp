@@ -8,6 +8,7 @@
 #include "config.h"
 #include "globals.h"
 #include "alarm_storage.h"
+#include "light_control.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -56,7 +57,9 @@ void handleButtons() {
   if (!modePressed && modeButtonPressTime > 0) {
     //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
-    stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
 
     if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS && duration > 1000) {
@@ -87,7 +90,10 @@ void handleButtons() {
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    //stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
+
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -122,11 +128,11 @@ void handleButtons() {
           uiState = MELODY_PREVIEW;
             previewMelodyIndex = alarms[selectedAlarmIndex].melody;
             // Start melody playback for first entry
-            startMelodyPreview(
+            startMelody(
               getMelodyData(previewMelodyIndex),
               getMelodyLength(previewMelodyIndex),
               getMelodyTempo(previewMelodyIndex),
-              BUZZER_PIN);
+              BUZZER_PIN, false);
           lastAdjustPress = millis();  // avoid double-trigger
           break;
       }
@@ -135,11 +141,11 @@ void handleButtons() {
       previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
             Serial.println("else if index:");
       Serial.println(previewMelodyIndex);
-      startMelodyPreview(
+      startMelody(
         getMelodyData(previewMelodyIndex),
         getMelodyLength(previewMelodyIndex),
         getMelodyTempo(previewMelodyIndex),
-        BUZZER_PIN);
+        BUZZER_PIN, false);
     }
     else if (uiState == ALARM_RINGING) {
       alarmActive = false;
@@ -155,7 +161,10 @@ void handleButtons() {
 
   // CONFIRM button
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
-    stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
+    
     lastConfirmPress = now;
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
@@ -185,9 +194,9 @@ void handleButtons() {
       lastSnoozed = false;
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
-
     }
     recordInteraction();
+    lastInteractionTime = now;
   }
 
   // Timeout to Idle

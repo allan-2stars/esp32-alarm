@@ -8,8 +8,20 @@ static int melodyIndex = 0;
 static unsigned long lastNoteTime = 0;
 static int buzzerPin = 0;
 static bool melodyPlaying = false;
+static bool looping = false;
 
-void startMelodyPreview(const int* melody, int length, int tempo, int pin) {
+
+  // void startMelodyPreview(const int* melody, int length, int tempo, int pin) {
+  //   currentMelody = melody;
+  //   melodyLength = length;
+  //   melodyTempo = tempo;
+  //   melodyIndex = 0;
+  //   lastNoteTime = 0;
+  //   buzzerPin = pin;
+  //   melodyPlaying = true;
+  // }
+
+void startMelody(const int* melody, int length, int tempo, int pin, bool loop) {
   currentMelody = melody;
   melodyLength = length;
   melodyTempo = tempo;
@@ -17,6 +29,7 @@ void startMelodyPreview(const int* melody, int length, int tempo, int pin) {
   lastNoteTime = 0;
   buzzerPin = pin;
   melodyPlaying = true;
+  looping = loop;
 }
 
 void updateMelodyPlayback() {
@@ -25,14 +38,14 @@ void updateMelodyPlayback() {
   }
 
   unsigned long now = millis();
-  if (now >= lastNoteTime) { //It advances the melody based on time
+  if (now >= lastNoteTime) {
     int note = currentMelody[melodyIndex * 2];
     int duration = currentMelody[melodyIndex * 2 + 1];
     int wholenote = (60000 * 4) / melodyTempo;
     int noteDuration = (duration > 0) ? wholenote / duration : (wholenote / abs(duration)) * 1.5;
 
     if (note > 0) {
-      tone(buzzerPin, note, noteDuration * 0.9);  // play tone for ~90% duration
+      tone(buzzerPin, note, noteDuration * 0.9);  // play tone
     } else {
       noTone(buzzerPin);  // rest
     }
@@ -40,19 +53,26 @@ void updateMelodyPlayback() {
     lastNoteTime = now + noteDuration;
     melodyIndex++;
 
+    // 🔁 Loop or stop when done
     if (melodyIndex >= melodyLength) {
-      melodyPlaying = false;
-      noTone(buzzerPin);  // stop at end of melody
+      if (looping) {
+        melodyIndex = 0;
+      } else {
+        melodyPlaying = false;
+        noTone(buzzerPin);
+      }
     }
   }
 }
+
 
 bool isMelodyPlaying() {
   return melodyPlaying;
 }
 
 void stopMelody() {
-  melodyPlaying = false;
   noTone(buzzerPin);
+  melodyPlaying = false;
+  looping = false;  // Important: turn off loop mode
   Serial.println("Stop melody");
 }
