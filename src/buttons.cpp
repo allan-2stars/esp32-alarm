@@ -127,11 +127,11 @@ void handleButtons() {
           uiState = MELODY_PREVIEW;
             previewMelodyIndex = alarms[selectedAlarmIndex].melody;
             // Start melody playback for first entry
-            startMelodyPreview(
+            startMelody(
               getMelodyData(previewMelodyIndex),
               getMelodyLength(previewMelodyIndex),
               getMelodyTempo(previewMelodyIndex),
-              BUZZER_PIN);
+              BUZZER_PIN, false);
           lastAdjustPress = millis();  // avoid double-trigger
           break;
       }
@@ -140,11 +140,11 @@ void handleButtons() {
       previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
             Serial.println("else if index:");
       Serial.println(previewMelodyIndex);
-      startMelodyPreview(
+      startMelody(
         getMelodyData(previewMelodyIndex),
         getMelodyLength(previewMelodyIndex),
         getMelodyTempo(previewMelodyIndex),
-        BUZZER_PIN);
+        BUZZER_PIN, false);
     }
     else if (uiState == ALARM_RINGING) {
       alarmActive = false;

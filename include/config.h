@@ -13,22 +13,15 @@
 //
 //#define RESET_BUTTON_PIN 14   // Real ESP32
 #define RESET_BUTTON_PIN 32  // Wokwi
-#define DHTPIN 14 // Wokwi
-#define DHTTYPE DHT22 // Wokwi
-#define WIFI_SSID  "Wokwi-GUEST" // Wokwi
-#define WIFI_PASSWORD ""  //Wokwi
+#define WIFI_SSID  "BlueberryHouse" // Wokwi
+#define WIFI_PASSWORD "allansy5-777"  //Wokwi
 #define DHTPIN 14   //Wokwi
 #define DHTTYPE DHT22   //Wokwi
-#define BUZZER_PIN  15  //Wokwi
-//#define BUZZER_PIN  22  // Real ESP32
-// #define RED_PIN    18   // Real ESP32
-// #define GREEN_PIN  19   // Real ESP32
-// #define BLUE_PIN   23   // Real ESP32
+#define BUZZER_PIN  15
 #define RED_PIN    18   // Wokwi
 #define GREEN_PIN  19   // Wokwi
-#define BLUE_PIN   23   // Wokwi
+#define BLUE_PIN   23   
 /// ###############################
-//
 
 #define MODE_BUTTON_PIN     33
 #define ADJUST_BUTTON_PIN   5

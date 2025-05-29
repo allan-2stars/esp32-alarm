@@ -48,6 +48,11 @@ void setup() {
 
   // Connect to Wifi
   if(!connectWifi()){
+    display.clearDisplay();
+    display.setTextColor(TEXT_COLOR);
+    display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT / 2 - 8);
+    display.print("Internet connection failed!");
+    display.display(); // make a dedicated display error message;
     return;
   }
 
@@ -63,7 +68,7 @@ void loop() {
   handleButtons();          // input + screen update
   checkAndTriggerAlarms();  // time match + melody
   updateMelodyPlayback();
-  resetESP32(); // only trigger by press the reset button.
+ // resetESP32(); // only trigger by press the reset button.
   updateAnimations();
   // Update display
   // if (isMelodyPlaying()) {
