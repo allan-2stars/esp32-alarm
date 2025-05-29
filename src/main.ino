@@ -59,43 +59,46 @@ void setup() {
   initNTP();
   initAlarmStorage();
   initAlarmLights();
-
-  //initFirebase();
+  initFirebase();
 
 }
 
 void loop() {
-  handleButtons();          // input + screen update
-  checkAndTriggerAlarms();  // time match + melody
+  handleButtons();
+  checkAndTriggerAlarms();
   updateMelodyPlayback();
- // resetESP32(); // only trigger by press the reset button.
+  resetESP32();
   updateAnimations();
-  // Update display
-  // if (isMelodyPlaying()) {
-  //   setLedMode(LED_MELODY);
-  // }
-  // else{
-  //   setLedMode(LED_OFF);
-  // }
+
+  // ✅ Force uiState to ALARM_RINGING while active
+  if (alarmActive) {
+    uiState = ALARM_RINGING;
+  }
+
+  // Debug
+  Serial.print("🎯 uiState: ");
+  Serial.println(uiState);
+  Serial.print("alarmActive = ");
+  Serial.println(alarmActive);
+
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
-    case ALARM_RINGING: {
+    case ALARM_RINGING:
       drawBellRinging(display);
-      updateAlarmLights();
+      updateAlarmLights();  // ✅ uncomment this now
       break;
-    }
-    // if lastSnoozed is true, then show snooze message, otherwise, show stop message.
-    case ALARM_SNOOZE_MESSAGE: {
-      drawSnoozeMessage(lastSnoozed); 
-      uiState = IDLE_SCREEN;break;}
+    case ALARM_SNOOZE_MESSAGE:
+      drawSnoozeMessage(lastSnoozed);
+      uiState = IDLE_SCREEN;
+      break;
     case ERROR_SCREEN:
       drawErrorScreen();
       break;
   }
 
-  //getDataFromFirebase();
+  getDataFromFirebase();
   delay(50);
 }

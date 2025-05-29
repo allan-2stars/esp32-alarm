@@ -37,9 +37,9 @@ void setLedMode(LedMode mode) {
 }
 
 void initLED() {
-  ledcSetup(0, 5000, 8);       // channel 0, 5kHz, 8-bit resolution
-  ledcAttachPin(LED_PIN, 0);   // LED_PIN from config
-  ledcWrite(0, 0);             // Start off
+  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);       // channel 0, 5kHz, 8-bit resolution
+  ledcAttachPin(LED_PIN, PWM_CHANNEL);   // LED_PIN from config
+  ledcWrite(PWM_CHANNEL, 0);             // Start off
 }
 
 

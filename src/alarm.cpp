@@ -50,7 +50,7 @@ void checkAndTriggerAlarms() {
         getMelodyData(a.melody),
         getMelodyLength(a.melody),
         getMelodyTempo(a.melody),
-        BUZZER_PIN
+        BUZZER_PIN,true
       );
 
       // 🔔 Start LED wake-up lights
@@ -72,7 +72,7 @@ void checkAndTriggerAlarms() {
       getMelodyData(alarms[selectedAlarmIndex].melody),
       getMelodyLength(alarms[selectedAlarmIndex].melody),
       getMelodyTempo(alarms[selectedAlarmIndex].melody),
-      BUZZER_PIN
+      BUZZER_PIN, true
     );
 
     // 🔔 Start LED lights again after snooze

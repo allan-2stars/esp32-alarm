@@ -92,7 +92,7 @@ void handleButtons() {
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    //stopMelody();
+    stopMelody();
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -192,10 +192,7 @@ void handleButtons() {
       lastSnoozed = false;
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
-
     }
-
-
     lastInteractionTime = now;
   }
 

@@ -44,7 +44,7 @@
 #define LED_RIGHT_PIN 25
 
 #define LED_PIN 12
-#define PWM_CHANNEL 0
+#define PWM_CHANNEL 6
 #define PWM_FREQ 5000
 #define PWM_RESOLUTION 8
 

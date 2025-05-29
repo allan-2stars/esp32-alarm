@@ -8,9 +8,9 @@ static unsigned long lastFlashUpdate = 0;
 static bool flashingState = false;
 
 void initAlarmLights() {
-  ledcSetup(3, 5000, 8); ledcAttachPin(LED_LEFT_PIN, CHANNEL_LEFT_LED);
-  ledcSetup(4, 5000, 8); ledcAttachPin(LED_TOP_PIN, CHANNEL_TOP_LED);
-  ledcSetup(4, 5000, 8); ledcAttachPin(LED_RIGHT_PIN, CHANNEL_RIGHT_LED);
+  ledcSetup(CHANNEL_LEFT_LED, 5000, 8); ledcAttachPin(LED_LEFT_PIN, CHANNEL_LEFT_LED);
+  ledcSetup(CHANNEL_TOP_LED, 5000, 8); ledcAttachPin(LED_TOP_PIN, CHANNEL_TOP_LED);
+  ledcSetup(CHANNEL_RIGHT_LED, 5000, 8); ledcAttachPin(LED_RIGHT_PIN, CHANNEL_RIGHT_LED);
 }
 
 void startAlarmLights() {
@@ -20,9 +20,9 @@ void startAlarmLights() {
 }
 
 void resetAlarmLights() {
-  ledcWrite(3, 0);
-  ledcWrite(4, 0);
-  ledcWrite(5, 0);
+  ledcWrite(CHANNEL_LEFT_LED, 0);
+  ledcWrite(CHANNEL_TOP_LED, 0);
+  ledcWrite(CHANNEL_RIGHT_LED, 0);
 }
 
 void updateAlarmLights() {
@@ -40,16 +40,16 @@ void updateAlarmLights() {
     float phase = (now % fadePeriod) / (float)fadePeriod;
     int brightness = int(127.5 * (1.0 - cos(2 * PI * phase)));
 
-    if (stage >= 1) ledcWrite(3, brightness);
-    if (stage >= 2) ledcWrite(4, brightness);
-    if (stage >= 3) ledcWrite(5, brightness);
+    if (stage >= 1) ledcWrite(LED_LEFT_PIN, brightness);
+    if (stage >= 2) ledcWrite(LED_TOP_PIN, brightness);
+    if (stage >= 3) ledcWrite(LED_RIGHT_PIN, brightness);
   } else if (stage == 5) {
     if (now - lastFlashUpdate >= 1000) {
       flashingState = !flashingState;
       uint8_t level = flashingState ? 255 : 0;
-      ledcWrite(3, level);
-      ledcWrite(4, level);
-      ledcWrite(5, level);
+      ledcWrite(LED_LEFT_PIN, level);
+      ledcWrite(LED_TOP_PIN, level);
+      ledcWrite(LED_RIGHT_PIN, level);
       lastFlashUpdate = now;
     }
   }
