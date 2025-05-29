@@ -16,9 +16,6 @@
 #include "animations.h"
 #include "light_control.h"
 
-//#include <Adafruit_GFX.h>
-
-
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
 Alarm tempAlarm;
@@ -32,18 +29,15 @@ unsigned long messageDisplayStart = 0;
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-
 void setup() {
   Serial.begin(115200);
   Wire.begin(SDA_PIN, SCL_PIN);
   //
   initButtons();
   initBuzzer();
-  //
   initLED();
   initRGBLed();
   initAHT10();
-  //
   initDisplay(display);
 
   // Connect to Wifi
@@ -59,8 +53,7 @@ void setup() {
   initNTP();
   initAlarmStorage();
   initAlarmLights();
-  initFirebase();
-
+  //initFirebase();
 }
 
 void loop() {
@@ -75,12 +68,6 @@ void loop() {
     uiState = ALARM_RINGING;
   }
 
-  // Debug
-  Serial.print("🎯 uiState: ");
-  Serial.println(uiState);
-  Serial.print("alarmActive = ");
-  Serial.println(alarmActive);
-
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
@@ -88,7 +75,7 @@ void loop() {
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
     case ALARM_RINGING:
       drawBellRinging(display);
-      updateAlarmLights();  // ✅ uncomment this now
+      updateAlarmLights();
       break;
     case ALARM_SNOOZE_MESSAGE:
       drawSnoozeMessage(lastSnoozed);
@@ -99,6 +86,6 @@ void loop() {
       break;
   }
 
-  getDataFromFirebase();
+ // getDataFromFirebase(); // uncomment this when use firebase
   delay(50);
 }

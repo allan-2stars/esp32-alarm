@@ -59,7 +59,9 @@ void handleButtons() {
   if (!modePressed && modeButtonPressTime > 0) {
     //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
-    stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
 
     if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS && duration > 1000) {
@@ -76,7 +78,6 @@ void handleButtons() {
     } else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
-      resetAlarmLights();
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
       uiState = ALARM_SNOOZE_MESSAGE;
@@ -92,7 +93,10 @@ void handleButtons() {
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
+
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -149,7 +153,6 @@ void handleButtons() {
     else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
-      resetAlarmLights();
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
       uiState = ALARM_SNOOZE_MESSAGE;
@@ -161,7 +164,10 @@ void handleButtons() {
 
   // CONFIRM button
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
-    stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
+    
     lastConfirmPress = now;
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
@@ -188,7 +194,6 @@ void handleButtons() {
     }else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
-      resetAlarmLights();
       lastSnoozed = false;
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
