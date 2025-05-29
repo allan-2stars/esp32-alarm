@@ -8,6 +8,7 @@
 #include "config.h"
 #include "globals.h"
 #include "alarm_storage.h"
+#include "light_control.h"
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -75,6 +76,7 @@ void handleButtons() {
     } else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
+      resetAlarmLights();
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
       uiState = ALARM_SNOOZE_MESSAGE;
@@ -147,6 +149,7 @@ void handleButtons() {
     else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
+      resetAlarmLights();
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
       uiState = ALARM_SNOOZE_MESSAGE;
@@ -185,6 +188,7 @@ void handleButtons() {
     }else if (uiState == ALARM_RINGING) {
       alarmActive = false;
       stopMelody();
+      resetAlarmLights();
       lastSnoozed = false;
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();

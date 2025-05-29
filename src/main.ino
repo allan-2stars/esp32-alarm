@@ -14,6 +14,8 @@
 #include "sensor.h"
 #include "alarm_storage.h"
 #include "animations.h"
+#include "light_control.h"
+
 //#include <Adafruit_GFX.h>
 
 
@@ -51,6 +53,8 @@ void setup() {
 
   initNTP();
   initAlarmStorage();
+  initAlarmLights();
+
   //initFirebase();
 
 }
@@ -61,7 +65,6 @@ void loop() {
   updateMelodyPlayback();
   resetESP32(); // only trigger by press the reset button.
   updateAnimations();
-  
   // Update display
   // if (isMelodyPlaying()) {
   //   setLedMode(LED_MELODY);
@@ -74,7 +77,11 @@ void loop() {
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
-    case ALARM_RINGING: drawBellRinging(display); break;
+    case ALARM_RINGING: {
+      drawBellRinging(display);
+      updateAlarmLights();
+      break;
+    }
     // if lastSnoozed is true, then show snooze message, otherwise, show stop message.
     case ALARM_SNOOZE_MESSAGE: {
       drawSnoozeMessage(lastSnoozed); 

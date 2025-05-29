@@ -41,8 +41,28 @@
       "left": -113.4,
       "attrs": { "volume": "0.1" }
     },
-    { "type": "wokwi-rgb-led", "id": "rgb1", "top": -207.2, "left": 135.5,   
-      "attrs": {"common": "cathode"} }
+    { "type": "wokwi-rgb-led", "id": "rgb1", "top": -207.2, "left": 135.5, "attrs": {} },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -234,
+      "left": -111.4,
+      "attrs": { "color": "white" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": -262.8,
+      "left": -82.6,
+      "attrs": { "color": "white" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led3",
+      "top": -234,
+      "left": -53.8,
+      "attrs": { "color": "white" }
+    }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -76,7 +96,13 @@
     [ "rgb1:G", "bb1:8t.a", "green", [ "v0" ] ],
     [ "rgb1:B", "bb1:9t.a", "green", [ "v0" ] ],
     [ "bb1:6t.c", "esp:18", "red", [ "v249.6" ] ],
-    [ "bb1:8t.e", "esp:19", "green", [ "v220.8" ] ]
+    [ "esp:19", "bb1:8t.d", "green", [ "h67.2", "v-9.6" ] ],
+    [ "esp:25", "led3:A", "yellow", [ "v0", "h-28.65" ] ],
+    [ "esp:21", "led1:A", "yellow", [ "h-182.4", "v-297.6" ] ],
+    [ "esp:22", "led2:A", "yellow", [ "h-144", "v-9.6" ] ],
+    [ "led1:C", "oled1:GND", "black", [ "v38.4", "h77.2", "v48" ] ],
+    [ "led2:C", "oled1:GND", "black", [ "v76.8", "h0.4" ] ],
+    [ "led3:C", "oled1:GND", "black", [ "v57.6", "h0.4" ] ]
   ],
   "dependencies": {}
 }
