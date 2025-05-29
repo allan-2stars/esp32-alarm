@@ -1,6 +1,7 @@
 #include <time.h>
 #include "utils.h"
 #include "config.h"
+#include "secrets.h"
 #include "led.h"
 #include "ui.h"
 #include <WiFi.h>
