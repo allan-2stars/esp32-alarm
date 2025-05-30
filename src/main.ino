@@ -28,6 +28,8 @@ bool lastSnoozed = false;
 unsigned long messageDisplayStart = 0;
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+unsigned long lastFirebaseUpdate = 0;
+const unsigned long firebaseInterval = 5000;  // 10 seconds
 
 void setup() {
   Serial.begin(115200);
@@ -80,7 +82,13 @@ void loop() {
       drawErrorScreen();
       break;
   }
-  getDataFromFirebase();
+
+  // Only call it every 10–30 seconds using millis():
+  if (millis() - lastFirebaseUpdate > firebaseInterval) {
+    getDataFromFirebase();
+    lastFirebaseUpdate = millis();
+  }
+
   if (!alarmActive && millis() - lastInteraction > INACTIVITY_TIMEOUT) {
     checkIdleAndSleep();
   }
