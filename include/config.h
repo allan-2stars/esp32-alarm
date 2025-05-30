@@ -21,12 +21,14 @@
 #define BLUE_PIN   23   
 /// ###############################
 
+#define TOUCH_WAKE_PIN 2
+
 #define MODE_BUTTON_PIN     33
 #define ADJUST_BUTTON_PIN   5
 #define CONFIRM_BUTTON_PIN  4
 
 
-#define UI_TIMEOUT_MS  30000  // half minute (if not 30000, then for testing)
+#define UI_TIMEOUT_MS  30000  // 30 seconds back to Idle screen
 #define CHECK_INTERVAL 6000 //check connection timeout
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
@@ -50,7 +52,7 @@
 #define CHANNEL_GREEN  1
 #define CHANNEL_BLUE   2
 
-#define INACTIVITY_TIMEOUT 300000 //5 mins then timeout (if not 600000, for testing)
+#define INACTIVITY_TIMEOUT 31000 // 1 min then sleep
 
 #define CHANNEL_LEFT_LED   3
 #define CHANNEL_TOP_LED  4

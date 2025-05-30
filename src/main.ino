@@ -15,9 +15,7 @@
 #include "alarm_storage.h"
 #include "animations.h"
 #include "light_control.h"
-
-//#include <Adafruit_GFX.h>
-
+#include "sleep.h"
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -28,24 +26,18 @@ int currentRepeatDayIndex = 0;
 int previewMelodyIndex = 0;
 bool lastSnoozed = false;
 unsigned long messageDisplayStart = 0;
-
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
 
 void setup() {
   Serial.begin(115200);
   Wire.begin(SDA_PIN, SCL_PIN);
-  //
   initButtons();
   initBuzzer();
-  //
   initLED();
   initRGBLed();
   initAHT10();
-  //
   initDisplay(display);
-
   // Connect to Wifi
   if(!connectWifi()){
     display.clearDisplay();
@@ -55,7 +47,6 @@ void setup() {
     display.display(); // make a dedicated display error message;
     return;
   }
-
   initNTP();
   initAlarmStorage();
   initAlarmLights();
@@ -68,12 +59,10 @@ void loop() {
   updateMelodyPlayback();
   resetESP32();
   updateAnimations();
-
   // ✅ Force uiState to ALARM_RINGING while active
   if (alarmActive) {
     uiState = ALARM_RINGING;
   }
-
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
@@ -91,8 +80,10 @@ void loop() {
       drawErrorScreen();
       break;
   }
-
   getDataFromFirebase();
+  if (!alarmActive && millis() - lastInteraction > INACTIVITY_TIMEOUT) {
+    checkIdleAndSleep();
+  }
   delay(50);
 }
 

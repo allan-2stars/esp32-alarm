@@ -48,40 +48,6 @@ int getSelectedFieldIndex(const std::vector<AlarmField> &visibleFields) {
   return 0;
 }
 
-void checkIdleAndSleep() {
-  if (millis() - lastInteraction < INACTIVITY_TIMEOUT) return;
-
-  // Calculate seconds until next alarm
-  struct tm timeinfo;
-  getLocalTime(&timeinfo);
-  int currentSeconds = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
-  int secondsToNextAlarm = INACTIVITY_TIMEOUT / 1000;
-  bool alarmClose = false;
-
-  for (int i = 0; i < MAX_SCREEN_ALARMS; ++i) {
-    if (!alarms[i].enabled) continue;
-    int alarmSeconds = alarms[i].hour * 3600 + alarms[i].minute * 60;
-    int diff = alarmSeconds - currentSeconds;
-    if (diff > 0 && diff <= 120) {
-      alarmClose = true;
-      secondsToNextAlarm = diff;
-      break;
-    }
-  }
-
-  // Setup wake sources
-  esp_sleep_enable_touchpad_wakeup();
-  esp_sleep_enable_timer_wakeup((uint64_t)(secondsToNextAlarm - 5) * 1000000ULL);
-
-  display.clearDisplay();
-  display.setCursor(0, SCREEN_HEIGHT / 2 - 8);
-  display.print("Entering Sleep");
-  display.display();
-  delay(1000);
-
-  esp_deep_sleep_start();
-}
-
 void initDisplay(Adafruit_SSD1306 &display) {
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("❌ SSD1306 allocation failed");
