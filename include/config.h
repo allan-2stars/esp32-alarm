@@ -26,8 +26,8 @@
 #define CONFIRM_BUTTON_PIN  4
 
 
-#define UI_TIMEOUT_MS  3000  // half minute (if not 30000, then for testing)
-#define CHECK_INTERVAL 5000 //check connection timeout
+#define UI_TIMEOUT_MS  30000  // half minute (if not 30000, then for testing)
+#define CHECK_INTERVAL 6000 //check connection timeout
 #define HEADER_HEIGHT 10  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
 

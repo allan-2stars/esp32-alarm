@@ -99,8 +99,6 @@ void handleButtons() {
         Serial.println(selectedField);
 
       switch (selectedField) {
-
-
         case ALARM_TYPE: a.type = (AlarmType)((a.type + 1) % 3); break;
         case ALARM_TIME_HOUR: a.hour = (a.hour + 1) % 24; break;
         case ALARM_TIME_MIN: a.minute = (a.minute + 1) % 60; break;
@@ -117,7 +115,6 @@ void handleButtons() {
           int maxDay = getMaxDay(a.year, a.month);
           a.day = (a.day % maxDay) + 1;
         }break;
-
         case ALARM_REPEAT_DAYS: currentRepeatDayIndex = (currentRepeatDayIndex + 1) % 7; break;
         case ALARM_ENABLED: a.enabled = !a.enabled; break;
         case ALARM_MELODY:
@@ -152,7 +149,6 @@ void handleButtons() {
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
     }
-
     recordInteraction();
   }
 
@@ -191,7 +187,6 @@ void handleButtons() {
       messageDisplayStart = millis();
     }
     recordInteraction();
-    lastInteractionTime = now;
   }
 
   // Timeout to Idle

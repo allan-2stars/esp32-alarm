@@ -24,7 +24,6 @@ extern bool lastSnoozed;
 // Snooze & display timing
 extern unsigned long messageDisplayStart;
 extern time_t snoozeUntil;
-extern unsigned long lastInteractionTime;
 
 // Display object
 extern Adafruit_SSD1306 display;
