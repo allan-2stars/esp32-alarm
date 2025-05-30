@@ -17,17 +17,22 @@ void checkIdleAndSleep() {
 
   int currentSeconds = timeinfo.tm_hour * 3600 + timeinfo.tm_min * 60 + timeinfo.tm_sec;
 
-  int secondsToAlarm = INACTIVITY_TIMEOUT / 1000;  // default fallback
+  bool nearAlarm = false;
 
+  // Check if any alarm is within the next 2 minutes
   for (int i = 0; i < MAX_SCREEN_ALARMS; ++i) {
     if (!alarms[i].enabled) continue;
     int alarmSeconds = alarms[i].hour * 3600 + alarms[i].minute * 60;
     int diff = alarmSeconds - currentSeconds;
-    if (diff > 10 && diff <= 120) {  // only sleep early if alarm is within 2 min
-      secondsToAlarm = diff - 120;
-      if (secondsToAlarm < 0) secondsToAlarm = 0;
+    if (diff > 0 && diff <= 120) {
+      nearAlarm = true;
       break;
     }
+  }
+
+  if (nearAlarm) {
+    Serial.println("⏰ Alarm is too close, not going to sleep.");
+    return;  // Stay awake if an alarm is within 2 minutes
   }
 
   display.clearDisplay();
@@ -37,9 +42,10 @@ void checkIdleAndSleep() {
   delay(1000);
   display.ssd1306_command(SSD1306_DISPLAYOFF);
 
-  esp_sleep_enable_touchpad_wakeup();                   // ✅ include
-  touchSleepWakeUpEnable(TOUCH_WAKE_PIN, 40);           // ✅ include
-  esp_sleep_enable_timer_wakeup(secondsToAlarm * 1000000ULL);
+  // Enable only touch wakeup
+  esp_sleep_enable_touchpad_wakeup();                   // Required on some platforms
+  touchSleepWakeUpEnable(TOUCH_WAKE_PIN, 40);           // e.g. GPIO15 (T3)
 
+  Serial.println("💤 Entering deep sleep. Waiting for touch...");
   esp_deep_sleep_start();
 }

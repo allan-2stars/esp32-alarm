@@ -15,13 +15,13 @@
 #define RESET_BUTTON_PIN 32  // Wokwi
 #define DHTPIN 14   //Wokwi
 #define DHTTYPE DHT22   //Wokwi
-#define BUZZER_PIN  15
+#define BUZZER_PIN  2
 #define RED_PIN    18   // Wokwi
 #define GREEN_PIN  19   // Wokwi
 #define BLUE_PIN   23   
 /// ###############################
 
-#define TOUCH_WAKE_PIN 2
+#define TOUCH_WAKE_PIN T3 // GPIO15
 
 #define MODE_BUTTON_PIN     33
 #define ADJUST_BUTTON_PIN   5
