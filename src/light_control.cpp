@@ -40,16 +40,16 @@ void updateAlarmLights() {
     float phase = (now % fadePeriod) / (float)fadePeriod;
     int brightness = int(127.5 * (1.0 - cos(2 * PI * phase)));
 
-    if (stage >= 1) ledcWrite(LED_LEFT_PIN, brightness);
-    if (stage >= 2) ledcWrite(LED_TOP_PIN, brightness);
-    if (stage >= 3) ledcWrite(LED_RIGHT_PIN, brightness);
+    if (stage >= 1) ledcWrite(CHANNEL_LEFT_LED, brightness);
+    if (stage >= 2) ledcWrite(CHANNEL_TOP_LED, brightness);
+    if (stage >= 3) ledcWrite(CHANNEL_RIGHT_LED, brightness);
   } else if (stage == 5) {
     if (now - lastFlashUpdate >= 1000) {
       flashingState = !flashingState;
       uint8_t level = flashingState ? 255 : 0;
-      ledcWrite(LED_LEFT_PIN, level);
-      ledcWrite(LED_TOP_PIN, level);
-      ledcWrite(LED_RIGHT_PIN, level);
+      ledcWrite(CHANNEL_LEFT_LED, level);
+      ledcWrite(CHANNEL_TOP_LED, level);
+      ledcWrite(CHANNEL_RIGHT_LED, level);
       lastFlashUpdate = now;
     }
   }

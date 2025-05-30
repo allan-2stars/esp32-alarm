@@ -74,12 +74,6 @@ void loop() {
     uiState = ALARM_RINGING;
   }
 
-  // Debug
-  Serial.print("🎯 uiState: ");
-  Serial.println(uiState);
-  Serial.print("alarmActive = ");
-  Serial.println(alarmActive);
-
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;

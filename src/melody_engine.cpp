@@ -74,5 +74,4 @@ void stopMelody() {
   noTone(buzzerPin);
   melodyPlaying = false;
   looping = false;  // Important: turn off loop mode
-  Serial.println("Stop melody");
 }

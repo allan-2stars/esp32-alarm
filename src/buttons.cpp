@@ -55,9 +55,12 @@ void handleButtons() {
   }
   //Detects the moment the button is released
   if (!modePressed && modeButtonPressTime > 0) {
+    recordInteraction();
     //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
-    stopMelody();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
 
     if (uiState == ALARM_CONFIG) {
       if (selectedField == ALARM_REPEAT_DAYS && duration > 1000) {
@@ -68,6 +71,7 @@ void handleButtons() {
         } while (!isFieldVisible(tempAlarm.type, selectedField));
       }
     } else if(uiState == MELODY_PREVIEW) {
+      //recordInteraction(); // when in preview screen, do not time out ui
       uiState = ALARM_CONFIG;
       selectedField = ALARM_MELODY;
       drawAlarmConfig();
@@ -82,14 +86,15 @@ void handleButtons() {
     }else {
       uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
     }
-
-    recordInteraction();
     modeButtonPressTime = 0;
   }
 
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    stopMelody();
+    recordInteraction();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
     if (uiState == ALARM_OVERVIEW) {
@@ -149,12 +154,15 @@ void handleButtons() {
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
     }
-    recordInteraction();
   }
 
   // CONFIRM button
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
-    stopMelody();
+    recordInteraction();
+    resetAlarmLights();  // Turn off LEDs
+    stopMelody();       // Stop sound
+    alarmActive = false;
+    
     lastConfirmPress = now;
     if (uiState == ALARM_OVERVIEW) {
       tempAlarm = alarms[selectedAlarmIndex];
@@ -186,7 +194,6 @@ void handleButtons() {
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();
     }
-    recordInteraction();
   }
 
   // Timeout to Idle
