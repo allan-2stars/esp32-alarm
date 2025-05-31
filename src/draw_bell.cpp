@@ -23,7 +23,7 @@ bool ui_bounce(short *y, short *fy, float *velocity, float step) {
   return true;
 }
 
-void drawBellRinging(Adafruit_SSD1306 &display) {
+void drawBellRinging(Adafruit_SSD1306 &display, const String &footerMessage) {
   display.clearDisplay();
 
   // Animate bell X offset
@@ -35,10 +35,11 @@ void drawBellRinging(Adafruit_SSD1306 &display) {
 
   display.drawBitmap(bellX, bellY, bellBitmap32x32, 32, 32, TEXT_COLOR);
 
-  // Draw "Snooze" prompt
+  // Draw footer message
   display.setTextColor(TEXT_COLOR);
-  display.setCursor((SCREEN_WIDTH - 90) / 2, SCREEN_HEIGHT - 10);
-  display.print("Mod:Abort, Cmf:OK");
+  display.setTextSize(1);
+  display.setCursor((SCREEN_WIDTH - footerMessage.length() * 6) / 2, SCREEN_HEIGHT - 10);
+  display.print(footerMessage);
 
   display.display();
 }

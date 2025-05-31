@@ -30,7 +30,7 @@
 
 #define UI_TIMEOUT_MS  30000  // 30 seconds back to Idle screen
 #define CHECK_INTERVAL 6000 //check connection timeout
-#define HEADER_HEIGHT 10  // vertical space reserved for top icons
+#define HEADER_HEIGHT 16  // vertical space reserved for top icons
 #define TEXT_COLOR SSD1306_WHITE
 
 #define MAX_SCREEN_ALARMS 3
@@ -52,7 +52,7 @@
 #define CHANNEL_GREEN  1
 #define CHANNEL_BLUE   2
 
-#define INACTIVITY_TIMEOUT 31000 // 1 min then sleep
+#define INACTIVITY_TIMEOUT 60000 // 1 min then sleep
 
 #define CHANNEL_LEFT_LED   3
 #define CHANNEL_TOP_LED  4

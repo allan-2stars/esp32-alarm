@@ -57,7 +57,7 @@ void initDisplay(Adafruit_SSD1306 &display) {
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(TEXT_COLOR);
-  display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT / 2 - 8);
+  display.setCursor((SCREEN_WIDTH - 90) / 2, SCREEN_HEIGHT / 2 - 4);
   display.print("OLED Initialized");
   display.display();
   delay(1000);  // Show message briefly
@@ -65,6 +65,15 @@ void initDisplay(Adafruit_SSD1306 &display) {
   display.display();
 }
 
+void drawWiFiAnimation() {
+    // Animate Wi-Fi (top-left)
+  if (millis() - lastWifiAnimTime > 1000) {
+    wifiAnimFrame = (wifiAnimFrame + 1) % 3;
+    lastWifiAnimTime = millis();
+  }
+  const unsigned char* wifiFrames[] = {wifi_1, wifi_2, wifi_3};
+  display.drawBitmap(0, 0, wifiFrames[wifiAnimFrame], 8, 8, TEXT_COLOR);
+}
 
 void drawIdleScreen() {
   String currentTime = getFormattedTime();  // HH:MM:SS
@@ -104,13 +113,7 @@ void drawIdleScreen() {
   display.clearDisplay();
   display.setTextColor(TEXT_COLOR);
 
-  // Animate Wi-Fi (top-left)
-  if (millis() - lastWifiAnimTime > 1000) {
-    wifiAnimFrame = (wifiAnimFrame + 1) % 3;
-    lastWifiAnimTime = millis();
-  }
-  const unsigned char* wifiFrames[] = {wifi_1, wifi_2, wifi_3};
-  display.drawBitmap(0, 0, wifiFrames[wifiAnimFrame], 8, 8, TEXT_COLOR);
+  drawWiFiAnimation();
 
   // Animate Sun or Moon (top-right)
   struct tm timeinfo;
@@ -134,7 +137,7 @@ void drawIdleScreen() {
 
   // Time (always shown if updated)
   display.setTextSize(2);
-  display.setCursor(0, HEADER_HEIGHT);
+  display.setCursor(5, HEADER_HEIGHT);
   display.print(currentTime);
 
   // Temp + Humidity
@@ -148,8 +151,8 @@ void drawIdleScreen() {
   // Alarm status
   bool enabled = false;
   for (int i = 0; i < 3; i++) if (alarms[i].enabled) enabled = true;
-  display.setCursor(0, HEADER_HEIGHT + 32);
-  display.print(enabled ? "Alarm ON" : "Alarm OFF");
+  display.setCursor(86, HEADER_HEIGHT + 22);
+  display.print(enabled ? "A:ON" : "A:OFF");
 
   // Date
   display.setCursor(0, SCREEN_HEIGHT - 12);
@@ -162,7 +165,7 @@ void drawAlarmOverview() {
   display.clearDisplay();
   display.setCursor(0, 0); display.print("Alarms");
   for (int i = 0; i < MAX_SCREEN_ALARMS; i++) {
-    int yPos = 12 + i * 16;
+    int yPos = HEADER_HEIGHT + i * 12; // drop down leave the top line for wifi single
     display.setCursor(0, yPos);
     display.printf("%sA%d: %02d:%02d",
       i == selectedAlarmIndex ? ">" : " ",
@@ -181,7 +184,6 @@ void drawAlarmOverview() {
 void drawAlarmConfig() {
   Alarm &a = tempAlarm;
   display.clearDisplay();
-
   std::vector<AlarmField> visibleFields;
   if (isFieldVisible(a.type, ALARM_TYPE)) visibleFields.push_back(ALARM_TYPE);
   visibleFields.push_back(ALARM_TIME_HOUR);
@@ -204,7 +206,7 @@ void drawAlarmConfig() {
   int drawLine = 0;
   for (int i = 0; i < totalFields; ++i) {
     if (i < scrollOffset || i >= scrollOffset + maxVisibleLines) continue;
-    int y = 12 + drawLine * 10;
+    int y = HEADER_HEIGHT + drawLine * 10;
     AlarmField field = visibleFields[i];
 
     display.setCursor(0, y);
@@ -230,7 +232,7 @@ void drawAlarmConfig() {
       case ALARM_REPEAT_DAYS: {
         display.printf("%sDays:", selectedField == ALARM_REPEAT_DAYS ? ">" : " ");
         drawLine++;
-        y = 12 + drawLine * 10;
+        y = HEADER_HEIGHT + drawLine * 10;
         if (y < SCREEN_HEIGHT - 8) {
           display.setCursor(0, y);
           for (int j = 0; j < 7; j++) {

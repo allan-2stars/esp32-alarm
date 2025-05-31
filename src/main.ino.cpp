@@ -1,3 +1,6 @@
+# 1 "C:\\Users\\test\\AppData\\Local\\Temp\\tmpj5tukqtg"
+#include <Arduino.h>
+# 1 "C:/Users/test/Documents/Wokwi/alarm-esp32/src/main.ino"
 #include <Arduino.h>
 #include "alarm.h"
 #include "ui.h"
@@ -29,8 +32,10 @@ unsigned long messageDisplayStart = 0;
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 unsigned long lastFirebaseUpdate = 0;
-const unsigned long firebaseInterval = 5000;  // 10 seconds
-
+const unsigned long firebaseInterval = 5000;
+void setup();
+void loop();
+#line 34 "C:/Users/test/Documents/Wokwi/alarm-esp32/src/main.ino"
 void setup() {
   Serial.begin(115200);
   Wire.begin(SDA_PIN, SCL_PIN);
@@ -40,13 +45,13 @@ void setup() {
   initRGBLed();
   initAHT10();
   initDisplay(display);
-  // Connect to Wifi
+
   if(!connectWifi()){
     display.clearDisplay();
     display.setTextColor(TEXT_COLOR);
     display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT / 2 - 8);
     display.print("Internet connection failed!");
-    display.display(); // make a dedicated display error message;
+    display.display();
     return;
   }
   initNTP();
@@ -61,7 +66,7 @@ void loop() {
   updateMelodyPlayback();
   resetESP32();
   updateAnimations();
-  // ✅ Force uiState to ALARM_RINGING while active
+
   if (alarmActive) {
     uiState = ALARM_RINGING;
   }
@@ -72,7 +77,7 @@ void loop() {
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
     case ALARM_RINGING:
       drawBellRinging(display, "Mod:Snooze, Cmf:Stop");
-      updateAlarmLights();  // ✅ uncomment this now
+      updateAlarmLights();
       break;
     case ALARM_SNOOZE_MESSAGE:
       drawSnoozeMessage(lastSnoozed);
@@ -83,7 +88,7 @@ void loop() {
       break;
   }
 
-  // Only call it every 10–30 seconds using millis():
+
   if (millis() - lastFirebaseUpdate > firebaseInterval) {
     getDataFromFirebase();
     lastFirebaseUpdate = millis();
@@ -94,4 +99,3 @@ void loop() {
   }
   delay(50);
 }
-

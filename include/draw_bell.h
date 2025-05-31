@@ -3,6 +3,6 @@
 
 #include <Adafruit_SSD1306.h>
 
-void drawBellRinging(Adafruit_SSD1306 &display);
+void drawBellRinging(Adafruit_SSD1306 &display, const String &footerMessage);
 
 #endif
