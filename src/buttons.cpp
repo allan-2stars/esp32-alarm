@@ -206,7 +206,7 @@ void handleButtons() {
         alarms[selectedAlarmIndex] = tempAlarm;
         alarms[selectedAlarmIndex].version = SCREEN_ALARM_VERSION;
         alarmStorageService.saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
-        uiState = IDLE_SCREEN;
+        uiState = ALARM_SAVE_MESSAGE;
       }
     } else if (uiState == MELODY_PREVIEW) {
       tempAlarm.melody = previewMelodyIndex;

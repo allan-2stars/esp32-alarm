@@ -294,7 +294,18 @@ void drawSnoozeMessage(bool wasSnoozed) {
   display.print(wasSnoozed ? "Snooze for 10 mins" : "Alarm STOPPED");
 
   display.display();
-  delay(3000);
+  delay(2000);
+}
+
+void drawSaveAlarmMessage() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(TEXT_COLOR);
+  display.setCursor((SCREEN_WIDTH - 100) / 2, (SCREEN_HEIGHT / 2) - 4);
+  display.print("Alarm Saved!");
+
+  display.display();
+  delay(2000);
 }
 
 void drawErrorScreen() {

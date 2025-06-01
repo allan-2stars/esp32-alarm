@@ -107,6 +107,10 @@ void loop() {
       bellUI.draw(display, "Mod:Snooze, Cmf:Stop");
       ledService.updateAlarmLights();
       break;
+    case ALARM_SAVE_MESSAGE:
+      drawSaveAlarmMessage();
+      uiState = IDLE_SCREEN;
+      break;
     case ALARM_SNOOZE_MESSAGE:
       drawSnoozeMessage(lastSnoozed);
       uiState = IDLE_SCREEN;
