@@ -16,6 +16,9 @@
 #include "animations.h"
 #include "light_control.h"
 #include "sleep.h"
+#include "services/AlarmService.h"
+AlarmService alarmService;
+
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -33,6 +36,8 @@ const unsigned long firebaseInterval = 5000;  // 10 seconds
 
 void setup() {
   Serial.begin(115200);
+  alarmService.begin();
+
   Wire.begin(SDA_PIN, SCL_PIN);
   initButtons();
   initBuzzer();
@@ -52,12 +57,14 @@ void setup() {
   initNTP();
   initAlarmStorage();
   initAlarmLights();
-  initFirebase();
+  //initFirebase();
 }
 
 void loop() {
+  alarmService.update();
+
   handleButtons();
-  checkAndTriggerAlarms();
+  //checkAndTriggerAlarms();
   updateMelodyPlayback();
   resetESP32();
   updateAnimations();
@@ -84,10 +91,10 @@ void loop() {
   }
 
   // Only call it every 10–30 seconds using millis():
-  if (millis() - lastFirebaseUpdate > firebaseInterval) {
-    getDataFromFirebase();
-    lastFirebaseUpdate = millis();
-  }
+  // if (millis() - lastFirebaseUpdate > firebaseInterval) {
+  //   getDataFromFirebase();
+  //   lastFirebaseUpdate = millis();
+  // }
 
   if (!alarmActive && millis() - lastInteraction > INACTIVITY_TIMEOUT) {
     checkIdleAndSleep();
