@@ -27,6 +27,8 @@ AlarmStorageService alarmStorageService;
 LedService ledService;
 #include "services/RGBLedService.h"
 RGBLedService rgbLed;
+#include "ui/BellUI.h"
+BellUI bellUI;
 
 
 UIState uiState = IDLE_SCREEN;
@@ -50,7 +52,9 @@ void setup() {
   ledService.begin();
   rgbLed.begin();
   rgbLed.setColor(255, 0, 0);  // Red
+  bellUI.begin();
 
+  //
   Wire.begin(SDA_PIN, SCL_PIN);
   initButtons();
   initBuzzer();
@@ -91,7 +95,7 @@ void loop() {
     case ALARM_CONFIG: drawAlarmConfig(); break;
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
     case ALARM_RINGING:
-      drawBellRinging(display, "Mod:Snooze, Cmf:Stop");
+      bellUI.draw(display, "Mod:Snooze, Cmf:Stop");
       ledService.updateAlarmLights();
       break;
     case ALARM_SNOOZE_MESSAGE:
