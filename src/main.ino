@@ -30,9 +30,12 @@
  RGBLedService rgbLed;
 #include "ui/BellUI.h"
  BellUI bellUI;
-// Drawing UI animation
+// Drawing UI
 #include "ui/SunMoonUI.h"
 SunMoonUI sunMoonUI;
+#include "ui/MelodyPreviewUI.h"
+MelodyPreviewUI melodyPreviewUI;
+
 
 
 UIState uiState = IDLE_SCREEN;
@@ -99,7 +102,7 @@ void loop() {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
-    case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
+    case MELODY_PREVIEW: melodyPreviewUI.draw(display, previewMelodyIndex); break;
     case ALARM_RINGING:
       bellUI.draw(display, "Mod:Snooze, Cmf:Stop");
       ledService.updateAlarmLights();

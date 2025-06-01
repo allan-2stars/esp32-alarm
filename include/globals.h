@@ -9,6 +9,7 @@
 #include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
 #include "ui/SunMoonUI.h"
+#include "ui/MelodyPreviewUI.h"
 
 // Shared system state
 extern UIState uiState;
@@ -48,5 +49,7 @@ extern UserAuth user_auth;
 extern unsigned long lastDataCheck;
 //
 extern SunMoonUI sunMoonUI;
+extern MelodyPreviewUI melodyPreviewUI;
+
 
 #endif

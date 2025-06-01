@@ -93,6 +93,11 @@
 #define NOTE_DS8 4978
 #define REST        0
 
+const int MELODY_COUNT = 6;
+const char* melodyNames[MELODY_COUNT] = {
+  "We Wish You", "White Xmas", "Jingle Bell", "Rudolf Red Nosed", "Santa Coming", "Silent Night"
+};
+
 const int melodyWeWishYou[] = {
   NOTE_D4, 4, NOTE_G4, 4, NOTE_G4, 4, NOTE_A4, 4,
   NOTE_G4, 4, NOTE_FS4, 4, NOTE_E4, 2,
