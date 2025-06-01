@@ -1,4 +1,4 @@
-#include "MelodyPreviewUI.h"
+#include "../include/ui/MelodyPreviewUI.h"
 #include "melodies.h"
 #include "config.h"
 

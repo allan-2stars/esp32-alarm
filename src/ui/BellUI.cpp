@@ -1,5 +1,5 @@
 // BellUI.cpp
-#include "BellUI.h"
+#include "../include/ui/BellUI.h"
 #include "icons.h"
 #include "config.h"
 
