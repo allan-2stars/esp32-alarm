@@ -1,21 +1,21 @@
-#include <Arduino.h>
-#include <time.h>
-#include "melody_engine.h"
-#include "alarm.h"
-#include "buttons.h"  // for BUZZER_PIN
-#include "config.h"
-#include "ui.h"
-#include "globals.h"
-#include "led.h"
-#include "melodies.h"
-#include "light_control.h"
+// #include <Arduino.h>
+// #include <time.h>
+// #include "melody_engine.h"
+// #include "alarm.h"
+// #include "buttons.h"  // for BUZZER_PIN
+// #include "config.h"
+// #include "ui.h"
+// #include "globals.h"
+// #include "led.h"
+// #include "melodies.h"
+// #include "light_control.h"
 
 
-// External variables (defined in main.cpp or shared)
-extern Alarm alarms[MAX_SCREEN_ALARMS];
-extern int lastTriggerMinute;
-extern bool alarmActive;
-extern int selectedAlarmIndex;
+// // External variables (defined in main.cpp or shared)
+// extern Alarm alarms[MAX_SCREEN_ALARMS];
+// extern int lastTriggerMinute;
+// extern bool alarmActive;
+// extern int selectedAlarmIndex;
 
 // void checkAndTriggerAlarms() {
 //   struct tm timeinfo;
@@ -86,10 +86,3 @@ extern int selectedAlarmIndex;
 // }
 
 
-bool isFieldVisible(AlarmType type, AlarmField field) {
-  if ((field == ALARM_DATE_YEAR || field == ALARM_DATE_MONTH || field == ALARM_DATE_DAY) && type != SPECIFIC_DATE)
-    return false;
-  if (field == ALARM_REPEAT_DAYS && type != REPEATED)
-    return false;
-  return true;
-}

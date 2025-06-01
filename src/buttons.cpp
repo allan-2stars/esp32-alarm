@@ -12,6 +12,9 @@
 ////
 #include "services/MelodyService.h"
 extern MelodyService melodyService;
+#include "services/AlarmStorageService.h"
+extern AlarmStorageService alarmStorage;
+
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -195,7 +198,7 @@ void handleButtons() {
       }else {
         alarms[selectedAlarmIndex] = tempAlarm;
         alarms[selectedAlarmIndex].version = SCREEN_ALARM_VERSION;
-        saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
+        alarmStorage.saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
         uiState = IDLE_SCREEN;
       }
     } else if (uiState == MELODY_PREVIEW) {

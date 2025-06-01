@@ -21,6 +21,9 @@
 AlarmService alarmService;
 #include "services/MelodyService.h"
 MelodyService melodyService;
+#include "services/AlarmStorageService.h"
+AlarmStorageService alarmStorage;
+
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -58,7 +61,8 @@ void setup() {
     return;
   }
   initNTP();
-  initAlarmStorage();
+  alarmStorage.begin();
+
   initAlarmLights();
   //initFirebase();
 }

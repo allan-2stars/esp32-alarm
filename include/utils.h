@@ -9,6 +9,7 @@ bool isTimeAvailable();
 void setAlarmToCurrentTime(Alarm &a);
 String getFormattedTime();
 String getFormattedDate();
+bool isFieldVisible(AlarmType type, AlarmField field);
 
 bool connectWifi();
 int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems);
