@@ -259,31 +259,31 @@ void drawAlarmConfig() {
   display.display();
 }
 
-void drawMelodyPreview(int selectedIndex) {
-  const int melodyCount = MELODY_COUNT;
+// void drawMelodyPreview(int selectedIndex) {
+//   const int melodyCount = MELODY_COUNT;
 
-  // Adjust scroll if selection is outside view
-  if (selectedIndex < scrollOffset) scrollOffset = selectedIndex;
-  if (selectedIndex >= scrollOffset + visibleMelodyCount) {
-    scrollOffset = selectedIndex - visibleMelodyCount + 1;
-  }
+//   // Adjust scroll if selection is outside view
+//   if (selectedIndex < scrollOffset) scrollOffset = selectedIndex;
+//   if (selectedIndex >= scrollOffset + visibleMelodyCount) {
+//     scrollOffset = selectedIndex - visibleMelodyCount + 1;
+//   }
 
-  display.clearDisplay();
-  display.setTextColor(TEXT_COLOR);
-  display.setCursor(0, 0);
-  display.print("Select Melody:");
+//   display.clearDisplay();
+//   display.setTextColor(TEXT_COLOR);
+//   display.setCursor(0, 0);
+//   display.print("Select Melody:");
 
-  for (int i = 0; i < visibleMelodyCount && (i + scrollOffset) < melodyCount; i++) {
-    display.setCursor(0, 12 + i * 10);
-    int actualIndex = i + scrollOffset;
-    display.print(actualIndex == selectedIndex ? "> " : "  ");
-    display.print(melodyNames[actualIndex]);
-  }
+//   for (int i = 0; i < visibleMelodyCount && (i + scrollOffset) < melodyCount; i++) {
+//     display.setCursor(0, 12 + i * 10);
+//     int actualIndex = i + scrollOffset;
+//     display.print(actualIndex == selectedIndex ? "> " : "  ");
+//     display.print(melodyNames[actualIndex]);
+//   }
 
-  display.setCursor(0, SCREEN_HEIGHT - 10);
-  display.print("Mod:Abort, Cmf:OK");
-  display.display();
-}
+//   display.setCursor(0, SCREEN_HEIGHT - 10);
+//   display.print("Mod:Abort, Cmf:OK");
+//   display.display();
+// }
 
 void drawSnoozeMessage(bool wasSnoozed) {
   display.clearDisplay();

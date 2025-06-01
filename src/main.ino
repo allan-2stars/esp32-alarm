@@ -31,12 +31,9 @@
 #include "ui/BellUI.h"
  BellUI bellUI;
 // Drawing UI
-#include "ui/SunMoonUI.h"
+
 SunMoonUI sunMoonUI;
-#include "ui/MelodyPreviewUI.h"
 MelodyPreviewUI melodyPreviewUI;
-
-
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -80,6 +77,7 @@ void setup() {
   }
   initNTP();
   alarmStorageService.begin();
+  melodyPreviewUI.begin(&display);
 
   initAlarmLights();
   //initFirebase();
@@ -102,7 +100,7 @@ void loop() {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: drawAlarmOverview(); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
-    case MELODY_PREVIEW: melodyPreviewUI.draw(display, previewMelodyIndex); break;
+    case MELODY_PREVIEW: melodyPreviewUI.draw(previewMelodyIndex); break;
     case ALARM_RINGING:
       bellUI.draw(display, "Mod:Snooze, Cmf:Stop");
       ledService.updateAlarmLights();
