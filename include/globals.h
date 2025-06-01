@@ -8,6 +8,7 @@
 #include <Preferences.h>
 #include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
+#include "ui/SunMoonUI.h"
 
 // Shared system state
 extern UIState uiState;
@@ -45,5 +46,7 @@ extern FirebaseApp app;
 extern RealtimeDatabase Database;
 extern UserAuth user_auth;
 extern unsigned long lastDataCheck;
+//
+extern SunMoonUI sunMoonUI;
 
 #endif

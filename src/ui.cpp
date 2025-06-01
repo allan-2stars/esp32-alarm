@@ -117,22 +117,8 @@ void drawIdleScreen() {
 
   // Animate Sun or Moon (top-right)
   struct tm timeinfo;
-  getLocalTime(&timeinfo);
-  int hour = timeinfo.tm_hour;  
-  if (hour >= 6 && hour < 18) {
-    if (millis() - lastSunAnimTime > 200) {
-      sunFrameIndex = (sunFrameIndex + 1) % 5;
-      lastSunAnimTime = millis();
-    }
-    display.drawBitmap(SCREEN_WIDTH - 16, 0, sun_frames[sunFrameIndex], 16, 16, TEXT_COLOR);
-  } else {
-    if (millis() - lastMoonAnimTime > 500) {
-      moonVisible = !moonVisible;
-      lastMoonAnimTime = millis();
-    }
-    if (moonVisible) {
-      display.drawBitmap(SCREEN_WIDTH - 16, 0, moon_icon, 16, 16, TEXT_COLOR);
-    }
+  if (getLocalTime(&timeinfo)) {
+    sunMoonUI.updateAndDraw(display, timeinfo.tm_hour);
   }
 
   // Time (always shown if updated)

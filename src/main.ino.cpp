@@ -1,3 +1,6 @@
+# 1 "C:\\Users\\test\\AppData\\Local\\Temp\\tmpflpetj1_"
+#include <Arduino.h>
+# 1 "C:/Users/test/Documents/Wokwi/alarm-esp32/src/main.ino"
 #include <Arduino.h>
 #include "alarm.h"
 #include "ui.h"
@@ -16,7 +19,7 @@
 #include "animations.h"
 #include "light_control.h"
 #include "sleep.h"
-////
+
 
 #include "services/AlarmService.h"
  AlarmService alarmService;
@@ -30,7 +33,7 @@
  RGBLedService rgbLed;
 #include "ui/BellUI.h"
  BellUI bellUI;
-// Drawing UI animation
+
 #include "ui/SunMoonUI.h"
 SunMoonUI sunMoonUI;
 
@@ -47,39 +50,41 @@ unsigned long messageDisplayStart = 0;
 time_t snoozeUntil = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 unsigned long lastFirebaseUpdate = 0;
-const unsigned long firebaseInterval = 5000;  // 10 seconds
-
+const unsigned long firebaseInterval = 5000;
+void setup();
+void loop();
+#line 52 "C:/Users/test/Documents/Wokwi/alarm-esp32/src/main.ino"
 void setup() {
   Serial.begin(115200);
   alarmService.begin();
   melodyService.begin();
   ledService.begin();
   rgbLed.begin();
-  rgbLed.setColor(255, 0, 0);  // Red
+  rgbLed.setColor(255, 0, 0);
   bellUI.begin();
   sunMoonUI.begin();
 
 
-  //
+
   Wire.begin(SDA_PIN, SCL_PIN);
   initButtons();
   initBuzzer();
   initAHT10();
   initDisplay(display);
-  // Connect to Wifi
+
   if(!connectWifi()){
     display.clearDisplay();
     display.setTextColor(TEXT_COLOR);
     display.setCursor((SCREEN_WIDTH - 72) / 2, SCREEN_HEIGHT / 2 - 8);
     display.print("Internet connection failed!");
-    display.display(); // make a dedicated display error message;
+    display.display();
     return;
   }
   initNTP();
   alarmStorageService.begin();
 
   initAlarmLights();
-  //initFirebase();
+
 }
 
 void loop() {
@@ -87,11 +92,11 @@ void loop() {
   melodyService.update();
 
   handleButtons();
-  //checkAndTriggerAlarms();
-  //updateMelodyPlayback();
+
+
   resetESP32();
   updateAnimations();
-  // ✅ Force uiState to ALARM_RINGING while active
+
   if (alarmActive) {
     uiState = ALARM_RINGING;
   }
@@ -113,15 +118,14 @@ void loop() {
       break;
   }
 
-  // Only call it every 10–30 seconds using millis():
-  // if (millis() - lastFirebaseUpdate > firebaseInterval) {
-  //   getDataFromFirebase();
-  //   lastFirebaseUpdate = millis();
-  // }
+
+
+
+
+
 
   if (!alarmActive && millis() - lastInteraction > INACTIVITY_TIMEOUT) {
     checkIdleAndSleep();
   }
   delay(50);
 }
-

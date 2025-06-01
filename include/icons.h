@@ -20,5 +20,6 @@ extern const unsigned char moon_icon[];
 
 // Rotating sun frames (5 total)
 extern const unsigned char sun_frames[5][32];
+const int SUN_FRAME_COUNT = 5;
 
 #endif
