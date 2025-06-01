@@ -22,7 +22,11 @@ AlarmService alarmService;
 #include "services/MelodyService.h"
 MelodyService melodyService;
 #include "services/AlarmStorageService.h"
-AlarmStorageService alarmStorage;
+AlarmStorageService alarmStorageService;
+#include "services/LedService.h"
+LedService ledService;
+#include "services/RGBLedService.h"
+RGBLedService rgbLed;
 
 
 UIState uiState = IDLE_SCREEN;
@@ -43,12 +47,13 @@ void setup() {
   Serial.begin(115200);
   alarmService.begin();
   melodyService.begin();
+  ledService.begin();
+  rgbLed.begin();
+  rgbLed.setColor(255, 0, 0);  // Red
 
   Wire.begin(SDA_PIN, SCL_PIN);
   initButtons();
   initBuzzer();
-  initLED();
-  initRGBLed();
   initAHT10();
   initDisplay(display);
   // Connect to Wifi
@@ -61,7 +66,7 @@ void setup() {
     return;
   }
   initNTP();
-  alarmStorage.begin();
+  alarmStorageService.begin();
 
   initAlarmLights();
   //initFirebase();
@@ -87,7 +92,7 @@ void loop() {
     case MELODY_PREVIEW: drawMelodyPreview(previewMelodyIndex); break;
     case ALARM_RINGING:
       drawBellRinging(display, "Mod:Snooze, Cmf:Stop");
-      updateAlarmLights();  // ✅ uncomment this now
+      ledService.updateAlarmLights();
       break;
     case ALARM_SNOOZE_MESSAGE:
       drawSnoozeMessage(lastSnoozed);

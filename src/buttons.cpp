@@ -13,7 +13,9 @@
 #include "services/MelodyService.h"
 extern MelodyService melodyService;
 #include "services/AlarmStorageService.h"
-extern AlarmStorageService alarmStorage;
+extern AlarmStorageService alarmStorageService;
+#include "services/LedService.h"
+extern LedService ledService;
 
 
 extern Alarm alarms[3];
@@ -64,7 +66,8 @@ void handleButtons() {
     recordInteraction();
     //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
-    resetAlarmLights();  // Turn off LEDs
+    ledService.stopAlarmLights();
+
     /// new class object call
     melodyService.stop();
     ///
@@ -88,7 +91,8 @@ void handleButtons() {
       /// new class object call
       melodyService.stop();
       ///
-      resetAlarmLights();
+      ledService.stopAlarmLights();
+
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
       uiState = ALARM_SNOOZE_MESSAGE;
@@ -102,7 +106,8 @@ void handleButtons() {
   // ADJUST button
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
     recordInteraction();
-    resetAlarmLights();  // Turn off LEDs
+    ledService.stopAlarmLights();
+
     /// new class object call
     melodyService.stop();
     ///
@@ -166,7 +171,8 @@ void handleButtons() {
       /// new class object call
       melodyService.stop();
       ///
-      resetAlarmLights();
+      ledService.stopAlarmLights();
+
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
       uiState = ALARM_SNOOZE_MESSAGE;
@@ -177,7 +183,8 @@ void handleButtons() {
   // CONFIRM button
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
     recordInteraction();
-    resetAlarmLights();  // Turn off LEDs
+    ledService.stopAlarmLights();
+
     /// new class object call
     melodyService.stop();
     ///
@@ -198,7 +205,7 @@ void handleButtons() {
       }else {
         alarms[selectedAlarmIndex] = tempAlarm;
         alarms[selectedAlarmIndex].version = SCREEN_ALARM_VERSION;
-        alarmStorage.saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
+        alarmStorageService.saveAlarm(alarms[selectedAlarmIndex], selectedAlarmIndex);
         uiState = IDLE_SCREEN;
       }
     } else if (uiState == MELODY_PREVIEW) {
@@ -211,7 +218,8 @@ void handleButtons() {
       /// new class object call
       melodyService.stop();
       ///
-      resetAlarmLights();
+      ledService.stopAlarmLights();
+
       lastSnoozed = false;
       uiState = ALARM_SNOOZE_MESSAGE;
       messageDisplayStart = millis();

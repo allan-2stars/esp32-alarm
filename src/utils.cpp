@@ -93,11 +93,11 @@ bool connectWifi() {
   unsigned long startAttemptTime = millis();
   const unsigned long timeout = 6000;
 
-  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
-    delay(100);
-    Serial.print(".");
-    setLedMode(LED_WIFI);  // blink LED while waiting
-  }
+  // while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+  //   delay(100);
+  //   Serial.print(".");
+  //   setLedMode(LED_WIFI);  // blink LED while waiting
+  // }
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ Wi-Fi connection failed.");

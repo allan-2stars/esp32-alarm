@@ -9,6 +9,8 @@
 
 #include "services/MelodyService.h"
 extern MelodyService melodyService;
+#include "services/LedService.h"
+extern LedService ledService;
 
 void AlarmService::begin() {
   // Optional: startup logic for alarms
@@ -32,7 +34,7 @@ void AlarmService::handleSnooze() {
   );
 
 
-    startAlarmLights();
+    ledService.startAlarmLights();
     uiState = ALARM_RINGING;
   }
 }
@@ -75,7 +77,7 @@ void AlarmService::checkAlarms() {
     );
 
 
-      startAlarmLights();
+      ledService.startAlarmLights();
       uiState = ALARM_RINGING;
       break;
     }
