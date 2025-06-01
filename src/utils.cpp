@@ -7,6 +7,27 @@
 #include <WiFi.h>
 #include <WiFiManager.h>
 
+#include "alarm.h"
+// use this can show the alarm type in overview.
+const char* getAlarmTypeLabel(AlarmType type) {
+  switch (type) {
+    case ONE_TIME:       return "One";
+    case SPECIFIC_DATE:  return "Date";
+    case REPEATED:       return "Repeat";
+    default:             return "?";
+  }
+}
+// same as getMelodyName
+#include "melodies.h"
+const char* getMelodyName(int melodyIndex) {
+  if (melodyIndex >= 0 && melodyIndex < MELODY_COUNT) {
+    return melodyNames[melodyIndex];
+  }
+  return "-";
+}
+
+
+
 String errorMessage = "";
 unsigned long lastInteraction = 0;
 

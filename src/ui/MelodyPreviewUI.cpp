@@ -22,7 +22,7 @@ void MelodyPreviewUI::draw(int selectedIndex) {
   display->print("Select Melody:");
 
   for (int i = 0; i < visibleMelodyCount && (i + scrollOffset) < melodyCount; i++) {
-    display->setCursor(HEADER_HEIGHT, 12 + i * 10);
+    display->setCursor(0, HEADER_HEIGHT + i * 10);
     int actualIndex = i + scrollOffset;
     display->print(actualIndex == selectedIndex ? "> " : "  ");
     display->print(melodyNames[actualIndex]);

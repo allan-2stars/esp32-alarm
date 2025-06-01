@@ -31,9 +31,9 @@
 #include "ui/BellUI.h"
  BellUI bellUI;
 // Drawing UI
-
 SunMoonUI sunMoonUI;
 MelodyPreviewUI melodyPreviewUI;
+AlarmOverviewUI alarmOverviewUI;
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -56,8 +56,11 @@ void setup() {
   ledService.begin();
   rgbLed.begin();
   rgbLed.setColor(255, 0, 0);  // Red
+  alarmStorageService.begin();
+  melodyPreviewUI.begin(&display);
   bellUI.begin();
   sunMoonUI.begin();
+  alarmOverviewUI.begin(&display);
 
 
   //
@@ -76,10 +79,9 @@ void setup() {
     return;
   }
   initNTP();
-  alarmStorageService.begin();
-  melodyPreviewUI.begin(&display);
 
-  initAlarmLights();
+
+  //initAlarmLights();
   //initFirebase();
 }
 
@@ -98,7 +100,7 @@ void loop() {
   }
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
-    case ALARM_OVERVIEW: drawAlarmOverview(); break;
+    case ALARM_OVERVIEW: alarmOverviewUI.draw(alarms, selectedAlarmIndex); break;
     case ALARM_CONFIG: drawAlarmConfig(); break;
     case MELODY_PREVIEW: melodyPreviewUI.draw(previewMelodyIndex); break;
     case ALARM_RINGING:

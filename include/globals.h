@@ -10,6 +10,7 @@
 #include <FirebaseClient.h>
 #include "ui/SunMoonUI.h"
 #include "ui/MelodyPreviewUI.h"
+#include "ui/AlarmOverviewUI.h"
 
 // Shared system state
 extern UIState uiState;
@@ -50,6 +51,8 @@ extern unsigned long lastDataCheck;
 //
 extern SunMoonUI sunMoonUI;
 extern MelodyPreviewUI melodyPreviewUI;
+extern AlarmOverviewUI alarmOverviewUI;
+
 
 
 #endif

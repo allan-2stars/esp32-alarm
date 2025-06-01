@@ -16,5 +16,8 @@ int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int 
 
 extern unsigned long lastInteraction;
 void recordInteraction();
+const char* getAlarmTypeLabel(AlarmType type);
+const char* getMelodyName(int melodyIndex);
+
 
 #endif
