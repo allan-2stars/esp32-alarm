@@ -2,7 +2,7 @@
 #include "alarm.h"
 #include "ui.h"
 #include "buttons.h"
-#include "melody_engine.h"
+
 #include "utils.h"
 #include "config.h"
 #include "draw_bell.h"
@@ -16,9 +16,11 @@
 #include "animations.h"
 #include "light_control.h"
 #include "sleep.h"
+////
 #include "services/AlarmService.h"
 AlarmService alarmService;
-
+#include "services/MelodyService.h"
+MelodyService melodyService;
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -37,6 +39,7 @@ const unsigned long firebaseInterval = 5000;  // 10 seconds
 void setup() {
   Serial.begin(115200);
   alarmService.begin();
+  melodyService.begin();
 
   Wire.begin(SDA_PIN, SCL_PIN);
   initButtons();
@@ -62,10 +65,11 @@ void setup() {
 
 void loop() {
   alarmService.update();
+  melodyService.update();
 
   handleButtons();
   //checkAndTriggerAlarms();
-  updateMelodyPlayback();
+  //updateMelodyPlayback();
   resetESP32();
   updateAnimations();
   // ✅ Force uiState to ALARM_RINGING while active

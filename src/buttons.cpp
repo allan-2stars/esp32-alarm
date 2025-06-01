@@ -2,13 +2,16 @@
 #include "buttons.h"
 #include "alarm.h"
 #include "ui.h"
-#include "melody_engine.h"
+
 #include "melodies.h"
 #include "utils.h"
 #include "config.h"
 #include "globals.h"
 #include "alarm_storage.h"
 #include "light_control.h"
+////
+#include "services/MelodyService.h"
+extern MelodyService melodyService;
 
 extern Alarm alarms[3];
 extern Alarm tempAlarm;
@@ -59,7 +62,9 @@ void handleButtons() {
     //Calculates how long the button was held
     unsigned long duration = now - modeButtonPressTime;
     resetAlarmLights();  // Turn off LEDs
-    stopMelody();       // Stop sound
+    /// new class object call
+    melodyService.stop();
+    ///
     alarmActive = false;
 
     if (uiState == ALARM_CONFIG) {
@@ -77,7 +82,9 @@ void handleButtons() {
       drawAlarmConfig();
     } else if (uiState == ALARM_RINGING) {
       alarmActive = false;
-      stopMelody();
+      /// new class object call
+      melodyService.stop();
+      ///
       resetAlarmLights();
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
@@ -93,7 +100,9 @@ void handleButtons() {
   if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
     recordInteraction();
     resetAlarmLights();  // Turn off LEDs
-    stopMelody();       // Stop sound
+    /// new class object call
+    melodyService.stop();
+    ///
     alarmActive = false;
     lastAdjustPress = now;
     Alarm &a = tempAlarm;
@@ -126,11 +135,13 @@ void handleButtons() {
           uiState = MELODY_PREVIEW;
             previewMelodyIndex = alarms[selectedAlarmIndex].melody;
             // Start melody playback for first entry
-            startMelody(
-              getMelodyData(previewMelodyIndex),
-              getMelodyLength(previewMelodyIndex),
-              getMelodyTempo(previewMelodyIndex),
-              BUZZER_PIN, false);
+      melodyService.play(
+        getMelodyData(alarms[selectedAlarmIndex].melody),
+        getMelodyLength(alarms[selectedAlarmIndex].melody),
+        getMelodyTempo(alarms[selectedAlarmIndex].melody),
+        BUZZER_PIN, false  // Looping = true
+      );
+
           lastAdjustPress = millis();  // avoid double-trigger
           break;
       }
@@ -139,15 +150,19 @@ void handleButtons() {
       previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
             Serial.println("else if index:");
       Serial.println(previewMelodyIndex);
-      startMelody(
-        getMelodyData(previewMelodyIndex),
-        getMelodyLength(previewMelodyIndex),
-        getMelodyTempo(previewMelodyIndex),
-        BUZZER_PIN, false);
+      melodyService.play(
+        getMelodyData(alarms[selectedAlarmIndex].melody),
+        getMelodyLength(alarms[selectedAlarmIndex].melody),
+        getMelodyTempo(alarms[selectedAlarmIndex].melody),
+        BUZZER_PIN, false  // Looping = true
+      );
+
     }
     else if (uiState == ALARM_RINGING) {
       alarmActive = false;
-      stopMelody();
+      /// new class object call
+      melodyService.stop();
+      ///
       resetAlarmLights();
       lastSnoozed = true;
       snoozeUntil = time(nullptr) + snoozeDurationSec;
@@ -160,7 +175,9 @@ void handleButtons() {
   if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
     recordInteraction();
     resetAlarmLights();  // Turn off LEDs
-    stopMelody();       // Stop sound
+    /// new class object call
+    melodyService.stop();
+    ///
     alarmActive = false;
     
     lastConfirmPress = now;
@@ -188,7 +205,9 @@ void handleButtons() {
       drawAlarmConfig();
     }else if (uiState == ALARM_RINGING) {
       alarmActive = false;
-      stopMelody();
+      /// new class object call
+      melodyService.stop();
+      ///
       resetAlarmLights();
       lastSnoozed = false;
       uiState = ALARM_SNOOZE_MESSAGE;

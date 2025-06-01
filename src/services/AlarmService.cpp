@@ -4,6 +4,11 @@
 #include "light_control.h"
 #include "ui.h"
 #include "time.h"
+#include "melodies.h"
+
+
+#include "services/MelodyService.h"
+extern MelodyService melodyService;
 
 void AlarmService::begin() {
   // Optional: startup logic for alarms
@@ -19,12 +24,13 @@ void AlarmService::handleSnooze() {
     snoozeUntil = 0;
     alarmActive = true;
 
-    startMelody(
-      getMelodyData(alarms[selectedAlarmIndex].melody),
-      getMelodyLength(alarms[selectedAlarmIndex].melody),
-      getMelodyTempo(alarms[selectedAlarmIndex].melody),
-      BUZZER_PIN, true
-    );
+  melodyService.play(
+    getMelodyData(alarms[selectedAlarmIndex].melody),
+    getMelodyLength(alarms[selectedAlarmIndex].melody),
+    getMelodyTempo(alarms[selectedAlarmIndex].melody),
+    BUZZER_PIN, true  // Looping = true
+  );
+
 
     startAlarmLights();
     uiState = ALARM_RINGING;
@@ -61,12 +67,13 @@ void AlarmService::checkAlarms() {
       alarmActive = true;
       lastTriggerMinute = timeinfo.tm_min;
 
-      startMelody(
-        getMelodyData(a.melody),
-        getMelodyLength(a.melody),
-        getMelodyTempo(a.melody),
-        BUZZER_PIN, true
-      );
+    melodyService.play(
+      getMelodyData(alarms[selectedAlarmIndex].melody),
+      getMelodyLength(alarms[selectedAlarmIndex].melody),
+      getMelodyTempo(alarms[selectedAlarmIndex].melody),
+      BUZZER_PIN, true  // Looping = true
+    );
+
 
       startAlarmLights();
       uiState = ALARM_RINGING;

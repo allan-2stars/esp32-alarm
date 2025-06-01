@@ -260,11 +260,11 @@ void drawAlarmConfig() {
     drawLine++;
   }
 
-  if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
-    display.clearDisplay();
-    display.setCursor(0, SCREEN_HEIGHT - 20);
-    display.print("Previewing...");
-  }
+  // if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
+  //   display.clearDisplay();
+  //   display.setCursor(0, SCREEN_HEIGHT - 20);
+  //   display.print("Previewing...");
+  // }
 
   // Draw scroll indicator if there are more lines below
   if (scrollOffset + maxVisibleLines < totalFields) {
