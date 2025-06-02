@@ -85,9 +85,23 @@ void handleButtons() {
 
     if (uiState == ALARM_OVERVIEW) {
       selectedAlarmIndex = (selectedAlarmIndex + 1) % 3;
-    } else if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      alarmConfigUI->adjustValue(true);
-    } else if (uiState == MELODY_PREVIEW) {
+    } 
+    else if (uiState == ALARM_CONFIG && alarmConfigUI) {
+      if (alarmConfigUI->getSelectedField() == ALARM_MELODY) {
+        uiState = MELODY_PREVIEW;
+        previewMelodyIndex = alarms[selectedAlarmIndex].melody;
+        melodyService.play(
+          getMelodyData(previewMelodyIndex),
+          getMelodyLength(previewMelodyIndex),
+          getMelodyTempo(previewMelodyIndex),
+          BUZZER_PIN, false
+        );
+      } else {
+        alarmConfigUI->adjustValue(true);
+      }
+    }
+    
+    else if (uiState == MELODY_PREVIEW) {
       previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
       melodyService.play(
         getMelodyData(previewMelodyIndex),
@@ -120,6 +134,7 @@ void handleButtons() {
       alarmConfigUI->confirm();
     } else if (uiState == MELODY_PREVIEW) {
       tempAlarm.melody = previewMelodyIndex;
+      alarmConfigUI->setSelectedMelody(previewMelodyIndex);
       uiState = ALARM_CONFIG;
     } else if (uiState == ALARM_RINGING) {
       lastSnoozed = false;

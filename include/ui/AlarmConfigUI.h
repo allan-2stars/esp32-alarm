@@ -1,43 +1,37 @@
 #pragma once
 
 #include <Adafruit_SSD1306.h>
-#include <vector>
 #include "alarm.h"
 #include "config.h"
-#include "ui.h"
-
-// Max number of visible lines on screen at once
-#define MAX_VISIBLE_LINES 4
+#include "utils.h"
 
 class AlarmConfigUI {
   public:
     AlarmConfigUI(Adafruit_SSD1306 &display, Alarm *alarm);
 
-    void begin();                     // Call once to start editing
-    void update();                    // Redraw the screen
-    void nextField();                // Move to next editable field
-    void prevField();                // Move to previous editable field
-    void adjustValue(bool increase); // Change value of selected field
-    void confirm();                  // Save changes to original alarm
-    void resetCursor();              // Reset field selection to top
-
+    void begin();
+    void update();
+    void nextField();
+    void prevField();
+    void adjustValue(bool increase);
+    void confirm();
     bool isDone() const;
+    AlarmField getSelectedField() const;
+    int getSelectedMelody() const;
+    void setSelectedMelody(int index);
 
   private:
     Adafruit_SSD1306 &display;
     Alarm *alarm;
     Alarm tempAlarm;
-    int selectedFieldIndex;
-    std::vector<AlarmField> visibleFields;
+    AlarmField selectedFieldIndex;
     int scrollOffset;
     bool done;
-    int currentRepeatDayIndex = 0;
+    int currentRepeatDayIndex;
 
-
-    void determineVisibleFields();
     void draw();
-    void drawField(int y, AlarmField field, bool selected);
     String getFieldLabel(AlarmField field);
     String getFieldValue(AlarmField field);
-    void applyAdjustment(AlarmField field, bool increase);
+
+
 };
