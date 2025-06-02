@@ -160,14 +160,12 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
 
 // utils.cpp
 String getRepeatDaysString(bool repeatDays[7]) {
-  const char* days[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-  String result = "";
-  for (int i = 0; i < 7; ++i) {
-    if (repeatDays[i]) {
-      if (result.length() > 0) result += ",";
-      result += days[i];
+    String result = "";
+    const char labels[] = {'S', 'M', 'T', 'W', 'T', 'F', 'S'};
+    for (int i = 0; i < 7; ++i) {
+        if (repeatDays[i]) {
+            result += labels[i];
+        }
     }
-  }
-  return result.length() > 0 ? result : "None";
+    return result.length() > 0 ? result : "None";
 }
-

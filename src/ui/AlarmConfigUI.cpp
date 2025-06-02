@@ -155,7 +155,7 @@ void AlarmConfigUI::draw() {
           for (int j = 0; j < 7; j++) {
             if (j == currentRepeatDayIndex && selectedFieldIndex == ALARM_REPEAT_DAYS) display.print("[");
             display.print(weekDays[j][0]);
-            display.print(tempAlarm.repeatDays[j] ? "*" : " ");
+            display.print(tempAlarm.repeatDays[j] ? "!" : " ");
             if (j == currentRepeatDayIndex && selectedFieldIndex == ALARM_REPEAT_DAYS) display.print("]");
             display.print(" ");
           }

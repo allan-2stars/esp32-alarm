@@ -28,6 +28,7 @@ class AlarmConfigUI {
     int scrollOffset;
     bool done;
     int currentRepeatDayIndex;
+    const char* weekDays[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     void draw();
     String getFieldLabel(AlarmField field);

@@ -23,7 +23,7 @@ int scrollOffset = 0;
 const int visibleMelodyCount = 4;
 
 
-const char* weekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+
 
 String lastTimeShown = "";
 float lastTempShown = -1000;   // impossible value to force first update
@@ -165,99 +165,99 @@ void drawAlarmOverview() {
   display.display();
 }
 
-void drawAlarmConfig() {
-  Alarm &a = tempAlarm;
-  display.clearDisplay();
-  std::vector<AlarmField> visibleFields;
-  if (isFieldVisible(a.type, ALARM_TYPE)) visibleFields.push_back(ALARM_TYPE);
-  visibleFields.push_back(ALARM_TIME_HOUR);
-  if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
-    visibleFields.push_back(ALARM_DATE_YEAR);
-  }
-  if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) visibleFields.push_back(ALARM_REPEAT_DAYS);
-  visibleFields.push_back(ALARM_ENABLED);
-  visibleFields.push_back(ALARM_MELODY);
+// void drawAlarmConfig() {
+//   Alarm &a = tempAlarm;
+//   display.clearDisplay();
+//   std::vector<AlarmField> visibleFields;
+//   if (isFieldVisible(a.type, ALARM_TYPE)) visibleFields.push_back(ALARM_TYPE);
+//   visibleFields.push_back(ALARM_TIME_HOUR);
+//   if (isFieldVisible(a.type, ALARM_DATE_YEAR)) {
+//     visibleFields.push_back(ALARM_DATE_YEAR);
+//   }
+//   if (isFieldVisible(a.type, ALARM_REPEAT_DAYS)) visibleFields.push_back(ALARM_REPEAT_DAYS);
+//   visibleFields.push_back(ALARM_ENABLED);
+//   visibleFields.push_back(ALARM_MELODY);
 
-  int totalFields = visibleFields.size();
-  const int maxVisibleLines = SCREEN_HEIGHT / 10 - 2;
+//   int totalFields = visibleFields.size();
+//   const int maxVisibleLines = SCREEN_HEIGHT / 10 - 2;
 
-  int selectedIndex = getSelectedFieldIndex(visibleFields);
-  scrollOffset = adjustVisibleStart(selectedIndex, scrollOffset, maxVisibleLines, totalFields);
+//   int selectedIndex = getSelectedFieldIndex(visibleFields);
+//   scrollOffset = adjustVisibleStart(selectedIndex, scrollOffset, maxVisibleLines, totalFields);
 
-  display.setCursor(0, 0);
-  display.printf("Config A%d", selectedAlarmIndex + 1);
+//   display.setCursor(0, 0);
+//   display.printf("Config A%d", selectedAlarmIndex + 1);
 
-  int drawLine = 0;
-  for (int i = 0; i < totalFields; ++i) {
-    if (i < scrollOffset || i >= scrollOffset + maxVisibleLines) continue;
-    int y = HEADER_HEIGHT + drawLine * 10;
-    AlarmField field = visibleFields[i];
+//   int drawLine = 0;
+//   for (int i = 0; i < totalFields; ++i) {
+//     if (i < scrollOffset || i >= scrollOffset + maxVisibleLines) continue;
+//     int y = HEADER_HEIGHT + drawLine * 10;
+//     AlarmField field = visibleFields[i];
 
-    display.setCursor(0, y);
-    switch (field) {
-      case ALARM_TYPE:
-        display.printf("%sType: %s", selectedField == ALARM_TYPE ? ">" : " ",
-          a.type == ONE_TIME ? "Once" : a.type == SPECIFIC_DATE ? "Date" : "Repeat");
-        break;
+//     display.setCursor(0, y);
+//     switch (field) {
+//       case ALARM_TYPE:
+//         display.printf("%sType: %s", selectedField == ALARM_TYPE ? ">" : " ",
+//           a.type == ONE_TIME ? "Once" : a.type == SPECIFIC_DATE ? "Date" : "Repeat");
+//         break;
 
-      case ALARM_TIME_HOUR:
-        display.printf(" Time: %s%02d%s:%s%02d%s",
-          selectedField == ALARM_TIME_HOUR ? "[" : "", a.hour, selectedField == ALARM_TIME_HOUR ? "]" : "",
-          selectedField == ALARM_TIME_MIN ? "[" : "", a.minute, selectedField == ALARM_TIME_MIN ? "]" : "");
-        break;
+//       case ALARM_TIME_HOUR:
+//         display.printf(" Time: %s%02d%s:%s%02d%s",
+//           selectedField == ALARM_TIME_HOUR ? "[" : "", a.hour, selectedField == ALARM_TIME_HOUR ? "]" : "",
+//           selectedField == ALARM_TIME_MIN ? "[" : "", a.minute, selectedField == ALARM_TIME_MIN ? "]" : "");
+//         break;
 
-      case ALARM_DATE_YEAR:
-        display.printf(" Date: %s%04d%s-%s%02d%s-%s%02d%s",
-          selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "",
-          selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "",
-          selectedField == ALARM_DATE_DAY ? "[" : "", a.day, selectedField == ALARM_DATE_DAY ? "]" : "");
-        break;
+//       case ALARM_DATE_YEAR:
+//         display.printf(" Date: %s%04d%s-%s%02d%s-%s%02d%s",
+//           selectedField == ALARM_DATE_YEAR ? "[" : "", a.year, selectedField == ALARM_DATE_YEAR ? "]" : "",
+//           selectedField == ALARM_DATE_MONTH ? "[" : "", a.month, selectedField == ALARM_DATE_MONTH ? "]" : "",
+//           selectedField == ALARM_DATE_DAY ? "[" : "", a.day, selectedField == ALARM_DATE_DAY ? "]" : "");
+//         break;
 
-      case ALARM_REPEAT_DAYS: {
-        display.printf("%sDays:", selectedField == ALARM_REPEAT_DAYS ? ">" : " ");
-        drawLine++;
-        y = HEADER_HEIGHT + drawLine * 10;
-        if (y < SCREEN_HEIGHT - 8) {
-          display.setCursor(0, y);
-          for (int j = 0; j < 7; j++) {
-            if (j == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("[");
-            display.print(weekDays[j][0]);
-            display.print(a.repeatDays[j] ? "*" : " ");
-            if (j == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("]");
-            display.print(" ");
-          }
-        }
-        break;
-      }
+//       case ALARM_REPEAT_DAYS: {
+//         display.printf("%sDays:", selectedField == ALARM_REPEAT_DAYS ? ">" : " ");
+//         drawLine++;
+//         y = HEADER_HEIGHT + drawLine * 10;
+//         if (y < SCREEN_HEIGHT - 8) {
+//           display.setCursor(0, y);
+//           for (int j = 0; j < 7; j++) {
+//             if (j == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("[");
+//             display.print(weekDays[j][0]);
+//             display.print(a.repeatDays[j] ? "*" : " ");
+//             if (j == currentRepeatDayIndex && selectedField == ALARM_REPEAT_DAYS) display.print("]");
+//             display.print(" ");
+//           }
+//         }
+//         break;
+//       }
 
-      case ALARM_ENABLED:
-        display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
-        break;
+//       case ALARM_ENABLED:
+//         display.printf("%sEnabled: %s", selectedField == ALARM_ENABLED ? ">" : " ", a.enabled ? "Yes" : "No");
+//         break;
 
-      case ALARM_MELODY:
-        display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
-        break;
+//       case ALARM_MELODY:
+//         display.printf("%sMelody: %s", selectedField == ALARM_MELODY ? ">" : " ", melodyNames[a.melody]);
+//         break;
 
-      default:
-        break;
-    }
-    drawLine++;
-  }
+//       default:
+//         break;
+//     }
+//     drawLine++;
+//   }
 
-  // if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
-  //   display.clearDisplay();
-  //   display.setCursor(0, SCREEN_HEIGHT - 20);
-  //   display.print("Previewing...");
-  // }
+//   // if (selectedField == ALARM_MELODY && isMelodyPlaying()) {
+//   //   display.clearDisplay();
+//   //   display.setCursor(0, SCREEN_HEIGHT - 20);
+//   //   display.print("Previewing...");
+//   // }
 
-  // Draw scroll indicator if there are more lines below
-  if (scrollOffset + maxVisibleLines < totalFields) {
-    display.setCursor(SCREEN_WIDTH - 6, SCREEN_HEIGHT - 8);
-    display.print("~");  // Down arrow indicator
-  }
+//   // Draw scroll indicator if there are more lines below
+//   if (scrollOffset + maxVisibleLines < totalFields) {
+//     display.setCursor(SCREEN_WIDTH - 6, SCREEN_HEIGHT - 8);
+//     display.print("~");  // Down arrow indicator
+//   }
 
-  display.display();
-}
+//   display.display();
+// }
 
 // void drawMelodyPreview(int selectedIndex) {
 //   const int melodyCount = MELODY_COUNT;
