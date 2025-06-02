@@ -11,6 +11,7 @@
 #include "ui/SunMoonUI.h"
 #include "ui/MelodyPreviewUI.h"
 #include "ui/AlarmOverviewUI.h"
+#include "ui/AlarmConfigUI.h"
 
 // Shared system state
 extern UIState uiState;
@@ -52,6 +53,8 @@ extern unsigned long lastDataCheck;
 extern SunMoonUI sunMoonUI;
 extern MelodyPreviewUI melodyPreviewUI;
 extern AlarmOverviewUI alarmOverviewUI;
+
+extern AlarmConfigUI* alarmConfigUI;
 
 
 

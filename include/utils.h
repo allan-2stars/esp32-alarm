@@ -19,5 +19,7 @@ void recordInteraction();
 const char* getAlarmTypeLabel(AlarmType type);
 const char* getMelodyName(int melodyIndex);
 
+// utils.h
+String getRepeatDaysString(bool repeatDays[7]);
 
 #endif

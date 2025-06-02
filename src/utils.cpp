@@ -136,14 +136,15 @@ bool connectWifi() {
 
 // if the list cannot be displayed in the screen, scroll down.
 int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems) {
-    if (selectedIndex < visibleStart) {
-        return selectedIndex;
-    } else if (selectedIndex >= visibleStart + maxVisible) {
-        return selectedIndex - maxVisible + 1;
-    }
-    return visibleStart;
+  if (selectedIndex < visibleStart) {
+      return selectedIndex;
+  } else if (selectedIndex >= visibleStart + maxVisible) {
+      return selectedIndex - maxVisible + 1;
+  }
+  return visibleStart;
 }
 
+//
 void recordInteraction() {
   lastInteraction = millis();
 }
@@ -156,3 +157,17 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
     return false;
   return true;
 }
+
+// utils.cpp
+String getRepeatDaysString(bool repeatDays[7]) {
+  const char* days[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+  String result = "";
+  for (int i = 0; i < 7; ++i) {
+    if (repeatDays[i]) {
+      if (result.length() > 0) result += ",";
+      result += days[i];
+    }
+  }
+  return result.length() > 0 ? result : "None";
+}
+

@@ -28,12 +28,17 @@
  LedService ledService;
 #include "services/RGBLedService.h"
  RGBLedService rgbLed;
+ AlarmConfigUI* alarmConfigUI = nullptr;
+
+
+ //UI
 #include "ui/BellUI.h"
- BellUI bellUI;
-// Drawing UI
+BellUI bellUI;
+
 SunMoonUI sunMoonUI;
 MelodyPreviewUI melodyPreviewUI;
 AlarmOverviewUI alarmOverviewUI;
+
 
 UIState uiState = IDLE_SCREEN;
 Alarm alarms[MAX_SCREEN_ALARMS];
@@ -51,16 +56,7 @@ const unsigned long firebaseInterval = 5000;  // 10 seconds
 
 void setup() {
   Serial.begin(115200);
-  alarmService.begin();
-  melodyService.begin();
-  ledService.begin();
-  rgbLed.begin();
-  rgbLed.setColor(255, 0, 0);  // Red
-  alarmStorageService.begin();
-  melodyPreviewUI.begin(&display);
-  bellUI.begin();
-  sunMoonUI.begin();
-  alarmOverviewUI.begin(&display);
+
 
 
   //
@@ -80,7 +76,16 @@ void setup() {
   }
   initNTP();
 
-
+  alarmService.begin();
+  melodyService.begin();
+  ledService.begin();
+  rgbLed.begin();
+  rgbLed.setColor(255, 0, 0);  // Red
+  alarmStorageService.begin();
+  melodyPreviewUI.begin(&display);
+  bellUI.begin();
+  sunMoonUI.begin();
+  alarmOverviewUI.begin(&display);
   //initAlarmLights();
   //initFirebase();
 }
@@ -101,7 +106,20 @@ void loop() {
   switch (uiState) {
     case IDLE_SCREEN: drawIdleScreen(); break;
     case ALARM_OVERVIEW: alarmOverviewUI.draw(alarms, selectedAlarmIndex); break;
-    case ALARM_CONFIG: drawAlarmConfig(); break;
+    case ALARM_CONFIG:
+      if (!alarmConfigUI) {
+        alarmConfigUI = new AlarmConfigUI(display, &alarms[selectedAlarmIndex]);
+        alarmConfigUI->begin();
+      }
+      if (alarmConfigUI->isDone()) {
+        delete alarmConfigUI;
+        alarmConfigUI = nullptr;
+        uiState = ALARM_SAVE_MESSAGE;
+      } else {
+        alarmConfigUI->update();
+      }
+      break;
+
     case MELODY_PREVIEW: melodyPreviewUI.draw(previewMelodyIndex); break;
     case ALARM_RINGING:
       bellUI.draw(display, "Mod:Snooze, Cmf:Stop");
