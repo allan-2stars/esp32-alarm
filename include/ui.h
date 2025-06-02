@@ -10,6 +10,7 @@ enum UIState {
   MELODY_PREVIEW,
   ALARM_RINGING,
   ALARM_SNOOZE_MESSAGE,
+  ALARM_SAVE_MESSAGE,
   ERROR_SCREEN,
   MESSAGE_DISPLAY, // New Message display screen
 };
@@ -21,6 +22,7 @@ void drawAlarmOverview();
 void drawAlarmConfig();
 void drawMelodyPreview(int selectedIndex);
 void drawSnoozeMessage(bool wasSnoozed);
+void drawSaveAlarmMessage();
 void drawErrorScreen();
 
 #include <Adafruit_SSD1306.h>

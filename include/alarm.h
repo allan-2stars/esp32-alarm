@@ -33,7 +33,7 @@ struct Alarm {
   String name;
 };
 
-extern Alarm alarms[3];
+extern Alarm alarms[MAX_SCREEN_ALARMS];
 extern int lastTriggerMinute;
 extern bool alarmActive;
 

@@ -7,6 +7,27 @@
 #include <WiFi.h>
 #include <WiFiManager.h>
 
+#include "alarm.h"
+// use this can show the alarm type in overview.
+const char* getAlarmTypeLabel(AlarmType type) {
+  switch (type) {
+    case ONE_TIME:       return "One";
+    case SPECIFIC_DATE:  return "Date";
+    case REPEATED:       return "Repeat";
+    default:             return "?";
+  }
+}
+// same as getMelodyName
+#include "melodies.h"
+const char* getMelodyName(int melodyIndex) {
+  if (melodyIndex >= 0 && melodyIndex < MELODY_COUNT) {
+    return melodyNames[melodyIndex];
+  }
+  return "-";
+}
+
+
+
 String errorMessage = "";
 unsigned long lastInteraction = 0;
 
@@ -93,11 +114,11 @@ bool connectWifi() {
   unsigned long startAttemptTime = millis();
   const unsigned long timeout = 6000;
 
-  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
-    delay(100);
-    Serial.print(".");
-    setLedMode(LED_WIFI);  // blink LED while waiting
-  }
+  // while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+  //   delay(100);
+  //   Serial.print(".");
+  //   setLedMode(LED_WIFI);  // blink LED while waiting
+  // }
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ Wi-Fi connection failed.");
@@ -115,14 +136,36 @@ bool connectWifi() {
 
 // if the list cannot be displayed in the screen, scroll down.
 int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems) {
-    if (selectedIndex < visibleStart) {
-        return selectedIndex;
-    } else if (selectedIndex >= visibleStart + maxVisible) {
-        return selectedIndex - maxVisible + 1;
-    }
-    return visibleStart;
+  if (selectedIndex < visibleStart) {
+      return selectedIndex;
+  } else if (selectedIndex >= visibleStart + maxVisible) {
+      return selectedIndex - maxVisible + 1;
+  }
+  return visibleStart;
 }
 
+//
 void recordInteraction() {
   lastInteraction = millis();
+}
+
+
+bool isFieldVisible(AlarmType type, AlarmField field) {
+  if ((field == ALARM_DATE_YEAR || field == ALARM_DATE_MONTH || field == ALARM_DATE_DAY) && type != SPECIFIC_DATE)
+    return false;
+  if (field == ALARM_REPEAT_DAYS && type != REPEATED)
+    return false;
+  return true;
+}
+
+// utils.cpp
+String getRepeatDaysString(bool repeatDays[7]) {
+    String result = "";
+    const char labels[] = {'S', 'M', 'T', 'W', 'T', 'F', 'S'};
+    for (int i = 0; i < 7; ++i) {
+        if (repeatDays[i]) {
+            result += labels[i];
+        }
+    }
+    return result.length() > 0 ? result : "None";
 }
