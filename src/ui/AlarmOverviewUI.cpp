@@ -8,6 +8,7 @@ void AlarmOverviewUI::begin(Adafruit_SSD1306* oled) {
 
 void AlarmOverviewUI::draw(const Alarm* alarms, int selectedIndex) {
   display->clearDisplay();
+  display->setTextSize(1);
   display->setTextColor(TEXT_COLOR);
   display->setCursor(0, 0);
   display->print("Alarm Overview:");

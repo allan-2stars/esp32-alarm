@@ -15,11 +15,15 @@ extern const unsigned char wifi_1[];
 extern const unsigned char wifi_2[];
 extern const unsigned char wifi_3[];
 
-// Moon icon
+// Moon icosn
 extern const unsigned char moon_icon[];
 
 // Rotating sun frames (5 total)
 extern const unsigned char sun_frames[5][32];
 const int SUN_FRAME_COUNT = 5;
+
+// Bell
+extern const unsigned char bellIcon[];
+extern const unsigned char bellSlashIcon[];
 
 #endif

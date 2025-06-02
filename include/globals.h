@@ -12,6 +12,7 @@
 #include "ui/MelodyPreviewUI.h"
 #include "ui/AlarmOverviewUI.h"
 #include "ui/AlarmConfigUI.h"
+#include "ui/IdleUI.h"
 
 // Shared system state
 extern UIState uiState;
@@ -56,6 +57,6 @@ extern AlarmOverviewUI alarmOverviewUI;
 
 extern AlarmConfigUI* alarmConfigUI;
 
-
+extern IdleUI idleUI;
 
 #endif

@@ -19,20 +19,20 @@ void drawWifiIcon(Adafruit_SSD1306 &display, int x, int y) {
 }
 
 // Bluetooth Icon 8x8
-const unsigned char btIcon[] PROGMEM = {
-  0b10000001,
-  0b01000010,
-  0b00100100,
-  0b00011000,
-  0b00011000,
-  0b00100100,
-  0b01000010,
-  0b10000001
-};
+// const unsigned char btIcon[] PROGMEM = {
+//   0b10000001,
+//   0b01000010,
+//   0b00100100,
+//   0b00011000,
+//   0b00011000,
+//   0b00100100,
+//   0b01000010,
+//   0b10000001
+// };
 
-void drawBtIcon(Adafruit_SSD1306 &display, int x, int y) {
-  display.drawBitmap(x, y, btIcon, 8, 8, TEXT_COLOR);
-}
+// void drawBtIcon(Adafruit_SSD1306 &display, int x, int y) {
+//   display.drawBitmap(x, y, btIcon, 8, 8, TEXT_COLOR);
+// }
 
 // Bell Icon 8x8
 const unsigned char bellIcon[] PROGMEM = {

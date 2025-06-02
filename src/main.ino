@@ -28,7 +28,7 @@
  LedService ledService;
 #include "services/RGBLedService.h"
  RGBLedService rgbLed;
- AlarmConfigUI* alarmConfigUI = nullptr;
+ 
 
 
  //UI
@@ -38,6 +38,9 @@ BellUI bellUI;
 SunMoonUI sunMoonUI;
 MelodyPreviewUI melodyPreviewUI;
 AlarmOverviewUI alarmOverviewUI;
+AlarmConfigUI* alarmConfigUI = nullptr;
+IdleUI idleUI(display);
+
 
 
 UIState uiState = IDLE_SCREEN;
@@ -104,7 +107,7 @@ void loop() {
     uiState = ALARM_RINGING;
   }
   switch (uiState) {
-    case IDLE_SCREEN: drawIdleScreen(); break;
+    case IDLE_SCREEN: idleUI.update(); break;
     case ALARM_OVERVIEW: alarmOverviewUI.draw(alarms, selectedAlarmIndex); break;
     case ALARM_CONFIG:
       if (!alarmConfigUI) {

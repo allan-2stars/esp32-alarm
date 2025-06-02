@@ -6,6 +6,7 @@ class AlarmService {
 public:
   void begin();
   void update();
+  bool anyAlarmEnabled() const;
 
 private:
   void handleSnooze();

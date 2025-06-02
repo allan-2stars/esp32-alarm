@@ -145,25 +145,25 @@ void drawIdleScreen() {
   display.display();  // push to screen
 }
 
-void drawAlarmOverview() {
-  display.clearDisplay();
-  display.setCursor(0, 0); display.print("Alarms");
-  for (int i = 0; i < MAX_SCREEN_ALARMS; i++) {
-    int yPos = HEADER_HEIGHT + i * 12; // drop down leave the top line for wifi single
-    display.setCursor(0, yPos);
-    display.printf("%sA%d: %02d:%02d",
-      i == selectedAlarmIndex ? ">" : " ",
-      i + 1, alarms[i].hour, alarms[i].minute);
+// void drawAlarmOverview() {
+//   display.clearDisplay();
+//   display.setCursor(0, 0); display.print("Alarms");
+//   for (int i = 0; i < MAX_SCREEN_ALARMS; i++) {
+//     int yPos = HEADER_HEIGHT + i * 12; // drop down leave the top line for wifi single
+//     display.setCursor(0, yPos);
+//     display.printf("%sA%d: %02d:%02d",
+//       i == selectedAlarmIndex ? ">" : " ",
+//       i + 1, alarms[i].hour, alarms[i].minute);
 
-    // Draw bell or slashed bell
-    if (alarms[i].enabled) {
-      drawBellIcon(display, SCREEN_WIDTH - 10, yPos);
-    } else {
-      drawBellSlashIcon(display, SCREEN_WIDTH - 10, yPos);
-    }
-  }
-  display.display();
-}
+//     // Draw bell or slashed bell
+//     if (alarms[i].enabled) {
+//       drawBellIcon(display, SCREEN_WIDTH - 10, yPos);
+//     } else {
+//       drawBellSlashIcon(display, SCREEN_WIDTH - 10, yPos);
+//     }
+//   }
+//   display.display();
+// }
 
 // void drawAlarmConfig() {
 //   Alarm &a = tempAlarm;

@@ -21,6 +21,15 @@ void AlarmService::update() {
   checkAlarms();
 }
 
+bool AlarmService::anyAlarmEnabled() const {
+    for (int i = 0; i < MAX_SCREEN_ALARMS; ++i) {
+        if (alarms[i].enabled) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void AlarmService::handleSnooze() {
   if (snoozeUntil > 0 && time(nullptr) >= snoozeUntil) {
     snoozeUntil = 0;
