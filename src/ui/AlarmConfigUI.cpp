@@ -1,14 +1,20 @@
 #include "../include/ui/AlarmConfigUI.h"
+#include "../include/services/AlarmStorageService.h"
 #include "utils.h"
 #include "globals.h"
 #include "melodies.h"
 
 extern const char* weekDays[];
+extern AlarmStorageService alarmStorageService;
+extern Alarm tempAlarm;
+extern int currentRepeatDayIndex;
 
-AlarmConfigUI::AlarmConfigUI(Adafruit_SSD1306 &display, Alarm *alarm)
-  : display(display), alarm(alarm), selectedFieldIndex(ALARM_TYPE), scrollOffset(0), done(false), currentRepeatDayIndex(0) {
+AlarmConfigUI::AlarmConfigUI(Adafruit_SSD1306 &display, Alarm* alarm, int index)
+  : display(display), alarm(alarm), alarmIndex(index), selectedFieldIndex(ALARM_TYPE), 
+  scrollOffset(0), done(false), currentRepeatDayIndex(0) {
   tempAlarm = *alarm;
 }
+
 
 void AlarmConfigUI::begin() {
   draw();
@@ -76,15 +82,17 @@ void AlarmConfigUI::adjustValue(bool increase) {
 }
 
 void AlarmConfigUI::confirm() {
-  if (selectedFieldIndex == ALARM_REPEAT_DAYS) {
-    tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
-  } else {
-    *alarm = tempAlarm;
-    alarm->version = SCREEN_ALARM_VERSION;
-    done = true;
-  }
-  draw();
+    if (selectedFieldIndex == ALARM_REPEAT_DAYS) {
+        tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
+    } else {
+        *alarm = tempAlarm;
+        alarm->version = SCREEN_ALARM_VERSION;
+        alarmStorageService.saveAlarm(*alarm, alarmIndex);
+        done = true;
+    }
+    draw();
 }
+
 
 bool AlarmConfigUI::isDone() const {
   return done;

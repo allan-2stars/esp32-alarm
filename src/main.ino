@@ -111,7 +111,7 @@ void loop() {
     case ALARM_OVERVIEW: alarmOverviewUI.draw(alarms, selectedAlarmIndex); break;
     case ALARM_CONFIG:
       if (!alarmConfigUI) {
-        alarmConfigUI = new AlarmConfigUI(display, &alarms[selectedAlarmIndex]);
+        alarmConfigUI = new AlarmConfigUI(display, &alarms[selectedAlarmIndex], selectedAlarmIndex);
         alarmConfigUI->begin();
       }
       if (alarmConfigUI->isDone()) {

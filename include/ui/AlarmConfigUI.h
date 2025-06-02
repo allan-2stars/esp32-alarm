@@ -7,7 +7,7 @@
 
 class AlarmConfigUI {
   public:
-    AlarmConfigUI(Adafruit_SSD1306 &display, Alarm *alarm);
+    AlarmConfigUI(Adafruit_SSD1306 &display, Alarm *alarm, int index);
 
     void begin();
     void update();
@@ -23,6 +23,8 @@ class AlarmConfigUI {
   private:
     Adafruit_SSD1306 &display;
     Alarm *alarm;
+    int alarmIndex;
+
     Alarm tempAlarm;
     AlarmField selectedFieldIndex;
     int scrollOffset;
@@ -33,6 +35,4 @@ class AlarmConfigUI {
     void draw();
     String getFieldLabel(AlarmField field);
     String getFieldValue(AlarmField field);
-
-
 };
