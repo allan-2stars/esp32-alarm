@@ -11,6 +11,7 @@ extern AlarmStorageService alarmStorageService;
 extern LedService ledService;
 extern Alarm alarms[MAX_SCREEN_ALARMS];
 extern Alarm tempAlarm;
+extern AlarmPlayerService alarmPlayerService;
 
 UIManager::UIManager(Adafruit_SSD1306 &display)
     : display(display),
@@ -22,7 +23,6 @@ UIManager::UIManager(Adafruit_SSD1306 &display)
       currentState(IDLE_SCREEN),
       selectedAlarmIndex(0),
       previewMelodyIndex(0),
-      alarmActive(false),
       snoozeUntil(0),
       messageDisplayStart(0) {}
 
@@ -105,7 +105,7 @@ void UIManager::handleMode() {
   } else if (currentState == ALARM_RINGING) {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
-    showMessageAndReturn("😴 Snoozed\nfor 10 mins", IDLE_SCREEN, 3000);
+    showMessageAndReturn(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
   } else {
     switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
   }
@@ -123,24 +123,25 @@ void UIManager::handleAdjust() {
   } else if (currentState == ALARM_CONFIG && alarmConfigUI) {
     if (alarmConfigUI->getSelectedField() == ALARM_MELODY) {
       currentState = MELODY_PREVIEW;
-      previewMelodyIndex = alarms[selectedAlarmIndex].melody;
-      melodyService.play(getMelodyData(previewMelodyIndex),
-                         getMelodyLength(previewMelodyIndex),
-                         getMelodyTempo(previewMelodyIndex),
-                         BUZZER_PIN, false);
+      tempAlarm.melody = alarms[selectedAlarmIndex].melody;
+      previewMelodyIndex = tempAlarm.melody;  // ✅ Fix: keep UI in sync
+      //if in melody review scree, no loop melody, and no light up
+      alarmPlayerService.playAlarm(tempAlarm, false, false);/////
+
     } else {
       alarmConfigUI->adjustValue(true);
     }
   } else if (currentState == MELODY_PREVIEW) {
-    previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
-    melodyService.play(getMelodyData(previewMelodyIndex),
-                       getMelodyLength(previewMelodyIndex),
-                       getMelodyTempo(previewMelodyIndex),
-                       BUZZER_PIN, false);
+    tempAlarm.melody = (tempAlarm.melody + 1) % MELODY_COUNT;
+    previewMelodyIndex = tempAlarm.melody;  // ✅ Fix: keep UI in sync
+    Serial.println("preview Melody index: ");
+    Serial.print(previewMelodyIndex);
+    alarmPlayerService.playAlarm(tempAlarm, false, false);
+
   } else if (currentState == ALARM_RINGING) {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
-    showMessageAndReturn("😴 Snoozed\nfor 10 mins", IDLE_SCREEN, 3000);
+    showMessageAndReturn(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
 
   }
 }
@@ -168,7 +169,7 @@ void UIManager::handleConfirm() {
         if (alarmConfigUI->isDone()) {
           delete alarmConfigUI;
           alarmConfigUI = nullptr;
-          uiManager.showMessageAndReturn("Alarm Set!", ALARM_OVERVIEW);
+          uiManager.showMessageAndReturn(" Alarm Set!", ALARM_OVERVIEW);
         }
       }
       break;
@@ -183,7 +184,7 @@ void UIManager::handleConfirm() {
 
     case ALARM_RINGING:
       lastSnoozed = false;
-      showMessageAndReturn("Snoozed\nfor 10 mins", IDLE_SCREEN, 3000);
+      showMessageAndReturn(" Alarm Stopped", IDLE_SCREEN, 3000);
       break;
     default:
       break;

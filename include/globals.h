@@ -16,6 +16,7 @@
 #include "services/LedService.h"
 #include "services/RGBLedService.h"
 #include "services/SleepManager.h"
+#include "services/AlarmPlayerService.h"
 
 
 // Global display
@@ -27,6 +28,7 @@ extern MelodyService melodyService;
 extern AlarmStorageService alarmStorageService;
 extern LedService ledService;
 extern RGBLedService rgbLed;
+extern AlarmPlayerService alarmPlayerService;
 
 // UI state + managers
 extern UIManager uiManager;

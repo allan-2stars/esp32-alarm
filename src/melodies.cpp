@@ -93,58 +93,84 @@
 #define NOTE_DS8 4978
 #define REST        0
 
-const int MELODY_COUNT = 6;
+const int MELODY_COUNT = 7;
 const char* melodyNames[MELODY_COUNT] = {
-  "We Wish You", "White Xmas", "Jingle Bell", "Rudolf Red Nosed", "Santa Coming", "Silent Night"
+  "We Wish You", "White Xmas", "Jingle Bell", "Rudolf Red Nosed", "Santa Coming", "Silent Night", "We Three Kings"
 };
 
 const int melodyWeWishYou[] = {
-  NOTE_D4, 4, NOTE_G4, 4, NOTE_G4, 4, NOTE_A4, 4,
-  NOTE_G4, 4, NOTE_FS4, 4, NOTE_E4, 2,
-  NOTE_E4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_B4, 4,
-  NOTE_A4, 4, NOTE_G4, 4, NOTE_FS4, 2,
-  NOTE_D4, 4, NOTE_B4, 4, NOTE_B4, 4, NOTE_C5, 4,
-  NOTE_B4, 4, NOTE_A4, 4, NOTE_G4, 2,
-  NOTE_E4, 4, NOTE_E4, 4, NOTE_A4, 4, NOTE_FS4, 4,
-  NOTE_G4, 2, NOTE_D4, 2
+    NOTE_C5,4,
+    NOTE_F5,4, NOTE_F5,8, NOTE_G5,8, NOTE_F5,8, NOTE_E5,8,
+    NOTE_D5,4, NOTE_D5,4, NOTE_D5,4,
+    NOTE_G5,4, NOTE_G5,8, NOTE_A5,8, NOTE_G5,8, NOTE_F5,8,
+    NOTE_E5,4, NOTE_C5,4, NOTE_C5,4,
+    NOTE_A5,4, NOTE_A5,8, NOTE_AS5,8, NOTE_A5,8, NOTE_G5,8,
+    NOTE_F5,4, NOTE_D5,4, NOTE_C5,8, NOTE_C5,8,
+    NOTE_D5,4, NOTE_G5,4, NOTE_E5,4,
+  
+    NOTE_F5,2, NOTE_C5,4,
+    NOTE_F5,4, NOTE_F5,8, NOTE_G5,8, NOTE_F5,8, NOTE_E5,8,
+    NOTE_D5,4, NOTE_D5,4, NOTE_D5,4,
+    NOTE_G5,4, NOTE_G5,8, NOTE_A5,8, NOTE_G5,8, NOTE_F5,8,
+    NOTE_E5,4, NOTE_C5,4, NOTE_C5,4,
+    NOTE_A5,4, NOTE_A5,8, NOTE_AS5,8, NOTE_A5,8, NOTE_G5,8,
+    NOTE_F5,4, NOTE_D5,4, NOTE_C5,8, NOTE_C5,8,
+    NOTE_D5,4, NOTE_G5,4, NOTE_E5,4,
+    NOTE_F5,2
 };
 const int melodyWeWishYouLength = sizeof(melodyWeWishYou) / sizeof(melodyWeWishYou[0]) / 2;
 
 extern const int melodyWhiteChristmas[] = {
-  NOTE_D4, 4, NOTE_G4, 4, NOTE_G4, 4, NOTE_A4, 4,
-  NOTE_G4, 4, NOTE_FS4, 4, NOTE_E4, 2,
-  NOTE_E4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_B4, 4,
-  NOTE_A4, 4, NOTE_G4, 4, NOTE_FS4, 2,
-  NOTE_D4, 4, NOTE_B4, 4, NOTE_B4, 4, NOTE_C5, 4,
-  NOTE_B4, 4, NOTE_A4, 4, NOTE_G4, 2,
-  NOTE_E4, 4, NOTE_E4, 4, NOTE_A4, 4, NOTE_FS4, 4,
-  NOTE_G4, 2, NOTE_D4, 2
+    NOTE_B4,1, NOTE_C5,4, NOTE_B4,4, 
+    NOTE_AS4,4, NOTE_B4,4, NOTE_C5,1, NOTE_CS5,4, 
+    NOTE_D5,-2, REST,16, NOTE_E5,4, NOTE_FS5,4, NOTE_G5,4, 
+    NOTE_A5,4, NOTE_G5,4, NOTE_FS5,4, NOTE_E5,4,
+    NOTE_D5,1, REST,8, NOTE_G4,4, NOTE_A4,4,
+    NOTE_B4,2, NOTE_B4,2, NOTE_B4,4, NOTE_E5,2,
+    NOTE_D5,4, NOTE_G4,2, NOTE_G4,2, NOTE_G4,4,
+    NOTE_D5,2, NOTE_C5,4, NOTE_B4,1, NOTE_C5,4, 
+    NOTE_B4,4, NOTE_A4,4, NOTE_G4,4, NOTE_A4,-1,
+    NOTE_B4,1, NOTE_C5,4, NOTE_B4,4, NOTE_AS4,4, 
+    NOTE_B4,4, NOTE_C5,1, NOTE_CS5,4, NOTE_D5,-2, 
+    REST,16, NOTE_E5,4, NOTE_FS5,4, NOTE_G5,4, 
+    NOTE_A5,4, NOTE_G5,4, NOTE_FS5,4, NOTE_E5,4, 
+    NOTE_D5,1, REST,8, NOTE_G4,4, NOTE_A4,4,
+    NOTE_B4,2, NOTE_B4,2, NOTE_B4,4, NOTE_E5,2, 
+    NOTE_D5,4, NOTE_G5,1, REST,16, NOTE_G4,4, 
+    NOTE_A4,4, NOTE_B4,2, NOTE_B4,2, NOTE_E5,4, 
+    NOTE_E5,4, NOTE_FS4,4, NOTE_FS4,4, NOTE_G4,-1
 };
 const int melodyWhiteChristmasLength = sizeof(melodyWhiteChristmas) / sizeof(melodyWhiteChristmas[0]) / 2;
 
 extern const int melodyJingleBells[] = {
-  NOTE_E4, 4, NOTE_E4, 4, NOTE_E4, 2,
-  NOTE_E4, 4, NOTE_E4, 4, NOTE_E4, 2,
-  NOTE_E4, 4, NOTE_G4, 4, NOTE_C4, 4, NOTE_D4, 4,
-  NOTE_E4, 1,
-
-  NOTE_F4, 4, NOTE_F4, 4, NOTE_F4, 4,
-  NOTE_F4, 4, NOTE_F4, 4, NOTE_E4, 4, NOTE_E4, 4,
-  NOTE_E4, 4, NOTE_E4, 4, NOTE_D4, 4, NOTE_D4, 4,
-  NOTE_E4, 4, NOTE_D4, 2, NOTE_G4, 2
+    NOTE_E5,4, NOTE_E5,4, NOTE_E5,2,
+    NOTE_E5,4, NOTE_E5,4, NOTE_E5,2,
+    NOTE_E5,4, NOTE_G5,4, NOTE_C5,4, NOTE_D5,4,
+    NOTE_E5,-2, REST,8,
+    NOTE_F5,4, NOTE_F5,4, NOTE_F5,-4, NOTE_F5,8,
+    NOTE_F5,4, NOTE_E5,4, NOTE_E5,4, NOTE_E5,8, NOTE_E5,8,
+    NOTE_E5,4, NOTE_D5,4, NOTE_D5,4, NOTE_E5,4,
+    NOTE_D5,2, NOTE_G5,2,
+    NOTE_E5,4, NOTE_E5,4, NOTE_E5,2,
+    NOTE_E5,4, NOTE_E5,4, NOTE_E5,2,
+    NOTE_E5,4, NOTE_G5,4, NOTE_C5,4, NOTE_D5,4,
+    NOTE_E5,-2, REST,8,
+    NOTE_F5,4, NOTE_F5,4, NOTE_F5,4, NOTE_F5,4,
+    NOTE_F5,4, NOTE_E5,4, NOTE_E5,4, NOTE_E5,8, NOTE_E5,8,
+    NOTE_G5,4, NOTE_G5,4, NOTE_F5,4, NOTE_D5,4,
+    NOTE_C5,-2
 };
 const int melodyJingleBellsLength = sizeof(melodyJingleBells) / sizeof(melodyJingleBells[0]) / 2;
 
 extern const int melodyRudolfTheRedNosed[] = {
-  NOTE_G4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
-  NOTE_E4, 2, NOTE_G4, 4, NOTE_E4, 4, NOTE_F4, 4,
-  NOTE_G4, 4, NOTE_E4, 2, NOTE_G4, 4, NOTE_E4, 4,
-  NOTE_F4, 4, NOTE_E4, 4, NOTE_D4, 2, NOTE_C4, 2,
-
-  NOTE_C4, 4, NOTE_D4, 4, NOTE_E4, 4, NOTE_F4, 4,
-  NOTE_G4, 2, NOTE_A4, 4, NOTE_B4, 4, NOTE_C5, 4,
-  NOTE_D5, 4, NOTE_E5, 2, NOTE_F5, 4, NOTE_E5, 4,
-  NOTE_D5, 4, NOTE_C5, 4, NOTE_B4, 2, NOTE_A4, 2
+    NOTE_G4,8, NOTE_A4,4, NOTE_G4,8, NOTE_E4,4, NOTE_C5,4, NOTE_A4,4, NOTE_G4,-2, NOTE_G4,8, NOTE_A4,8, NOTE_G4,8, NOTE_A4,8, NOTE_G4,4, NOTE_C5,4, NOTE_B4,1,
+    NOTE_F4,8, NOTE_G4,4, NOTE_F4,8, NOTE_D4,4, NOTE_B4,4, NOTE_A4,4, NOTE_G4,-2, NOTE_G4,8, NOTE_A4,8, NOTE_G4,8, NOTE_A4,8, NOTE_G4,4, NOTE_A4,4, NOTE_E4,1,
+    NOTE_G4,8, NOTE_A4,4, NOTE_G4,8, NOTE_E4,4, NOTE_C5,4, NOTE_A4,4, NOTE_G4,-2, NOTE_G4,8, NOTE_A4,8, NOTE_G4,8, NOTE_A4,8, NOTE_G4,4, NOTE_C5,4, NOTE_B4,1,
+    NOTE_F4,8, NOTE_G4,4, NOTE_F4,8, NOTE_D4,4, NOTE_B4,4, NOTE_A4,4, NOTE_G4,-2, NOTE_G4,8, NOTE_A4,8, NOTE_G4,8, NOTE_A4,8, NOTE_G4,4, NOTE_D5,4, NOTE_C5,1,
+    NOTE_A4,4, NOTE_A4,4, NOTE_C5,4, NOTE_A4,4, NOTE_G4,4, NOTE_E4,4, NOTE_G4,2, NOTE_F4,4, NOTE_A4,4, NOTE_G4,4, NOTE_F4,4, NOTE_E4,1,
+    NOTE_D4,4, NOTE_E4,4, NOTE_G4,4, NOTE_A4,4, NOTE_B4,4, NOTE_B4,4, NOTE_B4,2, NOTE_C5,4, NOTE_C5,4, NOTE_B4,4, NOTE_A4,4, NOTE_G4,4, NOTE_F4,8, NOTE_D4,-2,
+    NOTE_G4,8, NOTE_A4,4, NOTE_G4,8, NOTE_E4,4, NOTE_C5,4, NOTE_A4,4, NOTE_G4,-2, NOTE_G4,8, NOTE_A4,8, NOTE_G4,8, NOTE_A4,8, NOTE_G4,4, NOTE_C5,4, NOTE_B4,1,
+    NOTE_F4,8, NOTE_G4,4, NOTE_F4,8, NOTE_D4,4, NOTE_B4,4, NOTE_A4,4, NOTE_G4,-2, NOTE_G4,8, NOTE_A4,8, NOTE_G4,8, NOTE_A4,8, NOTE_G4,4, NOTE_D5,4, NOTE_C5,1
 };
 const int melodyRudolfTheRedNosedLength = sizeof(melodyRudolfTheRedNosed) / sizeof(melodyRudolfTheRedNosed[0]) / 2;
 
@@ -195,6 +221,26 @@ extern const int melodySilentNight[] = {
 };
 const int melodySilentNightLength = sizeof(melodySilentNight) / sizeof(melodySilentNight[0]) / 2;
 
+extern const int melodyWeThreeKings[] = {
+    NOTE_B4,2, NOTE_A4,4, NOTE_G4,2, NOTE_E4,4, 
+    NOTE_FS4,4, NOTE_G4,4, NOTE_FS4,4, NOTE_E4,-2,
+    NOTE_B4,2, NOTE_A4,4, NOTE_G4,2, NOTE_E4,4, 
+    NOTE_FS4,4, NOTE_G4,4, NOTE_FS4,4, NOTE_E4,-2,
+    NOTE_G4,2, NOTE_G4,4, NOTE_A4,2, NOTE_A4,4, 
+    NOTE_B4,2, NOTE_B4,4, NOTE_D5,4, NOTE_C5,4, 
+    NOTE_B4,4, NOTE_A4,4, NOTE_B4,4, NOTE_A4,4, 
+    NOTE_G4,2, NOTE_FS4,4, NOTE_E4,-2, REST,4,
+    NOTE_B4,2, NOTE_A4,4, NOTE_G4,2, NOTE_E4,4, 
+    NOTE_FS4,4, NOTE_G4,4, NOTE_FS4,4, NOTE_E4,-2,
+    NOTE_B4,2, NOTE_A4,4, NOTE_G4,2, NOTE_E4,4, 
+    NOTE_FS4,4, NOTE_G4,4, NOTE_FS4,4, NOTE_E4,-2,
+    NOTE_G4,2, NOTE_G4,4, NOTE_A4,2, NOTE_A4,4, 
+    NOTE_B4,2, NOTE_B4,4, NOTE_D5,4, NOTE_C5,4, 
+    NOTE_B4,4, NOTE_A4,4, NOTE_B4,4, NOTE_A4,4, 
+    NOTE_G4,2, NOTE_FS4,4, NOTE_E4,1
+};
+const int melodyWeThreeKingsLength = sizeof(melodyWeThreeKings) / sizeof(melodyWeThreeKings[0]) / 2;
+
 
 const int* melodyDataList[MELODY_COUNT] = {
   melodyWeWishYou,
@@ -202,7 +248,8 @@ const int* melodyDataList[MELODY_COUNT] = {
   melodyJingleBells,
   melodyRudolfTheRedNosed,
   melodySantaClausIsComin,
-  melodySilentNight
+  melodySilentNight,
+  melodyWeThreeKings
 };
 
 int melodyLengthList[MELODY_COUNT] = {
@@ -211,11 +258,12 @@ int melodyLengthList[MELODY_COUNT] = {
   melodyJingleBellsLength,
   melodyRudolfTheRedNosedLength,
   melodySantaClausIsCominLength,
-  melodySilentNightLength
+  melodySilentNightLength,
+  melodyWeThreeKingsLength
 };
 
 int melodyTempoList[MELODY_COUNT] = {
-  160, 155, 180, 150, 137, 130
+  160, 155, 180, 150, 137, 130, 144
 };
 
 const int* getMelodyData(int id) {

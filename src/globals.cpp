@@ -33,4 +33,6 @@ int lastTriggerMinute = -1;
 String errorMessage = "";
 SleepManager sleepManager;
 
+AlarmPlayerService alarmPlayerService;
+
 

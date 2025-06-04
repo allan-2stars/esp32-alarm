@@ -94,7 +94,7 @@ String getFormattedDate() {
 }
 
 bool connectWifi() {
-  Serial.println("🔌 Starting Wi-Fi connection...");
+  Serial.println(" Starting Wi-Fi connection...");
 
   WiFiManager wm;
 
@@ -107,6 +107,8 @@ bool connectWifi() {
   if (!wm.autoConnect("ESP32_Config", "config123")) {
     Serial.println("⚠️ AutoConnect failed. Starting config portal...");
     wm.startConfigPortal("ESP32_Config", "config123");
+    // ui manager display waiting for wifi connection.
+    // add code
   }
 
   // Wait for Wi-Fi to connect (with timeout)

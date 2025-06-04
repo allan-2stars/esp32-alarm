@@ -1,10 +1,9 @@
 #include "services/AlarmService.h"
 #include "globals.h"
-#include "light_control.h"
 #include "ui.h"
 #include "time.h"
 #include "melodies.h"
-
+#include "services/AlarmPlayerService.h"
 
 #include "services/MelodyService.h"
 extern MelodyService melodyService;
@@ -35,15 +34,7 @@ bool AlarmService::anyAlarmEnabled() const {
 void AlarmService::handleSnooze() {
   if (snoozeUntil > 0 && time(nullptr) >= snoozeUntil) {
     snoozeUntil = 0;
-
-    melodyService.play(
-      getMelodyData(alarms[selectedAlarmIndex].melody),
-      getMelodyLength(alarms[selectedAlarmIndex].melody),
-      getMelodyTempo(alarms[selectedAlarmIndex].melody),
-      BUZZER_PIN, true  // Looping = true
-    );
-
-    ledService.startAlarmLights();
+    alarmPlayerService.playAlarm(alarms[selectedAlarmIndex], true, true);
     uiManager.switchTo(ALARM_RINGING);
   }
 }
@@ -76,15 +67,8 @@ void AlarmService::checkAlarms() {
 
     if (shouldTrigger) {
       lastTriggerMinute = timeinfo.tm_min;
-
-      melodyService.play(
-        getMelodyData(alarms[selectedAlarmIndex].melody),
-        getMelodyLength(alarms[selectedAlarmIndex].melody),
-        getMelodyTempo(alarms[selectedAlarmIndex].melody),
-        BUZZER_PIN, true
-      );
-
-      ledService.startAlarmLights();
+      selectedAlarmIndex = i;  // Track which alarm is ringing
+      alarmPlayerService.playAlarm(alarms[i], true, true);
       uiManager.switchTo(ALARM_RINGING);
 
       break;

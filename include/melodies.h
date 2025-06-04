@@ -20,6 +20,9 @@ extern const int melodySantaClausIsCominLength;
 extern const int melodySilentNight[];
 extern const int melodySilentNightLength;
 
+extern const int melodyWeThreeKings[];
+extern const int melodyWeThreeKingsLength;
+
 extern const char* melodyNames[];
 extern const int MELODY_COUNT;
 
