@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -88,5 +87,3 @@
 // ENABLE_CUSTOM_TOKEN
 // ENABLE_ID_TOKEN
 // ENABLE_LEGACY_TOKEN
-
-#endif

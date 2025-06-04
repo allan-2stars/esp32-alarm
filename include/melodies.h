@@ -1,5 +1,4 @@
-#ifndef MELODIES_H
-#define MELODIES_H
+#pragma once
 
 //#define MELODY_COUNT 6 // when update the numbers of melody, modify the number.
 
@@ -27,8 +26,3 @@ extern const int MELODY_COUNT;
 const int* getMelodyData(int id);
 int getMelodyLength(int id);
 int getMelodyTempo(int id);
-
-
-
-
-#endif

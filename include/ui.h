@@ -1,5 +1,4 @@
-#ifndef UI_H
-#define UI_H
+
 #pragma once
 //#include "alarm.h"
 
@@ -29,5 +28,3 @@ void drawErrorScreen();
 void initNTP();
 void initDisplay(Adafruit_SSD1306 &display);
 void checkIdleAndSleep();
-
-#endif

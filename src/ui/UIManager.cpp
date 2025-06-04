@@ -2,7 +2,6 @@
 #include "services/MelodyService.h"
 #include "services/AlarmStorageService.h"
 #include "services/LedService.h"
-#include "draw_bell.h"
 #include "utils.h"
 #include "globals.h"
 #include "melodies.h"

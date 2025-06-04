@@ -1,8 +1,6 @@
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#pragma once
 
 void handleButtons();
 void initButtons();
 void resetESP32();
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef SENSOR_H
-#define SENSOR_H
+#pragma once
 
 void initAHT10();
 float getTemperature();
@@ -7,5 +6,3 @@ float getHumidity();
 
 void initBuzzer();
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include "alarm.h"
 
@@ -21,5 +20,3 @@ const char* getMelodyName(int melodyIndex);
 
 // utils.h
 String getRepeatDaysString(bool repeatDays[7]);
-
-#endif

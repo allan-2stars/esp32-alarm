@@ -13,7 +13,7 @@ void BellUI::update() {
   display.drawBitmap(x, y, bellBitmap32x32, 32, 32, TEXT_COLOR);
 
   display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH - 80) / 2, SCREEN_HEIGHT - 12);
+  display.setCursor((SCREEN_WIDTH - 120) / 2, SCREEN_HEIGHT - 12);
   display.setTextColor(TEXT_COLOR);
   display.print("Mod:Snooze, Cmf:Stop");
 
