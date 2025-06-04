@@ -3,10 +3,10 @@
 
 class MelodyPreviewUI {
 public:
-  void begin(Adafruit_SSD1306* disp);
+  explicit MelodyPreviewUI(Adafruit_SSD1306 &disp);  // NEW
   void draw(int selectedIndex);
 
 private:
-  Adafruit_SSD1306* display;
+  Adafruit_SSD1306 &display;
   int scrollOffset = 0;
 };

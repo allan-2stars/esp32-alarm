@@ -6,8 +6,13 @@
 #include "ui.h"
 #include <WiFi.h>
 #include <WiFiManager.h>
+#include "globals.h"
+#include "ui/UIManager.h"     // ✅ Include the header
+extern UIManager uiManager;   // ✅ Declare the instance
 
 #include "alarm.h"
+
+
 // use this can show the alarm type in overview.
 const char* getAlarmTypeLabel(AlarmType type) {
   switch (type) {
@@ -123,7 +128,7 @@ bool connectWifi() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ Wi-Fi connection failed.");
     errorMessage = "Connection failed.\nCheck your WiFi.";
-    uiState = ERROR_SCREEN;
+    uiManager.switchTo(ERROR_SCREEN);
     return false;
   }
 

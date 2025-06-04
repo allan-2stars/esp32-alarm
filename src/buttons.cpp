@@ -1,37 +1,9 @@
 #include <Arduino.h>
 #include "buttons.h"
-#include "alarm.h"
-#include "ui.h"
-#include "melodies.h"
-#include "utils.h"
 #include "config.h"
-#include "globals.h"
-#include "alarm_storage.h"
-#include "light_control.h"
+#include "ui/UIManager.h"
 
-#include "services/MelodyService.h"
-extern MelodyService melodyService;
-#include "services/AlarmStorageService.h"
-extern AlarmStorageService alarmStorageService;
-#include "services/LedService.h"
-extern LedService ledService;
-
-extern AlarmConfigUI* alarmConfigUI;
-extern Alarm alarms[3];
-extern Alarm tempAlarm;
-extern int selectedAlarmIndex;
-extern AlarmField selectedField;
-extern int currentRepeatDayIndex;
-extern UIState uiState;
-
-unsigned long lastModePress = 0;
-unsigned long lastAdjustPress = 0;
-unsigned long lastConfirmPress = 0;
-unsigned long modeButtonPressTime = 0;
-
-int lastTriggerMinute = -1;
-bool alarmActive = false;
-unsigned int snoozeDurationSec = 600;  // 10 minutes
+extern UIManager uiManager;
 
 void initButtons() {
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
@@ -48,102 +20,56 @@ void resetESP32() {
 }
 
 void handleButtons() {
+  static unsigned long lastDebounceTime = 0;
+  static bool lastModeState = HIGH;
+  static bool lastAdjustState = HIGH;
+  static bool lastConfirmState = HIGH;
+  static unsigned long adjustPressStart = 0;
+  unsigned long lastAdjustRepeat = 0;
+  bool adjustHeld = false;
+
+
   unsigned long now = millis();
+  bool modeState = digitalRead(MODE_BUTTON_PIN);
+  bool adjustState = digitalRead(ADJUST_BUTTON_PIN);
+  bool confirmState = digitalRead(CONFIRM_BUTTON_PIN);
 
-  bool modePressed = digitalRead(MODE_BUTTON_PIN) == LOW;
-  if (modePressed && modeButtonPressTime == 0) modeButtonPressTime = now;
+  // Debounce interval
+  const unsigned long debounceDelay = 200;
 
-  if (!modePressed && modeButtonPressTime > 0) {
-    recordInteraction();
-    unsigned long duration = now - modeButtonPressTime;
-    melodyService.stop();
-    ledService.stopAlarmLights();
-    alarmActive = false;
+  // Mode button
+  if (lastModeState == HIGH && modeState == LOW && (now - lastDebounceTime > debounceDelay)) {
+    uiManager.handleMode();
+    lastDebounceTime = now;
+  }
 
-    if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      alarmConfigUI->nextField();
-    } else if (uiState == MELODY_PREVIEW) {
-      uiState = ALARM_CONFIG;
-    } else if (uiState == ALARM_RINGING) {
-      snoozeUntil = time(nullptr) + snoozeDurationSec;
-      lastSnoozed = true;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
+  // === Adjust button auto-repeat ===
+  if (adjustState == LOW) {
+    if (lastAdjustState == HIGH) {
+      // Just pressed
+      adjustPressStart = millis();
+      lastAdjustRepeat = millis();
+      uiManager.handleAdjust();  // Initial tap
     } else {
-      uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
-    }
-
-    modeButtonPressTime = 0;
-  }
-
-  if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    recordInteraction();
-    melodyService.stop();
-    ledService.stopAlarmLights();
-    alarmActive = false;
-    lastAdjustPress = now;
-
-    if (uiState == ALARM_OVERVIEW) {
-      selectedAlarmIndex = (selectedAlarmIndex + 1) % 3;
-    } 
-    else if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      if (alarmConfigUI->getSelectedField() == ALARM_MELODY) {
-        uiState = MELODY_PREVIEW;
-        previewMelodyIndex = alarms[selectedAlarmIndex].melody;
-        melodyService.play(
-          getMelodyData(previewMelodyIndex),
-          getMelodyLength(previewMelodyIndex),
-          getMelodyTempo(previewMelodyIndex),
-          BUZZER_PIN, false
-        );
-      } else {
-        alarmConfigUI->adjustValue(true);
+      // Held down
+      if (millis() - adjustPressStart > 500 && millis() - lastAdjustRepeat > 150) {
+        uiManager.handleAdjust();  // Repeated action
+        lastAdjustRepeat = millis();
       }
     }
-    
-    else if (uiState == MELODY_PREVIEW) {
-      previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
-      melodyService.play(
-        getMelodyData(previewMelodyIndex),
-        getMelodyLength(previewMelodyIndex),
-        getMelodyTempo(previewMelodyIndex),
-        BUZZER_PIN, false
-      );
-    } else if (uiState == ALARM_RINGING) {
-      snoozeUntil = time(nullptr) + snoozeDurationSec;
-      lastSnoozed = true;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    }
+  } else {
+    adjustPressStart = 0;
+  }
+  lastAdjustState = adjustState;
+
+
+  // Confirm button
+  if (lastConfirmState == HIGH && confirmState == LOW && (now - lastDebounceTime > debounceDelay)) {
+    uiManager.handleConfirm();
+    lastDebounceTime = now;
   }
 
-  if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
-    recordInteraction();
-    melodyService.stop();
-    ledService.stopAlarmLights();
-    alarmActive = false;
-    lastConfirmPress = now;
-
-    if (uiState == ALARM_OVERVIEW) {
-      tempAlarm = alarms[selectedAlarmIndex];
-      if ((tempAlarm.year == 0 || tempAlarm.month == 0 || tempAlarm.day == 0) && isTimeAvailable()) {
-        setAlarmToCurrentTime(tempAlarm);
-      }
-      uiState = ALARM_CONFIG;
-    } else if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      alarmConfigUI->confirm();
-    } else if (uiState == MELODY_PREVIEW) {
-      tempAlarm.melody = previewMelodyIndex;
-      alarmConfigUI->setSelectedMelody(previewMelodyIndex);
-      uiState = ALARM_CONFIG;
-    } else if (uiState == ALARM_RINGING) {
-      lastSnoozed = false;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    }
-  }
-
-  if (now - lastInteraction > UI_TIMEOUT_MS && uiState != IDLE_SCREEN) {
-    uiState = IDLE_SCREEN;
-  }
+  lastModeState = modeState;
+  lastAdjustState = adjustState;
+  lastConfirmState = confirmState;
 }

@@ -1,4 +1,4 @@
-#include "../include/services/AlarmService.h"
+#include "services/AlarmService.h"
 #include "melody_engine.h"
 #include "globals.h"
 #include "light_control.h"
@@ -11,6 +11,9 @@
 extern MelodyService melodyService;
 #include "services/LedService.h"
 extern LedService ledService;
+#include "ui/UIManager.h"
+extern UIManager uiManager;
+
 
 void AlarmService::begin() {
   // Optional: startup logic for alarms
@@ -33,18 +36,16 @@ bool AlarmService::anyAlarmEnabled() const {
 void AlarmService::handleSnooze() {
   if (snoozeUntil > 0 && time(nullptr) >= snoozeUntil) {
     snoozeUntil = 0;
-    alarmActive = true;
 
-  melodyService.play(
-    getMelodyData(alarms[selectedAlarmIndex].melody),
-    getMelodyLength(alarms[selectedAlarmIndex].melody),
-    getMelodyTempo(alarms[selectedAlarmIndex].melody),
-    BUZZER_PIN, true  // Looping = true
-  );
-
+    melodyService.play(
+      getMelodyData(alarms[selectedAlarmIndex].melody),
+      getMelodyLength(alarms[selectedAlarmIndex].melody),
+      getMelodyTempo(alarms[selectedAlarmIndex].melody),
+      BUZZER_PIN, true  // Looping = true
+    );
 
     ledService.startAlarmLights();
-    uiState = ALARM_RINGING;
+    uiManager.switchTo(ALARM_RINGING);
   }
 }
 
@@ -75,19 +76,18 @@ void AlarmService::checkAlarms() {
     }
 
     if (shouldTrigger) {
-      alarmActive = true;
       lastTriggerMinute = timeinfo.tm_min;
 
-    melodyService.play(
-      getMelodyData(alarms[selectedAlarmIndex].melody),
-      getMelodyLength(alarms[selectedAlarmIndex].melody),
-      getMelodyTempo(alarms[selectedAlarmIndex].melody),
-      BUZZER_PIN, true  // Looping = true
-    );
-
+      melodyService.play(
+        getMelodyData(alarms[selectedAlarmIndex].melody),
+        getMelodyLength(alarms[selectedAlarmIndex].melody),
+        getMelodyTempo(alarms[selectedAlarmIndex].melody),
+        BUZZER_PIN, true
+      );
 
       ledService.startAlarmLights();
-      uiState = ALARM_RINGING;
+      uiManager.switchTo(ALARM_RINGING);
+
       break;
     }
   }
