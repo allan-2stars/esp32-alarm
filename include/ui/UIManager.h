@@ -22,6 +22,9 @@ public:
   void handleConfirm();
   void switchTo(UIState state);
   UIState getCurrentState() const;
+  // to show some temp message on the screen
+  void showTemporaryScreen(UIState screen, unsigned long durationMs, UIState nextState = IDLE_SCREEN);
+  void showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs = 3000);
 
 
 private:
@@ -32,6 +35,11 @@ private:
   BellUI bellUI;
   AlarmConfigUI* alarmConfigUI;
   unsigned long lastInteraction = 0;
+  // after the temp screem return to Idle screen
+  UIState returnState = IDLE_SCREEN;
+  unsigned long temporaryScreenStart = 0;
+  unsigned long temporaryScreenDuration = 0;
+
 
 
   UIState currentState;
@@ -41,4 +49,7 @@ private:
   time_t snoozeUntil;
   unsigned long messageDisplayStart;
   void confirmAlarmSelection();
+  // send temp message on screen
+  String temporaryMessage = "";
+
 };

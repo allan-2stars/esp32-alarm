@@ -61,19 +61,46 @@ void UIManager::update() {
     case ALARM_SAVE_MESSAGE:
       drawSaveAlarmMessage();
       // add 2 seconds delay to give the visual clue
-      if (millis() - messageDisplayStart > 2000) {
-        switchTo(IDLE_SCREEN);
+      if (millis() - temporaryScreenStart > temporaryScreenDuration) {
+        switchTo(returnState);
       }
       break;
     case ALARM_SNOOZE_MESSAGE:
       drawSnoozeMessage(lastSnoozed);
-      if (millis() - messageDisplayStart > 2000) {
-        switchTo(IDLE_SCREEN);
+      if (millis() - temporaryScreenStart > temporaryScreenDuration) {
+        switchTo(returnState);
       }
       break;
     case ERROR_SCREEN:
       drawErrorScreen();
       break;
+    case MESSAGE_DISPLAY:
+      display.clearDisplay();
+      display.setTextSize(1);
+      display.setTextColor(TEXT_COLOR);
+      display.setCursor(0, HEADER_HEIGHT);
+
+      {
+        int y = HEADER_HEIGHT;
+        int lineHeight = 10;
+        int start = 0;
+        while (start < temporaryMessage.length()) {
+          int end = temporaryMessage.indexOf('\n', start);
+          if (end == -1) end = temporaryMessage.length();
+          display.setCursor(0, y);
+          display.print(temporaryMessage.substring(start, end));
+          y += lineHeight;
+          start = end + 1;
+        }
+      }
+
+      display.display();
+
+      if (millis() - temporaryScreenStart > temporaryScreenDuration) {
+        switchTo(returnState);
+      }
+      break;
+
   }
 }
 
@@ -91,8 +118,7 @@ void UIManager::handleMode() {
   } else if (currentState == ALARM_RINGING) {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
-    currentState = ALARM_SNOOZE_MESSAGE;
-    messageDisplayStart = millis();
+    showTemporaryScreen(ALARM_SNOOZE_MESSAGE, 3000);
   } else {
     switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
   }
@@ -127,8 +153,7 @@ void UIManager::handleAdjust() {
   } else if (currentState == ALARM_RINGING) {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
-    currentState = ALARM_SNOOZE_MESSAGE;
-    messageDisplayStart = millis();
+    showTemporaryScreen(ALARM_SNOOZE_MESSAGE, 3000);
   }
 }
 
@@ -155,8 +180,11 @@ void UIManager::handleConfirm() {
         if (alarmConfigUI->isDone()) {
           delete alarmConfigUI;
           alarmConfigUI = nullptr;
-          messageDisplayStart = millis();
-          switchTo(ALARM_SAVE_MESSAGE);
+          showTemporaryScreen(ALARM_SAVE_MESSAGE, 3000);
+          // if you want to change to
+          // save and go to Alarm Overview screen, use below:
+          //showTemporaryScreen(ALARM_SAVE_MESSAGE, 3000, ALARM_OVERVIEW);
+
         }
       }
       break;
@@ -171,15 +199,12 @@ void UIManager::handleConfirm() {
 
     case ALARM_RINGING:
       lastSnoozed = false;
-      messageDisplayStart = millis();
-      switchTo(ALARM_SNOOZE_MESSAGE);
+      showTemporaryScreen(ALARM_SNOOZE_MESSAGE, 3000);
       break;
-
     default:
       break;
   }
 }
-
 
 void UIManager::switchTo(UIState newState) {
   currentState = newState;
@@ -215,4 +240,22 @@ void UIManager::switchTo(UIState newState) {
 UIState UIManager::getCurrentState() const {
   return currentState;
 }
+
+// show temp message on screen then return to Idle screen
+// implementation
+void UIManager::showTemporaryScreen(UIState screen, unsigned long durationMs, UIState nextState) {
+  temporaryScreenStart = millis();
+  temporaryScreenDuration = durationMs;
+  returnState = nextState;
+  switchTo(screen);
+}
+
+void UIManager::showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs) {
+  temporaryMessage = message;
+  temporaryScreenStart = millis();
+  temporaryScreenDuration = durationMs;
+  returnState = nextScreen;
+  switchTo(MESSAGE_DISPLAY);
+}
+
 
