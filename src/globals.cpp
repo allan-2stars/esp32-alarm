@@ -31,4 +31,6 @@ unsigned long lastInteraction = 0;
 int lastTriggerMinute = -1;
 
 String errorMessage = "";
+SleepManager sleepManager;
+
 

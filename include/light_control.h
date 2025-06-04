@@ -1,6 +1,7 @@
-#pragma once
+// #pragma once
 
-void initAlarmLights();
-void startAlarmLights();
-void updateAlarmLights();
-void resetAlarmLights();
+// void initAlarmLights();
+// void startAlarmLights();
+// void updateAlarmLights();
+// void resetAlarmLights();
+// // 

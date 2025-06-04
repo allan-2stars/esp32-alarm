@@ -4,8 +4,6 @@
 #include "utils.h"
 #include "sensor.h"
 #include "web_server.h"
-#include "sleep.h"
-#include "light_control.h"
 
 void setup() {
   Serial.begin(115200);
@@ -48,7 +46,7 @@ void loop() {
 
   if (uiManager.getCurrentState() != ALARM_RINGING &&
       millis() - lastInteraction > INACTIVITY_TIMEOUT) {
-    checkIdleAndSleep();
+    sleepManager.update();
   }
 
   delay(50);

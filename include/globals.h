@@ -15,6 +15,8 @@
 #include "services/AlarmStorageService.h"
 #include "services/LedService.h"
 #include "services/RGBLedService.h"
+#include "services/SleepManager.h"
+
 
 // Global display
 extern Adafruit_SSD1306 display;
@@ -53,3 +55,7 @@ extern unsigned long lastInteraction;
 
 // Error message
 extern String errorMessage;
+
+// Sleep manager
+extern SleepManager sleepManager;
+
