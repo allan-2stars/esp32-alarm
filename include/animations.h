@@ -1,10 +1,10 @@
-#ifndef ANIMATIONS_H
-#define ANIMATIONS_H
+// #ifndef ANIMATIONS_H
+// #define ANIMATIONS_H
 
-#include <Arduino.h>
+// #include <Arduino.h>
 
-void setupAnimations();         // Optional, if needed later
-void updateAnimations();        // Call from loop()
-void updateMoonLedFade(bool);   // Exposed for manual control if needed
+// void setupAnimations();         // Optional, if needed later
+// void updateAnimations();        // Call from loop()
+// void updateMoonLedFade(bool);   // Exposed for manual control if needed
 
-#endif
+// #endif

@@ -31,11 +31,6 @@ const char* getMelodyName(int melodyIndex) {
   return "-";
 }
 
-
-
-String errorMessage = "";
-unsigned long lastInteraction = 0;
-
 int getCurrentYear() {
   struct tm timeinfo;
   if (getLocalTime(&timeinfo)) {

@@ -8,8 +8,8 @@ public:
   void update();
   bool anyAlarmEnabled() const;
   void checkAlarms();
+  void handleSnooze();
 
 private:
-  void handleSnooze();
   int lastTriggerMinute = -1;
 };

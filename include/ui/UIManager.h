@@ -9,7 +9,7 @@
 #include "ui/SunMoonUI.h"
 #include "alarm.h"
 #include "config.h"
-#include "globals.h"
+//#include "globals.h"
 
 class UIManager {
 public:

@@ -294,7 +294,7 @@ void drawSnoozeMessage(bool wasSnoozed) {
   display.print(wasSnoozed ? "Snooze for 10 mins" : "Alarm STOPPED");
 
   display.display();
-  delay(2000);
+  //delay(2000);
 }
 
 void drawSaveAlarmMessage() {
@@ -305,7 +305,7 @@ void drawSaveAlarmMessage() {
   display.print("Alarm Saved!");
 
   display.display();
-  delay(2000);
+  //delay(2000);
 }
 
 void drawErrorScreen() {

@@ -61,11 +61,16 @@ void UIManager::update() {
       break;
     case ALARM_SAVE_MESSAGE:
       drawSaveAlarmMessage();
-      switchTo(IDLE_SCREEN);
+      // add 2 seconds delay to give the visual clue
+      if (millis() - messageDisplayStart > 2000) {
+        switchTo(IDLE_SCREEN);
+      }
       break;
     case ALARM_SNOOZE_MESSAGE:
       drawSnoozeMessage(lastSnoozed);
-      switchTo(IDLE_SCREEN);
+      if (millis() - messageDisplayStart > 2000) {
+        switchTo(IDLE_SCREEN);
+      }
       break;
     case ERROR_SCREEN:
       drawErrorScreen();
@@ -134,31 +139,48 @@ void UIManager::handleConfirm() {
   ledService.stopAlarmLights();
   lastInteraction = millis();
 
-  if (currentState == ALARM_OVERVIEW) {
-    tempAlarm = alarms[selectedAlarmIndex];
-    if ((tempAlarm.year == 0 || tempAlarm.month == 0 || tempAlarm.day == 0) && isTimeAvailable()) {
-      setAlarmToCurrentTime(tempAlarm);
-    }
-    alarmConfigUI = new AlarmConfigUI(display, &alarms[selectedAlarmIndex], selectedAlarmIndex);
-    alarmConfigUI->begin();
-    currentState = ALARM_CONFIG;
-  } else if (currentState == ALARM_CONFIG && alarmConfigUI) {
-    alarmConfigUI->confirm();
-    if (alarmConfigUI->isDone()) {
-      delete alarmConfigUI;
-      alarmConfigUI = nullptr;
-      currentState = ALARM_OVERVIEW;
-    }
-  } else if (currentState == MELODY_PREVIEW) {
-    tempAlarm.melody = previewMelodyIndex;
-    alarmConfigUI->setSelectedMelody(previewMelodyIndex);
-    currentState = ALARM_CONFIG;
-  } else if (currentState == ALARM_RINGING) {
-    lastSnoozed = false;
-    currentState = ALARM_SNOOZE_MESSAGE;
-    messageDisplayStart = millis();
+  switch (currentState) {
+    case ALARM_OVERVIEW:
+      tempAlarm = alarms[selectedAlarmIndex];
+      if ((tempAlarm.year == 0 || tempAlarm.month == 0 || tempAlarm.day == 0) && isTimeAvailable()) {
+        setAlarmToCurrentTime(tempAlarm);
+      }
+      alarmConfigUI = new AlarmConfigUI(display, &alarms[selectedAlarmIndex], selectedAlarmIndex);
+      alarmConfigUI->begin();
+      switchTo(ALARM_CONFIG);
+      break;
+
+    case ALARM_CONFIG:
+      if (alarmConfigUI) {
+        alarmConfigUI->confirm();
+        if (alarmConfigUI->isDone()) {
+          delete alarmConfigUI;
+          alarmConfigUI = nullptr;
+          messageDisplayStart = millis();
+          switchTo(ALARM_SAVE_MESSAGE);
+        }
+      }
+      break;
+
+    case MELODY_PREVIEW:
+      tempAlarm.melody = previewMelodyIndex;
+      if (alarmConfigUI) {
+        alarmConfigUI->setSelectedMelody(previewMelodyIndex);
+      }
+      switchTo(ALARM_CONFIG);
+      break;
+
+    case ALARM_RINGING:
+      lastSnoozed = false;
+      messageDisplayStart = millis();
+      switchTo(ALARM_SNOOZE_MESSAGE);
+      break;
+
+    default:
+      break;
   }
 }
+
 
 void UIManager::switchTo(UIState newState) {
   currentState = newState;
