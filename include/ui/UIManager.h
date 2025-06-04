@@ -23,7 +23,6 @@ public:
   void switchTo(UIState state);
   UIState getCurrentState() const;
   // to show some temp message on the screen
-  void showTemporaryScreen(UIState screen, unsigned long durationMs, UIState nextState = IDLE_SCREEN);
   void showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs = 3000);
 
 

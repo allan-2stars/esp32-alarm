@@ -46,7 +46,7 @@ void UIManager::update() {
       if (alarmConfigUI->isDone()) {
         delete alarmConfigUI;
         alarmConfigUI = nullptr;
-        switchTo(ALARM_SAVE_MESSAGE);
+        showMessageAndReturn("✅ Alarm Saved", ALARM_OVERVIEW);
       } else {
         alarmConfigUI->update();
       }
@@ -57,19 +57,6 @@ void UIManager::update() {
     case ALARM_RINGING:
       bellUI.update();
       ledService.updateAlarmLights();
-      break;
-    case ALARM_SAVE_MESSAGE:
-      drawSaveAlarmMessage();
-      // add 2 seconds delay to give the visual clue
-      if (millis() - temporaryScreenStart > temporaryScreenDuration) {
-        switchTo(returnState);
-      }
-      break;
-    case ALARM_SNOOZE_MESSAGE:
-      drawSnoozeMessage(lastSnoozed);
-      if (millis() - temporaryScreenStart > temporaryScreenDuration) {
-        switchTo(returnState);
-      }
       break;
     case ERROR_SCREEN:
       drawErrorScreen();
@@ -118,7 +105,7 @@ void UIManager::handleMode() {
   } else if (currentState == ALARM_RINGING) {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
-    showTemporaryScreen(ALARM_SNOOZE_MESSAGE, 3000);
+    showMessageAndReturn("😴 Snoozed\nfor 10 mins", IDLE_SCREEN, 3000);
   } else {
     switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
   }
@@ -153,7 +140,8 @@ void UIManager::handleAdjust() {
   } else if (currentState == ALARM_RINGING) {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
-    showTemporaryScreen(ALARM_SNOOZE_MESSAGE, 3000);
+    showMessageAndReturn("😴 Snoozed\nfor 10 mins", IDLE_SCREEN, 3000);
+
   }
 }
 
@@ -180,11 +168,7 @@ void UIManager::handleConfirm() {
         if (alarmConfigUI->isDone()) {
           delete alarmConfigUI;
           alarmConfigUI = nullptr;
-          showTemporaryScreen(ALARM_SAVE_MESSAGE, 3000);
-          // if you want to change to
-          // save and go to Alarm Overview screen, use below:
-          //showTemporaryScreen(ALARM_SAVE_MESSAGE, 3000, ALARM_OVERVIEW);
-
+          uiManager.showMessageAndReturn("Alarm Set!", ALARM_OVERVIEW);
         }
       }
       break;
@@ -199,7 +183,7 @@ void UIManager::handleConfirm() {
 
     case ALARM_RINGING:
       lastSnoozed = false;
-      showTemporaryScreen(ALARM_SNOOZE_MESSAGE, 3000);
+      showMessageAndReturn("Snoozed\nfor 10 mins", IDLE_SCREEN, 3000);
       break;
     default:
       break;
@@ -227,9 +211,6 @@ void UIManager::switchTo(UIState newState) {
     case ALARM_CONFIG:
       if (alarmConfigUI) alarmConfigUI->update();
       break;
-    case ALARM_SNOOZE_MESSAGE:
-      bellUI.update();
-      break;
     case MESSAGE_DISPLAY:
       // optional: handle message state
       break;
@@ -243,13 +224,6 @@ UIState UIManager::getCurrentState() const {
 
 // show temp message on screen then return to Idle screen
 // implementation
-void UIManager::showTemporaryScreen(UIState screen, unsigned long durationMs, UIState nextState) {
-  temporaryScreenStart = millis();
-  temporaryScreenDuration = durationMs;
-  returnState = nextState;
-  switchTo(screen);
-}
-
 void UIManager::showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs) {
   temporaryMessage = message;
   temporaryScreenStart = millis();
