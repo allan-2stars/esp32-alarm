@@ -31,35 +31,7 @@ bool brightnessRequestPending = false;
 bool messageRequestPending = false;
 unsigned long lastDataCheck = 0;
 
-struct tm timeinfo;
 
-void initNTP(){
-  // Set timezone for NTP sync (Sydney, with daylight saving)
-  configTzTime("AEST-10AEDT,M10.1.0,M4.1.0/3", "pool.ntp.org");
-  bool timeSynced = false;
-  unsigned long ntpStart = millis();
-  while (millis() - ntpStart < 10000) {
-    if (getLocalTime(&timeinfo) && timeinfo.tm_year + 1900 >= 2024) {
-      timeSynced = true;
-      break;
-    }
-    delay(200);
-  }
-
-  if (!timeSynced) {
-    Serial.println("NTP sync failed.");
-    display.clearDisplay();
-    display.setCursor(10, 20);
-    display.println("Time sync failed.");
-    display.setCursor(10, 30);
-    display.println("Check WiFi or reset.");
-    display.display();
-    while (true); // Halt execution until reset
-  }
-
-  Serial.println("Time synced!");
-
-}
 
 void processData(AsyncResult &aResult) {
   Serial.println("📥 processData called");

@@ -1,4 +1,6 @@
 #include "ui/UIManager.h"
+#include "ui/MessageScrollerUI.h"  // NEW: include scroller logic
+
 #include "services/MelodyService.h"
 #include "services/AlarmStorageService.h"
 #include "services/LedService.h"
@@ -13,6 +15,7 @@ extern Alarm alarms[MAX_SCREEN_ALARMS];
 extern Alarm tempAlarm;
 extern AlarmPlayerService alarmPlayerService;
 
+
 UIManager::UIManager(Adafruit_SSD1306 &display)
     : display(display),
       idleUI(display),
@@ -25,6 +28,7 @@ UIManager::UIManager(Adafruit_SSD1306 &display)
       previewMelodyIndex(0),
       snoozeUntil(0),
       messageDisplayStart(0) {}
+      
 
 void UIManager::begin() {
   idleUI.update();
@@ -87,6 +91,9 @@ void UIManager::update() {
         switchTo(returnState);
       }
       break;
+    case SCROLLABLE_MESSAGE:
+      if (scrollableMessageUI) scrollableMessageUI->update();
+      break;
 
   }
 }
@@ -106,7 +113,10 @@ void UIManager::handleMode() {
     snoozeUntil = time(nullptr) + 600;
     lastSnoozed = true;
     showMessageAndReturn(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
-  } else {
+  }   else if (currentState == SCROLLABLE_MESSAGE && scrollableMessageUI) {
+    scrollableMessageUI->scrollDown();
+  }
+else {
     switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
   }
 }
@@ -143,7 +153,10 @@ void UIManager::handleAdjust() {
     lastSnoozed = true;
     showMessageAndReturn(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
 
+  }  else if (currentState == SCROLLABLE_MESSAGE && scrollableMessageUI) {
+    scrollableMessageUI->scrollUp();
   }
+
 }
 
 void UIManager::handleConfirm() {
@@ -234,3 +247,12 @@ void UIManager::showMessageAndReturn(const String& message, UIState nextScreen, 
 }
 
 
+void UIManager::showScrollableMessage(const String& message) {
+  if (scrollableMessageUI) {
+    delete scrollableMessageUI;
+    scrollableMessageUI = nullptr;
+  }
+
+  scrollableMessageUI = new MessageScrollerUI(display, message);
+  switchTo(SCROLLABLE_MESSAGE);
+}

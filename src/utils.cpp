@@ -97,10 +97,8 @@ bool connectWifi() {
   Serial.println(" Starting Wi-Fi connection...");
 
   WiFiManager wm;
-
   // Optional: reset settings if needed for debugging
   // wm.resetSettings();
-
   // Auto-connect or open config portal
   // For Wokwi Wifi 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -109,6 +107,8 @@ bool connectWifi() {
     wm.startConfigPortal("ESP32_Config", "config123");
     // ui manager display waiting for wifi connection.
     // add code
+    uiManager.showScrollableMessage("Wifi has not connected yet...\nSSID: ESP32_Config\npassword: config123");
+
   }
 
   // Wait for Wi-Fi to connect (with timeout)
@@ -135,6 +135,35 @@ bool connectWifi() {
   return true;
 }
 
+struct tm timeinfo;
+void initNTP(){
+  // Set timezone for NTP sync (Sydney, with daylight saving)
+  configTzTime("AEST-10AEDT,M10.1.0,M4.1.0/3", "pool.ntp.org");
+  bool timeSynced = false;
+  unsigned long ntpStart = millis();
+  while (millis() - ntpStart < 10000) {
+    if (getLocalTime(&timeinfo) && timeinfo.tm_year + 1900 >= 2024) {
+      timeSynced = true;
+      break;
+    }
+    delay(200);
+  }
+
+  if (!timeSynced) {
+    Serial.println("NTP sync failed.");
+    display.clearDisplay();
+    display.setCursor(10, 20);
+    display.println("Time sync failed.");
+    display.setCursor(10, 30);
+    display.println("Check WiFi or reset.");
+    display.display();
+    while (true); // Halt execution until reset
+  }
+
+  Serial.println("Time synced!");
+
+}
+
 // if the list cannot be displayed in the screen, scroll down.
 int adjustVisibleStart(int selectedIndex, int visibleStart, int maxVisible, int totalItems) {
   if (selectedIndex < visibleStart) {
@@ -159,14 +188,14 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
   return true;
 }
 
-// utils.cpp
-String getRepeatDaysString(bool repeatDays[7]) {
-    String result = "";
-    const char labels[] = {'S', 'M', 'T', 'W', 'T', 'F', 'S'};
-    for (int i = 0; i < 7; ++i) {
-        if (repeatDays[i]) {
-            result += labels[i];
-        }
-    }
-    return result.length() > 0 ? result : "None";
-}
+// // utils.cpp
+// String getRepeatDaysString(bool repeatDays[7]) {
+//     String result = "";
+//     const char labels[] = {'S', 'M', 'T', 'W', 'T', 'F', 'S'};
+//     for (int i = 0; i < 7; ++i) {
+//         if (repeatDays[i]) {
+//             result += labels[i];
+//         }
+//     }
+//     return result.length() > 0 ? result : "None";
+// }

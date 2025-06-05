@@ -10,6 +10,7 @@ enum UIState {
   ALARM_RINGING,
   ERROR_SCREEN,
   MESSAGE_DISPLAY, // New Message display screen
+  SCROLLABLE_MESSAGE // New screen
 };
 
 extern UIState uiState;
