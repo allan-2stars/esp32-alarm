@@ -24,6 +24,8 @@
 #include "ui_state.h"
 #include "ui.h"
 
+#include <Face.h>
+extern Face *face;
 // Global display
 extern Adafruit_SSD1306 display;
 
