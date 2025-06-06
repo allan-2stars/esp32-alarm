@@ -35,7 +35,11 @@ void UIManager::begin() {
   idleUI.update();
 }
 
-void UIManager::showMessage(const String& msg) {
+void UIManager::showMessage(const String& msg, UIState returnTo, unsigned long durationMs) {
+    temporaryMessage = msg;
+    temporaryScreenStart = millis();
+    temporaryScreenDuration = durationMs;
+    returnState = returnTo;
     messageDisplayUI.show(msg);
     switchTo(MESSAGE_DISPLAY);
 }
@@ -56,7 +60,7 @@ void UIManager::update() {
       if (alarmConfigUI->isDone()) {
         delete alarmConfigUI;
         alarmConfigUI = nullptr;
-        showMessageAndReturn("✅ Alarm Saved", ALARM_OVERVIEW);
+        showMessage(" Alarm Saved", ALARM_OVERVIEW, 2000);
       } else {
         alarmConfigUI->update();
       }
@@ -70,11 +74,12 @@ void UIManager::update() {
       break;
     case MESSAGE_DISPLAY:
       messageDisplayUI.render();
-      // Optional auto-return timeout:
-      if (temporaryScreenDuration > 0 && millis() - temporaryScreenStart > temporaryScreenDuration) {
-        switchTo(returnState);
+      if (temporaryScreenDuration > 0 &&
+          millis() - temporaryScreenStart > temporaryScreenDuration) {
+          switchTo(returnState);
       }
       break;
+    break;
 
     }
   }
@@ -85,24 +90,36 @@ void UIManager::handleMode() {
   ledService.stopAlarmLights();
   lastInteraction = millis();
 
-
-  if (currentState == ALARM_CONFIG && alarmConfigUI) {
-    alarmConfigUI->nextField();
-  } else if (currentState == MELODY_PREVIEW) {
-    currentState = ALARM_CONFIG;
-  } else if (currentState == ALARM_RINGING) {
-    snoozeUntil = time(nullptr) + 600;
-    lastSnoozed = true;
-    showMessageAndReturn(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
-  }
-  if (uiState == MESSAGE_DISPLAY) {
+  // Prioritize MESSAGE_DISPLAY scroll behavior
+  if (uiState == MESSAGE_DISPLAY && temporaryScreenDuration == 0) {
     messageDisplayUI.scrollDown();
+    return;
   }
-  
-  else {
-    switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
+
+  switch (currentState) {
+    case ALARM_CONFIG:
+      if (alarmConfigUI) {
+        alarmConfigUI->nextField();
+      }
+      break;
+
+    case MELODY_PREVIEW:
+      currentState = ALARM_CONFIG;
+      break;
+
+    case ALARM_RINGING:
+      snoozeUntil = time(nullptr) + 600;
+      lastSnoozed = true;
+      showMessage(" Snoozed\n for 10 mins", IDLE_SCREEN, 2000);
+      break;
+
+    default:
+      // Toggle between IDLE and OVERVIEW
+      switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
+      break;
   }
 }
+
 
 void UIManager::handleAdjust() {
   recordInteraction();
@@ -110,41 +127,62 @@ void UIManager::handleAdjust() {
   ledService.stopAlarmLights();
   lastInteraction = millis();
 
-
-  if (currentState == ALARM_OVERVIEW) {
-    selectedAlarmIndex = (selectedAlarmIndex + 1) % MAX_SCREEN_ALARMS;
-  } else if (currentState == ALARM_CONFIG && alarmConfigUI) {
-    if (alarmConfigUI->getSelectedField() == ALARM_MELODY) {
-      currentState = MELODY_PREVIEW;
-      tempAlarm.melody = alarms[selectedAlarmIndex].melody;
-      previewMelodyIndex = tempAlarm.melody;  // ✅ Fix: keep UI in sync
-      //if in melody review scree, no loop melody, and no light up
-      alarmPlayerService.playAlarm(tempAlarm, false, false);/////
-
-    } else {
-      alarmConfigUI->adjustValue(true);
-    }
-  } else if (currentState == MELODY_PREVIEW) {
-    tempAlarm.melody = (tempAlarm.melody + 1) % MELODY_COUNT;
-    previewMelodyIndex = tempAlarm.melody;  // ✅ Fix: keep UI in sync
-    Serial.println("preview Melody index: ");
-    Serial.print(previewMelodyIndex);
-    alarmPlayerService.playAlarm(tempAlarm, false, false);
-
-  } else if (currentState == ALARM_RINGING) {
-    snoozeUntil = time(nullptr) + 600;
-    lastSnoozed = true;
-    showMessageAndReturn(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
-  } else if (uiState == MESSAGE_DISPLAY) {
+    // Prioritize MESSAGE_DISPLAY scroll behavior
+  Serial.println("temporaryScreenDuration");
+  Serial.println(temporaryScreenDuration);
+  if (uiState == MESSAGE_DISPLAY && temporaryScreenDuration == 0) {
     messageDisplayUI.scrollUp();
+    return;
+  }
+  switch (currentState) {
+    case ALARM_OVERVIEW:
+      selectedAlarmIndex = (selectedAlarmIndex + 1) % MAX_SCREEN_ALARMS;
+      break;
+
+    case ALARM_CONFIG:
+      if (alarmConfigUI) {
+        if (alarmConfigUI->getSelectedField() == ALARM_MELODY) {
+          currentState = MELODY_PREVIEW;
+          tempAlarm.melody = alarms[selectedAlarmIndex].melody;
+          previewMelodyIndex = tempAlarm.melody;  // ✅ Fix: keep UI in sync
+          alarmPlayerService.playAlarm(tempAlarm, false, false);  // no loop, no lights
+        } else {
+          alarmConfigUI->adjustValue(true);
+        }
+      }
+      break;
+
+    case MELODY_PREVIEW:
+      tempAlarm.melody = (tempAlarm.melody + 1) % MELODY_COUNT;
+      previewMelodyIndex = tempAlarm.melody;
+      Serial.println("preview Melody index: ");
+      Serial.print(previewMelodyIndex);
+      alarmPlayerService.playAlarm(tempAlarm, false, false);
+      break;
+
+    case ALARM_RINGING:
+      snoozeUntil = time(nullptr) + 600;
+      lastSnoozed = true;
+      showMessage(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
+      break;
+
+    default:
+      break;
   }
 }
+
 
 void UIManager::handleConfirm() {
   recordInteraction();
   melodyService.stop();
   ledService.stopAlarmLights();
   lastInteraction = millis();
+
+  // Prioritize MESSAGE_DISPLAY confirm behavior
+  if (uiState == MESSAGE_DISPLAY) {
+    switchTo(returnState);
+    return;
+  }
 
   switch (currentState) {
     case ALARM_OVERVIEW:
@@ -163,7 +201,8 @@ void UIManager::handleConfirm() {
         if (alarmConfigUI->isDone()) {
           delete alarmConfigUI;
           alarmConfigUI = nullptr;
-          uiManager.showMessageAndReturn(" Alarm Set!", ALARM_OVERVIEW);
+          showMessage(" Alarm Set!", ALARM_OVERVIEW, 2000);
+          Serial.println("Alarm set message should show.");
         }
       }
       break;
@@ -178,10 +217,11 @@ void UIManager::handleConfirm() {
 
     case ALARM_RINGING:
       lastSnoozed = false;
-      showMessageAndReturn(" Alarm Stopped", IDLE_SCREEN, 3000);
+      showMessage(" Alarm Stopped", IDLE_SCREEN, 3000);
       break;
+
     default:
-      break;
+    break;
   }
 }
 
@@ -207,8 +247,9 @@ void UIManager::switchTo(UIState newState) {
       if (alarmConfigUI) alarmConfigUI->update();
       break;
     case MESSAGE_DISPLAY:
-      // optional: handle message state
+      // Just allow rendering via uiManager.update()
       break;
+
   }
 }
 
@@ -219,10 +260,4 @@ UIState UIManager::getCurrentState() const {
 
 // show temp message on screen then return to Idle screen
 // implementation
-void UIManager::showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs) {
-  temporaryMessage = message;
-  temporaryScreenStart = millis();
-  temporaryScreenDuration = durationMs;
-  returnState = nextScreen;
-  switchTo(MESSAGE_DISPLAY);
-}
+

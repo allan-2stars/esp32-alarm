@@ -23,9 +23,7 @@ public:
   void switchTo(UIState state);
   UIState getCurrentState() const;
   // to show some temp message on the screen
-  void showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs = 3000);
-  void showMessage(const String& msg);
-
+  void showMessage(const String& msg, UIState returnTo = IDLE_SCREEN, unsigned long durationMs = 0);
 private:
   Adafruit_SSD1306 &display;
   IdleUI idleUI;

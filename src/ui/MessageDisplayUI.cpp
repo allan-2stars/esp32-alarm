@@ -41,7 +41,7 @@ void MessageDisplayUI::render() {
     display.setCursor(0, HEADER_HEIGHT);
     display.setTextSize(1);
     display.setTextColor(TEXT_COLOR);
-
+    
     for (int i = 0; i < maxVisibleLines; ++i) {
         int lineIndex = scrollIndex + i;
         if (lineIndex >= (int)lines.size()) break;
