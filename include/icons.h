@@ -1,5 +1,4 @@
-#ifndef ICONS_H
-#define ICONS_H
+#pragma once
 
 #include <Adafruit_SSD1306.h>
 
@@ -25,5 +24,3 @@ const int SUN_FRAME_COUNT = 5;
 // Bell
 extern const unsigned char bellIcon[];
 extern const unsigned char bellSlashIcon[];
-
-#endif

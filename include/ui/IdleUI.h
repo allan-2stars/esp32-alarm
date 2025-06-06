@@ -2,7 +2,7 @@
 #pragma once
 
 #include <Adafruit_SSD1306.h>
-#include "ui.h"
+#include "ui_state.h"
 
 class IdleUI {
 public:

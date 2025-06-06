@@ -1,16 +1,17 @@
-#include "../include/services/AlarmService.h"
-#include "melody_engine.h"
+#include "services/AlarmService.h"
 #include "globals.h"
-#include "light_control.h"
-#include "ui.h"
+#include "ui_state.h"
 #include "time.h"
 #include "melodies.h"
-
+#include "services/AlarmPlayerService.h"
 
 #include "services/MelodyService.h"
 extern MelodyService melodyService;
 #include "services/LedService.h"
 extern LedService ledService;
+#include "ui/UIManager.h"
+extern UIManager uiManager;
+
 
 void AlarmService::begin() {
   // Optional: startup logic for alarms
@@ -33,18 +34,8 @@ bool AlarmService::anyAlarmEnabled() const {
 void AlarmService::handleSnooze() {
   if (snoozeUntil > 0 && time(nullptr) >= snoozeUntil) {
     snoozeUntil = 0;
-    alarmActive = true;
-
-  melodyService.play(
-    getMelodyData(alarms[selectedAlarmIndex].melody),
-    getMelodyLength(alarms[selectedAlarmIndex].melody),
-    getMelodyTempo(alarms[selectedAlarmIndex].melody),
-    BUZZER_PIN, true  // Looping = true
-  );
-
-
-    ledService.startAlarmLights();
-    uiState = ALARM_RINGING;
+    alarmPlayerService.playAlarm(alarms[selectedAlarmIndex], true, true);
+    uiManager.switchTo(ALARM_RINGING);
   }
 }
 
@@ -75,19 +66,11 @@ void AlarmService::checkAlarms() {
     }
 
     if (shouldTrigger) {
-      alarmActive = true;
       lastTriggerMinute = timeinfo.tm_min;
+      selectedAlarmIndex = i;  // Track which alarm is ringing
+      alarmPlayerService.playAlarm(alarms[i], true, true);
+      uiManager.switchTo(ALARM_RINGING);
 
-    melodyService.play(
-      getMelodyData(alarms[selectedAlarmIndex].melody),
-      getMelodyLength(alarms[selectedAlarmIndex].melody),
-      getMelodyTempo(alarms[selectedAlarmIndex].melody),
-      BUZZER_PIN, true  // Looping = true
-    );
-
-
-      ledService.startAlarmLights();
-      uiState = ALARM_RINGING;
       break;
     }
   }

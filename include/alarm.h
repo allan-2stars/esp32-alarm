@@ -1,5 +1,4 @@
-#ifndef ALARM_H
-#define ALARM_H
+#pragma once
 
 #include <Arduino.h>
 #include "config.h"
@@ -39,5 +38,3 @@ extern bool alarmActive;
 
 bool isFieldVisible(AlarmType type, AlarmField field);
 void checkAndTriggerAlarms();
-
-#endif

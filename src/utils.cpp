@@ -2,12 +2,16 @@
 #include "utils.h"
 #include "config.h"
 #include "secrets.h"
-#include "led.h"
 #include "ui.h"
 #include <WiFi.h>
 #include <WiFiManager.h>
+#include "globals.h"
+#include "ui/UIManager.h"     // ✅ Include the header
+extern UIManager uiManager;   // ✅ Declare the instance
 
 #include "alarm.h"
+
+
 // use this can show the alarm type in overview.
 const char* getAlarmTypeLabel(AlarmType type) {
   switch (type) {
@@ -25,11 +29,6 @@ const char* getMelodyName(int melodyIndex) {
   }
   return "-";
 }
-
-
-
-String errorMessage = "";
-unsigned long lastInteraction = 0;
 
 int getCurrentYear() {
   struct tm timeinfo;
@@ -95,35 +94,35 @@ String getFormattedDate() {
 }
 
 bool connectWifi() {
-  Serial.println("🔌 Starting Wi-Fi connection...");
-
+  Serial.println(" Starting Wi-Fi connection...");
+    Serial.println("begin Wifi...");
   WiFiManager wm;
-
   // Optional: reset settings if needed for debugging
   // wm.resetSettings();
-
   // Auto-connect or open config portal
   // For Wokwi Wifi 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
   if (!wm.autoConnect("ESP32_Config", "config123")) {
     Serial.println("⚠️ AutoConnect failed. Starting config portal...");
     wm.startConfigPortal("ESP32_Config", "config123");
+
   }
 
   // Wait for Wi-Fi to connect (with timeout)
   unsigned long startAttemptTime = millis();
   const unsigned long timeout = 6000;
 
-  // while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
-  //   delay(100);
-  //   Serial.print(".");
-  //   setLedMode(LED_WIFI);  // blink LED while waiting
-  // }
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+    delay(100);
+    Serial.print(".");
+  }
 
+      Serial.println("out of while trying");
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ Wi-Fi connection failed.");
     errorMessage = "Connection failed.\nCheck your WiFi.";
-    uiState = ERROR_SCREEN;
+    uiManager.showMessage(errorMessage,IDLE_SCREEN,0);
     return false;
   }
 
@@ -132,6 +131,35 @@ bool connectWifi() {
   Serial.println(WiFi.localIP());
 
   return true;
+}
+
+struct tm timeinfo;
+void initNTP(){
+  // Set timezone for NTP sync (Sydney, with daylight saving)
+  configTzTime("AEST-10AEDT,M10.1.0,M4.1.0/3", "pool.ntp.org");
+  bool timeSynced = false;
+  unsigned long ntpStart = millis();
+  while (millis() - ntpStart < 10000) {
+    if (getLocalTime(&timeinfo) && timeinfo.tm_year + 1900 >= 2024) {
+      timeSynced = true;
+      break;
+    }
+    delay(200);
+  }
+
+  if (!timeSynced) {
+    Serial.println("NTP sync failed.");
+    display.clearDisplay();
+    display.setCursor(10, 20);
+    display.println("Time sync failed.");
+    display.setCursor(10, 30);
+    display.println("Check WiFi or reset.");
+    display.display();
+    while (true); // Halt execution until reset
+  }
+
+  Serial.println("Time synced!");
+
 }
 
 // if the list cannot be displayed in the screen, scroll down.
@@ -149,7 +177,6 @@ void recordInteraction() {
   lastInteraction = millis();
 }
 
-
 bool isFieldVisible(AlarmType type, AlarmField field) {
   if ((field == ALARM_DATE_YEAR || field == ALARM_DATE_MONTH || field == ALARM_DATE_DAY) && type != SPECIFIC_DATE)
     return false;
@@ -158,14 +185,9 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
   return true;
 }
 
-// utils.cpp
-String getRepeatDaysString(bool repeatDays[7]) {
-    String result = "";
-    const char labels[] = {'S', 'M', 'T', 'W', 'T', 'F', 'S'};
-    for (int i = 0; i < 7; ++i) {
-        if (repeatDays[i]) {
-            result += labels[i];
-        }
-    }
-    return result.length() > 0 ? result : "None";
+void resetESP32() {
+  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+    delay(50);
+    ESP.restart();
+  }
 }

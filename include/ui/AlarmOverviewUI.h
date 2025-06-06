@@ -4,8 +4,9 @@
 
 class AlarmOverviewUI {
 public:
-  void begin(Adafruit_SSD1306* oled);
+  explicit AlarmOverviewUI(Adafruit_SSD1306 &display);
   void draw(const Alarm* alarms, int selectedIndex);
+
 private:
-  Adafruit_SSD1306* display;
+  Adafruit_SSD1306 &display;
 };

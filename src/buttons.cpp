@@ -1,37 +1,20 @@
 #include <Arduino.h>
 #include "buttons.h"
-#include "alarm.h"
-#include "ui.h"
-#include "melodies.h"
-#include "utils.h"
 #include "config.h"
 #include "globals.h"
-#include "alarm_storage.h"
-#include "light_control.h"
 
-#include "services/MelodyService.h"
-extern MelodyService melodyService;
-#include "services/AlarmStorageService.h"
-extern AlarmStorageService alarmStorageService;
-#include "services/LedService.h"
-extern LedService ledService;
+// Define per-button handlers
+#include "services/ButtonHoldClassifier.h"
 
-extern AlarmConfigUI* alarmConfigUI;
-extern Alarm alarms[3];
-extern Alarm tempAlarm;
-extern int selectedAlarmIndex;
-extern AlarmField selectedField;
-extern int currentRepeatDayIndex;
-extern UIState uiState;
+ButtonHoldClassifier confirmClassifier;
+ButtonHoldClassifier modeClassifier;
+ButtonHoldClassifier adjustClassifier;
 
-unsigned long lastModePress = 0;
-unsigned long lastAdjustPress = 0;
-unsigned long lastConfirmPress = 0;
-unsigned long modeButtonPressTime = 0;
+static unsigned long adjustRepeatStart = 0;
+static unsigned long lastAdjustRepeat = 0;
+const unsigned long repeatDelay = 500;    // Initial hold before repeat
+const unsigned long repeatRate  = 150;    // Repeat every 150ms
 
-int lastTriggerMinute = -1;
-bool alarmActive = false;
-unsigned int snoozeDurationSec = 600;  // 10 minutes
 
 void initButtons() {
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
@@ -40,110 +23,76 @@ void initButtons() {
   pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
 }
 
-void resetESP32() {
-  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
-    delay(50);
-    ESP.restart();
+void handleButtons() {
+  bool modeState = digitalRead(MODE_BUTTON_PIN) == LOW;
+  bool adjustState = digitalRead(ADJUST_BUTTON_PIN) == LOW;
+  bool confirmState = digitalRead(CONFIRM_BUTTON_PIN) == LOW;
+
+  // === Update press states with built-in debounce ===
+  confirmClassifier.update(confirmState);
+  modeClassifier.update(modeState);
+  adjustClassifier.update(adjustState);
+
+  // === Mode Button ===
+  if (modeClassifier.wasReleased()) {
+    unsigned long dur = modeClassifier.getHoldDuration();
+    if (dur >= 2000) {
+      // future long press for mode
+    } else if (dur >= 100) {
+      uiManager.handleMode();
+    }
+    modeClassifier.reset();  // ✅ important
   }
+
+  // === Adjust Button ===
+  if (adjustClassifier.wasReleased()) {
+    unsigned long dur = adjustClassifier.getHoldDuration();
+    if (dur >= 100 && dur < repeatDelay) {
+      // Normal tap
+      uiManager.handleAdjust();
+    }
+    adjustClassifier.reset();
+  } else if (adjustState) {
+    // Held down
+    unsigned long now = millis();
+    if (adjustRepeatStart == 0) {
+      adjustRepeatStart = now;
+      lastAdjustRepeat = now;
+    } else if (now - adjustRepeatStart >= repeatDelay && now - lastAdjustRepeat >= repeatRate) {
+      uiManager.handleAdjust();  // Repeat action
+      lastAdjustRepeat = now;
+    }
+  } else {
+    // Not pressed anymore
+    adjustRepeatStart = 0;
+    lastAdjustRepeat = 0;
+  }
+
+
+
+// --- Confirm (based on release duration) ---
+if (confirmClassifier.wasReleased()) {
+  unsigned long dur = confirmClassifier.getHoldDuration();
+  Serial.print("Confirm released, duration: ");
+  Serial.println(dur);
+
+  if (dur >= 2000) {
+    Serial.println("Long press detected");
+    UIState state = uiManager.getCurrentState();
+
+    if (state == ROBOT_FACE_DISPLAY) {
+      uiManager.switchTo(IDLE_SCREEN);
+    } else if (state == IDLE_SCREEN) {
+      uiManager.switchTo(ROBOT_FACE_DISPLAY);
+    }
+  } else if (dur >= 100) {
+    //Serial.println("Short press handled");
+    uiManager.handleConfirm();
+  } else {
+    Serial.println("Ignored tiny press");
+  }
+
+  confirmClassifier.reset();
 }
 
-void handleButtons() {
-  unsigned long now = millis();
-
-  bool modePressed = digitalRead(MODE_BUTTON_PIN) == LOW;
-  if (modePressed && modeButtonPressTime == 0) modeButtonPressTime = now;
-
-  if (!modePressed && modeButtonPressTime > 0) {
-    recordInteraction();
-    unsigned long duration = now - modeButtonPressTime;
-    melodyService.stop();
-    ledService.stopAlarmLights();
-    alarmActive = false;
-
-    if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      alarmConfigUI->nextField();
-    } else if (uiState == MELODY_PREVIEW) {
-      uiState = ALARM_CONFIG;
-    } else if (uiState == ALARM_RINGING) {
-      snoozeUntil = time(nullptr) + snoozeDurationSec;
-      lastSnoozed = true;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    } else {
-      uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
-    }
-
-    modeButtonPressTime = 0;
-  }
-
-  if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    recordInteraction();
-    melodyService.stop();
-    ledService.stopAlarmLights();
-    alarmActive = false;
-    lastAdjustPress = now;
-
-    if (uiState == ALARM_OVERVIEW) {
-      selectedAlarmIndex = (selectedAlarmIndex + 1) % 3;
-    } 
-    else if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      if (alarmConfigUI->getSelectedField() == ALARM_MELODY) {
-        uiState = MELODY_PREVIEW;
-        previewMelodyIndex = alarms[selectedAlarmIndex].melody;
-        melodyService.play(
-          getMelodyData(previewMelodyIndex),
-          getMelodyLength(previewMelodyIndex),
-          getMelodyTempo(previewMelodyIndex),
-          BUZZER_PIN, false
-        );
-      } else {
-        alarmConfigUI->adjustValue(true);
-      }
-    }
-    
-    else if (uiState == MELODY_PREVIEW) {
-      previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
-      melodyService.play(
-        getMelodyData(previewMelodyIndex),
-        getMelodyLength(previewMelodyIndex),
-        getMelodyTempo(previewMelodyIndex),
-        BUZZER_PIN, false
-      );
-    } else if (uiState == ALARM_RINGING) {
-      snoozeUntil = time(nullptr) + snoozeDurationSec;
-      lastSnoozed = true;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    }
-  }
-
-  if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
-    recordInteraction();
-    melodyService.stop();
-    ledService.stopAlarmLights();
-    alarmActive = false;
-    lastConfirmPress = now;
-
-    if (uiState == ALARM_OVERVIEW) {
-      tempAlarm = alarms[selectedAlarmIndex];
-      if ((tempAlarm.year == 0 || tempAlarm.month == 0 || tempAlarm.day == 0) && isTimeAvailable()) {
-        setAlarmToCurrentTime(tempAlarm);
-      }
-      uiState = ALARM_CONFIG;
-    } else if (uiState == ALARM_CONFIG && alarmConfigUI) {
-      alarmConfigUI->confirm();
-    } else if (uiState == MELODY_PREVIEW) {
-      tempAlarm.melody = previewMelodyIndex;
-      alarmConfigUI->setSelectedMelody(previewMelodyIndex);
-      uiState = ALARM_CONFIG;
-    } else if (uiState == ALARM_RINGING) {
-      lastSnoozed = false;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    }
-  }
-
-  if (now - lastInteraction > UI_TIMEOUT_MS && uiState != IDLE_SCREEN) {
-    uiState = IDLE_SCREEN;
-  }
 }

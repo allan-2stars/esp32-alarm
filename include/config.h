@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -61,7 +60,7 @@
 
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
-#include <FirebaseClient.h>
+// #include <FirebaseClient.h>
 
 // in case you need them below for Firebase
 // ENABLE_DATABASE // For RTDB compilation
@@ -88,5 +87,3 @@
 // ENABLE_CUSTOM_TOKEN
 // ENABLE_ID_TOKEN
 // ENABLE_LEGACY_TOKEN
-
-#endif

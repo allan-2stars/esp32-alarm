@@ -1,5 +1,5 @@
-#include "../include/ui/AlarmConfigUI.h"
-#include "../include/services/AlarmStorageService.h"
+#include "ui/AlarmConfigUI.h"
+#include "services/AlarmStorageService.h"
 #include "utils.h"
 #include "globals.h"
 #include "melodies.h"

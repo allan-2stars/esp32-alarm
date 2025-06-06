@@ -1,4 +1,4 @@
-#include "../include/ui/SunMoonUI.h"
+#include "ui/SunMoonUI.h"
 #include "icons.h"
 #include "config.h"
 
