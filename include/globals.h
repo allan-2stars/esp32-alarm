@@ -66,8 +66,8 @@ extern MessageDisplayUI messageDisplayUI;
 extern SleepManager sleepManager;
 
 // Buttons Controll
-extern ButtonPressService confirmLongPress;  // 3000 ms = 3 seconds
-extern ButtonPressService confirmShortPress; 
-extern ButtonPressService modePress;      // Short press (default threshold)
-extern ButtonPressService adjustPress;
+// extern ButtonPressService confirmLongPress;  // 3000 ms = 3 seconds
+// extern ButtonPressService confirmShortPress; 
+// extern ButtonPressService modePress;      // Short press (default threshold)
+// extern ButtonPressService adjustPress;
 
