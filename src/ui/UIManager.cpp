@@ -79,6 +79,8 @@ void UIManager::update() {
           switchTo(returnState);
       }
       break;
+    case ROBOT_FACE_DISPLAY:
+      robotFaceUI.update(); // new robot render.
     break;
 
     }
@@ -258,11 +260,6 @@ void UIManager::switchTo(UIState newState) {
   }
 }
 
-
 UIState UIManager::getCurrentState() const {
   return currentState;
 }
-
-// show temp message on screen then return to Idle screen
-// implementation
-

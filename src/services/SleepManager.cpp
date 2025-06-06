@@ -5,7 +5,6 @@
 #include "config.h"
 #include "globals.h"
 #include "alarm.h"
-#include "ui.h"
 
 void SleepManager::begin() {
   // Nothing for now – placeholder for future expansion

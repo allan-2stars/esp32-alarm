@@ -36,5 +36,6 @@ SleepManager sleepManager;
 AlarmPlayerService alarmPlayerService;
 MessageDisplayUI messageDisplayUI;
 
-
+// instance RobotFaceUI
+RobotFaceUI robotFaceUI(display);  // This creates the actual instance
 

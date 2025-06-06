@@ -20,7 +20,9 @@
 
 #include "ui/MessageDisplayUI.h"
 #include "services/ButtonPressService.h"
-
+#include "ui/RobotFaceUI.h"
+#include "ui_state.h"
+#include "ui.h"
 
 // Global display
 extern Adafruit_SSD1306 display;
@@ -64,6 +66,9 @@ extern MessageDisplayUI messageDisplayUI;
 
 // Sleep manager
 extern SleepManager sleepManager;
+
+// Robot
+extern RobotFaceUI robotFaceUI;
 
 // Buttons Controll
 // extern ButtonPressService confirmLongPress;  // 3000 ms = 3 seconds

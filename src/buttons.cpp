@@ -71,22 +71,28 @@ void handleButtons() {
 
 
 // --- Confirm (based on release duration) ---
-  if (confirmClassifier.wasReleased()) {
+if (confirmClassifier.wasReleased()) {
   unsigned long dur = confirmClassifier.getHoldDuration();
+  Serial.print("Confirm released, duration: ");
+  Serial.println(dur);
 
-  if (dur >= 3000) {
-    // Long press
-    if (uiState == ROBOT_FACE_DISPLAY) {
+  if (dur >= 2000) {
+    Serial.println("Long press detected");
+    UIState state = uiManager.getCurrentState();
+
+    if (state == ROBOT_FACE_DISPLAY) {
       uiManager.switchTo(IDLE_SCREEN);
-    } else if (uiState == IDLE_SCREEN) {
+    } else if (state == IDLE_SCREEN) {
       uiManager.switchTo(ROBOT_FACE_DISPLAY);
     }
-  } else if (dur >= 100) {  // ✅ Short press must be ≥ 100ms
+  } else if (dur >= 100) {
+    //Serial.println("Short press handled");
     uiManager.handleConfirm();
   } else {
-    // Ignore micro-presses under 100ms
+    Serial.println("Ignored tiny press");
   }
 
-    confirmClassifier.reset();
-  }
+  confirmClassifier.reset();
+}
+
 }
