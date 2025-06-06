@@ -7,7 +7,6 @@
 #include "ui/MelodyPreviewUI.h"
 #include "ui/BellUI.h"
 #include "ui/SunMoonUI.h"
-#include "ui/MessageScrollerUI.h"  // NEW: include scroller class
 #include "alarm.h"
 #include "config.h"
 //#include "globals.h"
@@ -25,10 +24,7 @@ public:
   UIState getCurrentState() const;
   // to show some temp message on the screen
   void showMessageAndReturn(const String& message, UIState nextScreen, unsigned long durationMs = 3000);
-  void showScrollableMessage(const String& message); // new
-
-  
-
+  void showMessage(const String& msg);
 
 private:
   Adafruit_SSD1306 &display;
@@ -40,9 +36,7 @@ private:
   unsigned long lastInteraction = 0;
   // after the temp screem return to Idle screen
   UIState returnState = IDLE_SCREEN;
-  unsigned long temporaryScreenStart = 0;
-  unsigned long temporaryScreenDuration = 0;
-  MessageScrollerUI* scrollableMessageUI = nullptr; // new
+
 
 
   UIState currentState;

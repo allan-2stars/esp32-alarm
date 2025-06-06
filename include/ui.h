@@ -8,9 +8,7 @@ enum UIState {
   ALARM_CONFIG,
   MELODY_PREVIEW,
   ALARM_RINGING,
-  ERROR_SCREEN,
-  MESSAGE_DISPLAY, // New Message display screen
-  SCROLLABLE_MESSAGE // New screen
+  MESSAGE_DISPLAY // New Message display screen
 };
 
 extern UIState uiState;

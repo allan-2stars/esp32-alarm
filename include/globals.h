@@ -18,6 +18,8 @@
 #include "services/SleepManager.h"
 #include "services/AlarmPlayerService.h"
 
+#include "ui/MessageDisplayUI.h"
+
 
 // Global display
 extern Adafruit_SSD1306 display;
@@ -57,6 +59,8 @@ extern unsigned long lastInteraction;
 
 // Error message
 extern String errorMessage;
+extern MessageDisplayUI messageDisplayUI;
+
 
 // Sleep manager
 extern SleepManager sleepManager;

@@ -102,12 +102,13 @@ bool connectWifi() {
   // Auto-connect or open config portal
   // For Wokwi Wifi 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
   if (!wm.autoConnect("ESP32_Config", "config123")) {
     Serial.println("⚠️ AutoConnect failed. Starting config portal...");
     wm.startConfigPortal("ESP32_Config", "config123");
     // ui manager display waiting for wifi connection.
     // add code
-    uiManager.showScrollableMessage("Wifi has not connected yet...\nSSID: ESP32_Config\npassword: config123");
+    
 
   }
 
@@ -115,16 +116,16 @@ bool connectWifi() {
   unsigned long startAttemptTime = millis();
   const unsigned long timeout = 6000;
 
-  // while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
-  //   delay(100);
-  //   Serial.print(".");
-  //   setLedMode(LED_WIFI);  // blink LED while waiting
-  // }
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+    delay(100);
+    Serial.print(".");
+  }
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ Wi-Fi connection failed.");
     errorMessage = "Connection failed.\nCheck your WiFi.";
-    uiManager.switchTo(ERROR_SCREEN);
+    //uiManager.switchTo(ERROR_SCREEN);
+    //uiManager.showScrollableMessage("Wifi has not connected yet...\nSSID: ESP32_Config\npassword: config123");
     return false;
   }
 

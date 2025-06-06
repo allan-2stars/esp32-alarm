@@ -34,5 +34,7 @@ String errorMessage = "";
 SleepManager sleepManager;
 
 AlarmPlayerService alarmPlayerService;
+MessageDisplayUI messageDisplayUI;
+
 
 
