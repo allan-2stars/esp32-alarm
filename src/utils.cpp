@@ -95,7 +95,7 @@ String getFormattedDate() {
 
 bool connectWifi() {
   Serial.println(" Starting Wi-Fi connection...");
-
+    Serial.println("begin Wifi...");
   WiFiManager wm;
   // Optional: reset settings if needed for debugging
   // wm.resetSettings();
@@ -106,9 +106,6 @@ bool connectWifi() {
   if (!wm.autoConnect("ESP32_Config", "config123")) {
     Serial.println("⚠️ AutoConnect failed. Starting config portal...");
     wm.startConfigPortal("ESP32_Config", "config123");
-    // ui manager display waiting for wifi connection.
-    // add code
-    
 
   }
 
@@ -121,11 +118,11 @@ bool connectWifi() {
     Serial.print(".");
   }
 
+      Serial.println("out of while trying");
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\n❌ Wi-Fi connection failed.");
     errorMessage = "Connection failed.\nCheck your WiFi.";
-    //uiManager.switchTo(ERROR_SCREEN);
-    //uiManager.showScrollableMessage("Wifi has not connected yet...\nSSID: ESP32_Config\npassword: config123");
+    uiManager.showMessage(errorMessage,IDLE_SCREEN,0);
     return false;
   }
 
@@ -188,15 +185,3 @@ bool isFieldVisible(AlarmType type, AlarmField field) {
     return false;
   return true;
 }
-
-// // utils.cpp
-// String getRepeatDaysString(bool repeatDays[7]) {
-//     String result = "";
-//     const char labels[] = {'S', 'M', 'T', 'W', 'T', 'F', 'S'};
-//     for (int i = 0; i < 7; ++i) {
-//         if (repeatDays[i]) {
-//             result += labels[i];
-//         }
-//     }
-//     return result.length() > 0 ? result : "None";
-// }
