@@ -50,16 +50,7 @@ void initDisplay(Adafruit_SSD1306 &display) {
     Serial.println("❌ SSD1306 allocation failed");
     while (true) delay(10);
   }
-
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(TEXT_COLOR);
-  display.setCursor((SCREEN_WIDTH - 90) / 2, SCREEN_HEIGHT / 2 - 4);
-  display.print("OLED Initialized");
-  display.display();
-  delay(1000);  // Show message briefly
-  display.clearDisplay();
-  display.display();
+  uiManager.showMessage("OLED Initialized", IDLE_SCREEN, 1000);
 }
 
 void drawWiFiAnimation() {

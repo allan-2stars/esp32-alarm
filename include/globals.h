@@ -19,6 +19,7 @@
 #include "services/AlarmPlayerService.h"
 
 #include "ui/MessageDisplayUI.h"
+#include "services/ButtonPressService.h"
 
 
 // Global display
@@ -61,7 +62,12 @@ extern unsigned long lastInteraction;
 extern String errorMessage;
 extern MessageDisplayUI messageDisplayUI;
 
-
 // Sleep manager
 extern SleepManager sleepManager;
+
+// Buttons Controll
+extern ButtonPressService confirmLongPress;  // 3000 ms = 3 seconds
+extern ButtonPressService confirmShortPress; 
+extern ButtonPressService modePress;      // Short press (default threshold)
+extern ButtonPressService adjustPress;
 

@@ -60,7 +60,7 @@
 
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
-#include <FirebaseClient.h>
+// #include <FirebaseClient.h>
 
 // in case you need them below for Firebase
 // ENABLE_DATABASE // For RTDB compilation

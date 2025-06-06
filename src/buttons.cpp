@@ -1,10 +1,20 @@
 #include <Arduino.h>
 #include "buttons.h"
 #include "config.h"
-#include "ui/UIManager.h"
-// #include "globals.h"
+#include "globals.h"
 
-extern UIManager uiManager;
+// Define per-button handlers
+#include "services/ButtonHoldClassifier.h"
+
+ButtonHoldClassifier confirmClassifier;
+ButtonHoldClassifier modeClassifier;
+ButtonHoldClassifier adjustClassifier;
+
+static unsigned long adjustRepeatStart = 0;
+static unsigned long lastAdjustRepeat = 0;
+const unsigned long repeatDelay = 500;    // Initial hold before repeat
+const unsigned long repeatRate  = 150;    // Repeat every 150ms
+
 
 void initButtons() {
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
@@ -13,64 +23,70 @@ void initButtons() {
   pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
 }
 
-void resetESP32() {
-  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
-    delay(50);
-    ESP.restart();
-  }
-}
-
 void handleButtons() {
-  static unsigned long lastDebounceTime = 0;
-  static bool lastModeState = HIGH;
-  static bool lastAdjustState = HIGH;
-  static bool lastConfirmState = HIGH;
-  static unsigned long adjustPressStart = 0;
-  unsigned long lastAdjustRepeat = 0;
-  bool adjustHeld = false;
+  bool modeState = digitalRead(MODE_BUTTON_PIN) == LOW;
+  bool adjustState = digitalRead(ADJUST_BUTTON_PIN) == LOW;
+  bool confirmState = digitalRead(CONFIRM_BUTTON_PIN) == LOW;
 
+  // === Update press states with built-in debounce ===
+  confirmClassifier.update(confirmState);
+  modeClassifier.update(modeState);
+  adjustClassifier.update(adjustState);
 
-  unsigned long now = millis();
-  bool modeState = digitalRead(MODE_BUTTON_PIN);
-  bool adjustState = digitalRead(ADJUST_BUTTON_PIN);
-  bool confirmState = digitalRead(CONFIRM_BUTTON_PIN);
-
-  // Debounce interval
-  const unsigned long debounceDelay = 200;
-
-  // Mode button
-  if (lastModeState == HIGH && modeState == LOW && (now - lastDebounceTime > debounceDelay)) {
-    uiManager.handleMode();
-    lastDebounceTime = now;
+  // === Mode Button ===
+  if (modeClassifier.wasReleased()) {
+    unsigned long dur = modeClassifier.getHoldDuration();
+    if (dur >= 2000) {
+      // future long press for mode
+    } else if (dur >= 100) {
+      uiManager.handleMode();
+    }
+    modeClassifier.reset();  // ✅ important
   }
 
-  // === Adjust button auto-repeat ===
-  if (adjustState == LOW) {
-    if (lastAdjustState == HIGH) {
-      // Just pressed
-      adjustPressStart = millis();
-      lastAdjustRepeat = millis();
-      uiManager.handleAdjust();  // Initial tap
-    } else {
-      // Held down
-      if (millis() - adjustPressStart > 500 && millis() - lastAdjustRepeat > 150) {
-        uiManager.handleAdjust();  // Repeated action
-        lastAdjustRepeat = millis();
-      }
+  // === Adjust Button ===
+  if (adjustClassifier.wasReleased()) {
+    unsigned long dur = adjustClassifier.getHoldDuration();
+    if (dur >= 100 && dur < repeatDelay) {
+      // Normal tap
+      uiManager.handleAdjust();
+    }
+    adjustClassifier.reset();
+  } else if (adjustState) {
+    // Held down
+    unsigned long now = millis();
+    if (adjustRepeatStart == 0) {
+      adjustRepeatStart = now;
+      lastAdjustRepeat = now;
+    } else if (now - adjustRepeatStart >= repeatDelay && now - lastAdjustRepeat >= repeatRate) {
+      uiManager.handleAdjust();  // Repeat action
+      lastAdjustRepeat = now;
     }
   } else {
-    adjustPressStart = 0;
+    // Not pressed anymore
+    adjustRepeatStart = 0;
+    lastAdjustRepeat = 0;
   }
-  lastAdjustState = adjustState;
 
 
-  // Confirm button
-  if (lastConfirmState == HIGH && confirmState == LOW && (now - lastDebounceTime > debounceDelay)) {
+
+// --- Confirm (based on release duration) ---
+  if (confirmClassifier.wasReleased()) {
+  unsigned long dur = confirmClassifier.getHoldDuration();
+
+  if (dur >= 3000) {
+    // Long press
+    if (uiState == ROBOT_FACE_DISPLAY) {
+      uiManager.switchTo(IDLE_SCREEN);
+    } else if (uiState == IDLE_SCREEN) {
+      uiManager.switchTo(ROBOT_FACE_DISPLAY);
+    }
+  } else if (dur >= 100) {  // ✅ Short press must be ≥ 100ms
     uiManager.handleConfirm();
-    lastDebounceTime = now;
+  } else {
+    // Ignore micro-presses under 100ms
   }
 
-  lastModeState = modeState;
-  lastAdjustState = adjustState;
-  lastConfirmState = confirmState;
+    confirmClassifier.reset();
+  }
 }

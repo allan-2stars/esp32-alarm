@@ -249,6 +249,11 @@ void UIManager::switchTo(UIState newState) {
     case MESSAGE_DISPLAY:
       // Just allow rendering via uiManager.update()
       break;
+    case ROBOT_FACE_DISPLAY:
+    Serial.println("in robot face screen.");
+      break;
+    default:
+    break;
 
   }
 }

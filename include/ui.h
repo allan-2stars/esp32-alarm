@@ -8,7 +8,8 @@ enum UIState {
   ALARM_CONFIG,
   MELODY_PREVIEW,
   ALARM_RINGING,
-  MESSAGE_DISPLAY // New Message display screen
+  MESSAGE_DISPLAY, // New Message display screen
+  ROBOT_FACE_DISPLAY
 };
 
 extern UIState uiState;

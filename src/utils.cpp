@@ -177,11 +177,17 @@ void recordInteraction() {
   lastInteraction = millis();
 }
 
-
 bool isFieldVisible(AlarmType type, AlarmField field) {
   if ((field == ALARM_DATE_YEAR || field == ALARM_DATE_MONTH || field == ALARM_DATE_DAY) && type != SPECIFIC_DATE)
     return false;
   if (field == ALARM_REPEAT_DAYS && type != REPEATED)
     return false;
   return true;
+}
+
+void resetESP32() {
+  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+    delay(50);
+    ESP.restart();
+  }
 }
