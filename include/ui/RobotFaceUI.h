@@ -3,7 +3,7 @@
 #include <Face.h>
 #include "ui/emotions/FaceEmotion.h"
 
-#define NUM_EMOTIONS 1  // Expandable later
+#define NUM_EMOTIONS 2  // Expandable later
 
 class RobotFaceUI {
 public:

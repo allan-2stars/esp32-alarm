@@ -1,5 +1,6 @@
 #include "ui/RobotFaceUI.h"
 #include "ui/emotions/HappyEmotion.h"
+#include "ui/emotions/SurprisedEmotion.h"
 
 RobotFaceUI::RobotFaceUI() : face(nullptr), currentEmotionIndex(0), lastEmotionChange(0) {}
 
@@ -21,10 +22,12 @@ void RobotFaceUI::begin() {
 
   // Initialize emotion list
   emotions[0] = new HappyEmotion();
+  emotions[1] = new SurprisedEmotion();  // Add new emotion
   for (int i = 0; i < NUM_EMOTIONS; ++i) {
     emotions[i]->attach(face);
   }
 
+  // add logic to trigger emotion 0, 1,2,3
   showEmotion(0);
 }
 

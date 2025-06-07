@@ -252,6 +252,7 @@ void UIManager::switchTo(UIState newState) {
       // Just allow rendering via uiManager.update()
       break;
     case ROBOT_FACE_DISPLAY:
+      robotFaceUI.begin();
       Serial.println("switch to Robot Face Display.");
       break;
     default:

@@ -76,7 +76,7 @@ if (confirmClassifier.wasReleased()) {
   Serial.print("Confirm released, duration: ");
   Serial.println(dur);
 
-  if (dur >= 2000) {
+  if (dur >= 1500) { // press and hold for xx seconds to swith screen
     Serial.println("Long press detected");
     UIState state = uiManager.getCurrentState();
 

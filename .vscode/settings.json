@@ -1,6 +1,15 @@
 {
     "files.associations": {
         "string_view": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "random": "cpp",
+        "unordered_map": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "memory": "cpp",
+        "initializer_list": "cpp"
     }
 }

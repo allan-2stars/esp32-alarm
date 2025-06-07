@@ -5,7 +5,7 @@ void HappyEmotion::activate() {
 
   face->Expression.GoTo_Happy();           // Set happy expression
   face->Behavior.Clear();                  // Clear previous emotional behavior
-  face->Behavior.SetEmotion(eEmotions::Happy, 1.0);  // Full happy weight
+  face->Behavior.SetEmotion(eEmotions::Happy, 0.5);  // Full happy weight
   face->RandomBlink = true;
   face->RandomBehavior = false;
   face->RandomLook = false;
