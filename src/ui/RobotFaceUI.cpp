@@ -1,6 +1,7 @@
 #include "ui/RobotFaceUI.h"
 #include "ui/emotions/HappyEmotion.h"
 #include "ui/emotions/SurprisedEmotion.h" // Add other emotions similarly
+#include "ui/emotions/SadEmotion.h"
 
 // emotionCount tracks how many emotions were added via addEmotion()
 // NUM_EMOTIONS is a fixed maximum capacity defined elsewhere (e.g., #define NUM_EMOTIONS 10)
@@ -36,9 +37,10 @@ void RobotFaceUI::begin() {
   emotionCount = 0;  // reset count
   addEmotion(new HappyEmotion());
   addEmotion(new SurprisedEmotion());
+  addEmotion(new SadEmotion());
   // Add more: addEmotion(new AngryEmotion()); etc.
 
-  showEmotion(0); // default emotion
+  showEmotion(2); // default emotion
 }
 
 void RobotFaceUI::reset() {
