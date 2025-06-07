@@ -19,6 +19,7 @@ private:
   FaceEmotion* emotions[NUM_EMOTIONS];
   int currentEmotionIndex = 0;
   unsigned long lastEmotionChange = 0;
-
+  int emotionCount = 0;
   void showEmotion(int index);  // ← define this method
+  void addEmotion(FaceEmotion* emotion);
 };

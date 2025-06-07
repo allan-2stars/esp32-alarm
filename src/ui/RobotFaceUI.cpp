@@ -1,14 +1,27 @@
 #include "ui/RobotFaceUI.h"
 #include "ui/emotions/HappyEmotion.h"
-#include "ui/emotions/SurprisedEmotion.h"
+#include "ui/emotions/SurprisedEmotion.h" // Add other emotions similarly
 
-RobotFaceUI::RobotFaceUI() : face(nullptr), currentEmotionIndex(0), lastEmotionChange(0) {}
+// emotionCount tracks how many emotions were added via addEmotion()
+// NUM_EMOTIONS is a fixed maximum capacity defined elsewhere (e.g., #define NUM_EMOTIONS 10)
+
+RobotFaceUI::RobotFaceUI() : emotionCount(0), currentEmotionIndex(0), lastEmotionChange(0) {}
 
 RobotFaceUI::~RobotFaceUI() {
-  for (int i = 0; i < NUM_EMOTIONS; ++i) {
+  for (int i = 0; i < emotionCount; ++i) {
     delete emotions[i];
   }
   delete face;
+}
+
+// As soon as a RobotFaceUI object is created, emotionCount starts at 0.
+// Each call to addEmotion(...) increments it by one.
+// This counter is used to track how many emotions have been added dynamically to the emotions[] array.
+void RobotFaceUI::addEmotion(FaceEmotion* emotion) {
+  if (emotionCount < NUM_EMOTIONS) {
+    emotions[emotionCount++] = emotion;
+    emotion->attach(face);
+  }
 }
 
 void RobotFaceUI::begin() {
@@ -20,15 +33,12 @@ void RobotFaceUI::begin() {
     face->Blink.Timer.SetIntervalMillis(5000);
   }
 
-  // Initialize emotion list
-  emotions[0] = new HappyEmotion();
-  emotions[1] = new SurprisedEmotion();  // Add new emotion
-  for (int i = 0; i < NUM_EMOTIONS; ++i) {
-    emotions[i]->attach(face);
-  }
+  emotionCount = 0;  // reset count
+  addEmotion(new HappyEmotion());
+  addEmotion(new SurprisedEmotion());
+  // Add more: addEmotion(new AngryEmotion()); etc.
 
-  // add logic to trigger emotion 0, 1,2,3
-  showEmotion(0);
+  showEmotion(0); // default emotion
 }
 
 void RobotFaceUI::reset() {
@@ -38,7 +48,7 @@ void RobotFaceUI::reset() {
 }
 
 void RobotFaceUI::showEmotion(int index) {
-  if (index < 0 || index >= NUM_EMOTIONS) return;
+  if (index < 0 || index >= emotionCount || !emotions[index]) return;
   currentEmotionIndex = index;
   emotions[index]->activate();
 }
