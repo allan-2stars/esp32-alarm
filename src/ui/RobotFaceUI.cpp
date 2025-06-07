@@ -1,10 +1,19 @@
 #include "ui/RobotFaceUI.h"
 #include "ui/emotions/HappyEmotion.h"
-#include "ui/emotions/SurprisedEmotion.h" // Add other emotions similarly
+#include "ui/emotions/SurprisedEmotion.h"
 #include "ui/emotions/SadEmotion.h"
+#include "ui/emotions/AngryEmotion.h"
+#include "ui/emotions/AnnoyedEmotion.h"
+#include "ui/emotions/AweEmotion.h"
+#include "ui/emotions/FocusedEmotion.h"
+#include "ui/emotions/FrustratedEmotion.h"
+#include "ui/emotions/FuriousEmotion.h"
+#include "ui/emotions/GleeEmotion.h"
+#include "ui/emotions/NormalEmotion.h"
+#include "ui/emotions/ScaredEmotion.h"
 
 // emotionCount tracks how many emotions were added via addEmotion()
-// NUM_EMOTIONS is a fixed maximum capacity defined elsewhere (e.g., #define NUM_EMOTIONS 10)
+// NUM_EMOTIONS is a fixed maximum capacity defined elsewhere (e.g., #define NUM_EMOTIONS 12)
 
 RobotFaceUI::RobotFaceUI() : emotionCount(0), currentEmotionIndex(0), lastEmotionChange(0) {}
 
@@ -38,15 +47,18 @@ void RobotFaceUI::begin() {
   addEmotion(new HappyEmotion());
   addEmotion(new SurprisedEmotion());
   addEmotion(new SadEmotion());
-  // Add more: addEmotion(new AngryEmotion()); etc.
+  addEmotion(new AngryEmotion());
+  addEmotion(new AnnoyedEmotion());
+  addEmotion(new AweEmotion());
+  addEmotion(new FocusedEmotion());
+  addEmotion(new FrustratedEmotion());
+  addEmotion(new FuriousEmotion());
+  addEmotion(new GleeEmotion());
+  addEmotion(new NormalEmotion());
+  addEmotion(new ScaredEmotion());
 
-  showEmotion(2); // default emotion
-}
-
-void RobotFaceUI::reset() {
-  currentEmotionIndex = 0;
+  showEmotion(2); // default emotion (Sad)
   lastEmotionChange = millis();
-  showEmotion(currentEmotionIndex);
 }
 
 void RobotFaceUI::showEmotion(int index) {
@@ -55,8 +67,21 @@ void RobotFaceUI::showEmotion(int index) {
   emotions[index]->activate();
 }
 
+void RobotFaceUI::reset() {
+  currentEmotionIndex = 0;
+  lastEmotionChange = millis();
+  showEmotion(currentEmotionIndex);
+}
+
 void RobotFaceUI::update() {
   if (face) {
     face->Update();
+  }
+  //Serial.print("in Robot Face update...current Emotion Index: ");
+  // Auto cycle every 3 seconds
+  if (millis() - lastEmotionChange >= 3000) {
+    currentEmotionIndex = (currentEmotionIndex + 1) % emotionCount;
+    showEmotion(currentEmotionIndex);
+    lastEmotionChange = millis();
   }
 }

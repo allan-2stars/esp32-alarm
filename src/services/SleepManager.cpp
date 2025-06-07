@@ -38,11 +38,7 @@ bool SleepManager::isNearAlarm() {
 }
 
 void SleepManager::enterSleep() {
-  display.clearDisplay();
-  display.setCursor(0, 0);
-  display.println("Sleeping...");
-  display.display();
-  delay(1000);
+  uiManager.showMessage("Sleeping ...", IDLE_SCREEN, 1000);
   display.ssd1306_command(SSD1306_DISPLAYOFF);
 
   esp_sleep_enable_touchpad_wakeup();

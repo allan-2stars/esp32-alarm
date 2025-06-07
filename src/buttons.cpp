@@ -14,6 +14,9 @@ static unsigned long adjustRepeatStart = 0;
 static unsigned long lastAdjustRepeat = 0;
 const unsigned long repeatDelay = 500;    // Initial hold before repeat
 const unsigned long repeatRate  = 150;    // Repeat every 150ms
+bool adjustAllowed = true;  // Must release Adjust at least once before it's allowed again
+bool confirmAllowed = true;
+
 
 
 void initButtons() {
@@ -33,7 +36,9 @@ void handleButtons() {
   modeClassifier.update(modeState);
   adjustClassifier.update(adjustState);
 
+  // ===================
   // === Mode Button ===
+  // ===================
   if (modeClassifier.wasReleased()) {
     unsigned long dur = modeClassifier.getHoldDuration();
     if (dur >= 2000) {
@@ -44,55 +49,64 @@ void handleButtons() {
     modeClassifier.reset();  // ✅ important
   }
 
+
+  // =====================
   // === Adjust Button ===
+  // =====================
+
+
   if (adjustClassifier.wasReleased()) {
-    unsigned long dur = adjustClassifier.getHoldDuration();
-    if (dur >= 100 && dur < repeatDelay) {
-      // Normal tap
+  unsigned long dur = adjustClassifier.getHoldDuration();
+  if (dur >= 100 && dur < repeatDelay) {
+    if (adjustAllowed) {
       uiManager.handleAdjust();
     }
-    adjustClassifier.reset();
+  }
+  adjustAllowed = true;  // ✅ button was released, safe to use again
+  adjustClassifier.reset();
   } else if (adjustState) {
-    // Held down
+  // Held down
+  if (adjustAllowed) {
     unsigned long now = millis();
     if (adjustRepeatStart == 0) {
       adjustRepeatStart = now;
       lastAdjustRepeat = now;
     } else if (now - adjustRepeatStart >= repeatDelay && now - lastAdjustRepeat >= repeatRate) {
-      uiManager.handleAdjust();  // Repeat action
+      uiManager.handleAdjust();
       lastAdjustRepeat = now;
     }
+  }
   } else {
-    // Not pressed anymore
     adjustRepeatStart = 0;
     lastAdjustRepeat = 0;
   }
 
-
-
-// --- Confirm (based on release duration) ---
-if (confirmClassifier.wasReleased()) {
+  // ===========================================
+  // --- Confirm (based on release duration) ---
+  // ===========================================
+  if (confirmClassifier.wasReleased()) {
   unsigned long dur = confirmClassifier.getHoldDuration();
-  Serial.print("Confirm released, duration: ");
-  Serial.println(dur);
 
-  if (dur >= 1500) { // press and hold for xx seconds to swith screen
-    Serial.println("Long press detected");
-    UIState state = uiManager.getCurrentState();
-
-    if (state == ROBOT_FACE_DISPLAY) {
-      uiManager.switchTo(IDLE_SCREEN);
-    } else if (state == IDLE_SCREEN) {
-      uiManager.switchTo(ROBOT_FACE_DISPLAY);
-    }
+  UIState state = uiManager.getCurrentState();
+  if (dur >= 1500 && confirmAllowed) {
+   // long press in the future
   } else if (dur >= 100) {
-    //Serial.println("Short press handled");
-    uiManager.handleConfirm();
-  } else {
-    Serial.println("Ignored tiny press");
+//    if (state != ROBOT_FACE_DISPLAY) {
+      uiManager.handleConfirm();
+//    }
   }
 
+  confirmAllowed = true;
+  confirmClassifier.reset();
+}
+}
+
+void resetAdjustRepeat() {
+  adjustRepeatStart = 0;
+  lastAdjustRepeat = 0;
+  adjustAllowed = false;
+  confirmAllowed = false;  // ✅ must release before valid again
+  adjustClassifier.reset();
   confirmClassifier.reset();
 }
 
-}
