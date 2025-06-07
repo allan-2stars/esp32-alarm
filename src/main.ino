@@ -32,11 +32,6 @@ void setup() {
   rgbLed.setColor(255, 0, 0);
   alarmStorageService.begin();
   sunMoonUI.begin();
-
-  ///
-  face = new Face(/* screenWidth = */ 128, /* screenHeight = */ 64, /* eyeSize = */ 40);
-  // Assign the current expression
-  face->Expression.GoTo_Normal();
 }
 
 void loop() {

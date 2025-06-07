@@ -1,19 +1,24 @@
-// === RobotFaceUI.h ===
 #pragma once
 
-#include <Adafruit_SSD1306.h>
-#include "emotions/Emotion.h"
+#include <Face.h>
+#include "ui/emotions/FaceEmotion.h"
+
+#define NUM_EMOTIONS 1  // Expandable later
 
 class RobotFaceUI {
 public:
-  RobotFaceUI(Adafruit_SSD1306& disp);
+  RobotFaceUI();
   ~RobotFaceUI();
 
+  void begin();
   void update();
   void reset();
 
 private:
-  Adafruit_SSD1306& display;
-  unsigned long lastChange;
-  int currentEmotion;
+  Face* face;
+  FaceEmotion* emotions[NUM_EMOTIONS];
+  int currentEmotionIndex = 0;
+  unsigned long lastEmotionChange = 0;
+
+  void showEmotion(int index);  // ← define this method
 };

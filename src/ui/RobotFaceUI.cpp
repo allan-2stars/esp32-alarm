@@ -1,35 +1,47 @@
 #include "ui/RobotFaceUI.h"
-#include "ui/emotions/EmotionHappy.h"
-//#include "ui/emotions/EmotionAngry.h"
+#include "ui/emotions/HappyEmotion.h"
 
-EmotionHappy happy;
-//EmotionAngry angry;
-
-Emotion* robotEmotions[] = {
-  &happy,
- // &angry
-};
-
-const int NUM_EMOTIONS = sizeof(robotEmotions) / sizeof(robotEmotions[0]);
-
-RobotFaceUI::RobotFaceUI(Adafruit_SSD1306& disp) : display(disp), currentEmotion(0), lastChange(0) {}
+RobotFaceUI::RobotFaceUI() : face(nullptr), currentEmotionIndex(0), lastEmotionChange(0) {}
 
 RobotFaceUI::~RobotFaceUI() {
-  // Nothing to delete when using static emotion instances
+  for (int i = 0; i < NUM_EMOTIONS; ++i) {
+    delete emotions[i];
+  }
+  delete face;
+}
+
+void RobotFaceUI::begin() {
+  if (!face) {
+    face = new Face(128, 64, 40);  // Width, Height, Eye Size
+    face->RandomBlink = true;
+    face->RandomBehavior = false;
+    face->RandomLook = false;
+    face->Blink.Timer.SetIntervalMillis(5000);
+  }
+
+  // Initialize emotion list
+  emotions[0] = new HappyEmotion();
+  for (int i = 0; i < NUM_EMOTIONS; ++i) {
+    emotions[i]->attach(face);
+  }
+
+  showEmotion(0);
 }
 
 void RobotFaceUI::reset() {
-  currentEmotion = 0;
-  lastChange = millis();
+  currentEmotionIndex = 0;
+  lastEmotionChange = millis();
+  showEmotion(currentEmotionIndex);
+}
+
+void RobotFaceUI::showEmotion(int index) {
+  if (index < 0 || index >= NUM_EMOTIONS) return;
+  currentEmotionIndex = index;
+  emotions[index]->activate();
 }
 
 void RobotFaceUI::update() {
-  if (millis() - lastChange > 3000) {
-    currentEmotion = (currentEmotion + 1) % NUM_EMOTIONS;
-    lastChange = millis();
+  if (face) {
+    face->Update();
   }
-
-  display.clearDisplay();
-  robotEmotions[currentEmotion]->draw(display);
-  display.display();
 }
