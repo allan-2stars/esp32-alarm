@@ -1,11 +1,11 @@
-#include "ui/emotions/AweEmotion.h"
+#include "../include/emotions/HappyEmotion.h"
 
-void AweEmotion::activate() {
+void HappyEmotion::activate() {
   if (!face) return;
 
-  face->Expression.GoTo_Awe();
+  face->Expression.GoTo_Happy();
   face->Behavior.Clear();
-  face->Behavior.SetEmotion(eEmotions::Awe, 1.0);
+  face->Behavior.SetEmotion(eEmotions::Happy, 1.0);
 
   face->RandomBlink = false;
   face->RandomBehavior = false;

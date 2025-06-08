@@ -1,11 +1,11 @@
-#include "ui/emotions/FocusedEmotion.h"
+#include "../include/emotions/AnnoyedEmotion.h"
 
-void FocusedEmotion::activate() {
+void AnnoyedEmotion::activate() {
   if (!face) return;
 
-  face->Expression.GoTo_Focused();
+  face->Expression.GoTo_Annoyed();
   face->Behavior.Clear();
-  face->Behavior.SetEmotion(eEmotions::Focused, 1.0);
+  face->Behavior.SetEmotion(eEmotions::Annoyed, 1.0);
 
   face->RandomBlink = false;
   face->RandomBehavior = false;

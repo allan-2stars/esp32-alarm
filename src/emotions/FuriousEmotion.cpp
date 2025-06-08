@@ -1,11 +1,11 @@
-#include "ui/emotions/AnnoyedEmotion.h"
+#include "../include/emotions/FuriousEmotion.h"
 
-void AnnoyedEmotion::activate() {
+void FuriousEmotion::activate() {
   if (!face) return;
 
-  face->Expression.GoTo_Annoyed();
+  face->Expression.GoTo_Furious();
   face->Behavior.Clear();
-  face->Behavior.SetEmotion(eEmotions::Annoyed, 1.0);
+  face->Behavior.SetEmotion(eEmotions::Furious, 1.0);
 
   face->RandomBlink = false;
   face->RandomBehavior = false;

@@ -1,17 +1,24 @@
 #include "ui/RobotFaceUI.h"
-#include "ui/emotions/HappyEmotion.h"
-#include "ui/emotions/SurprisedEmotion.h"
-#include "ui/emotions/SadEmotion.h"
-#include "ui/emotions/AngryEmotion.h"
-#include "ui/emotions/AnnoyedEmotion.h"
-#include "ui/emotions/AweEmotion.h"
-#include "ui/emotions/FocusedEmotion.h"
-#include "ui/emotions/FrustratedEmotion.h"
-#include "ui/emotions/FuriousEmotion.h"
-#include "ui/emotions/GleeEmotion.h"
-#include "ui/emotions/NormalEmotion.h"
-#include "ui/emotions/ScaredEmotion.h"
+#include "emotions/HappyEmotion.h"
+#include "emotions/SurprisedEmotion.h"
+#include "emotions/SadEmotion.h"
+#include "emotions/AngryEmotion.h"
+#include "emotions/AnnoyedEmotion.h"
+#include "emotions/AweEmotion.h"
+#include "emotions/FocusedEmotion.h"
+#include "emotions/FrustratedEmotion.h"
+#include "emotions/FuriousEmotion.h"
+#include "emotions/GleeEmotion.h"
+#include "emotions/NormalEmotion.h"
+#include "emotions/ScaredEmotion.h"
+#include "globals.h"
+#include "config.h"
 
+////// Aniamtion
+#include "../include/animations/FaceAnimation.h"
+#include "../include/animations/GreatfulAnimation.h"
+
+FaceAnimation* currentAnimation = nullptr;
 // emotionCount tracks how many emotions were added via addEmotion()
 // NUM_EMOTIONS is a fixed maximum capacity defined elsewhere (e.g., #define NUM_EMOTIONS 12)
 
@@ -34,6 +41,7 @@ void RobotFaceUI::addEmotion(FaceEmotion* emotion) {
   }
 }
 
+
 void RobotFaceUI::begin() {
   if (!face) {
     face = new Face(128, 64, 40);  // Width, Height, Eye Size
@@ -43,23 +51,32 @@ void RobotFaceUI::begin() {
     face->Blink.Timer.SetIntervalMillis(5000);
   }
 
-  emotionCount = 0;  // reset count
-  addEmotion(new HappyEmotion());
-  addEmotion(new SurprisedEmotion());
-  addEmotion(new SadEmotion());
-  addEmotion(new AngryEmotion());
-  addEmotion(new AnnoyedEmotion());
-  addEmotion(new AweEmotion());
-  addEmotion(new FocusedEmotion());
-  addEmotion(new FrustratedEmotion());
-  addEmotion(new FuriousEmotion());
-  addEmotion(new GleeEmotion());
-  addEmotion(new NormalEmotion());
-  addEmotion(new ScaredEmotion());
+  // Clear old animation if still active
+  if (currentAnimation) {
+    delete currentAnimation;
+    currentAnimation = nullptr;
+  }
 
-  showEmotion(2); // default emotion (Sad)
-  lastEmotionChange = millis();
+  // Clear emotions list and reattach (only once ideally)
+  if (emotionCount == 0) {
+    addEmotion(new HappyEmotion());
+    addEmotion(new SurprisedEmotion());
+    addEmotion(new SadEmotion());
+    addEmotion(new AngryEmotion());
+    addEmotion(new AnnoyedEmotion());
+    addEmotion(new AweEmotion());
+    addEmotion(new FocusedEmotion());
+    addEmotion(new FrustratedEmotion());
+    addEmotion(new FuriousEmotion());
+    addEmotion(new GleeEmotion());
+    addEmotion(new NormalEmotion());
+    addEmotion(new ScaredEmotion());
+  }
+
+  showEmotionByName("Normal");
+  drawEmotionLabel();
 }
+
 
 void RobotFaceUI::showEmotion(int index) {
   if (index < 0 || index >= emotionCount || !emotions[index]) return;
@@ -74,17 +91,22 @@ void RobotFaceUI::reset() {
 }
 
 void RobotFaceUI::update() {
-  if (face) {
-    face->Update();
+  if (face) face->Update();
+
+  if (currentAnimation) {
+    currentAnimation->update(millis());
+    if (currentAnimation->isFinished()) {
+      delete currentAnimation;
+      currentAnimation = nullptr;
+      showEmotionByName("Normal");
+      drawEmotionLabel();
+    }
+    return;
   }
-  //Serial.print("in Robot Face update...current Emotion Index: ");
-  // Auto cycle every 3 seconds
-  if (millis() - lastEmotionChange >= 3000) {
-    currentEmotionIndex = (currentEmotionIndex + 1) % emotionCount;
-    showEmotion(currentEmotionIndex);
-    lastEmotionChange = millis();
-  }
+
+  // handle emotion timeout fallback if needed
 }
+
 
 void RobotFaceUI::showEmotionByName(const String& name) {
   for (int i = 0; i < emotionCount; ++i) {
@@ -99,28 +121,25 @@ void RobotFaceUI::showEmotionByName(const String& name) {
 }
 
 void RobotFaceUI::playGratefulAnimation() {
-  // Step 1: Awe for 1 second
-  showEmotionByName("Awe");
-  delay(1000);
+  if (currentAnimation) delete currentAnimation;
+  currentAnimation = new GratefulAnimation();
+  currentAnimation->start(face);
+}
 
-  // Step 2: Blink
-  face->DoBlink();
-  delay(300); // Wait for blink to complete
+void RobotFaceUI::drawEmotionLabel() {
+  display.setTextSize(1);
+  display.setTextColor(TEXT_COLOR);
+  display.setCursor(0, 0);
 
-  // Step 3: Happy for 2 seconds
-  showEmotionByName("Happy");
-  delay(2000);
+  String label = "Emotion: ";
+  if (currentEmotionIndex >= 0 && currentEmotionIndex < emotionCount && emotions[currentEmotionIndex]) {
+    label += emotions[currentEmotionIndex]->getName();
+  } else {
+    label += "Unknown";
+  }
 
-  // Step 4: Blink twice
-  face->DoBlink();
-  delay(300);
-  face->DoBlink();
-  delay(300);
-
-  // Step 5: Stay Happy for 2 seconds
-  delay(2000);
-
-  // Step 6: Return to Normal
-  showEmotionByName("Normal");
+  display.fillRect(0, 0, SCREEN_WIDTH, 10, SSD1306_BLACK);  // clear top area
+  display.print(label);
+  display.display();
 }
 

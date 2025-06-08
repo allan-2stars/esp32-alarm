@@ -1,11 +1,11 @@
-#include "ui/emotions/NormalEmotion.h"
+#include "../include/emotions/GleeEmotion.h"
 
-void NormalEmotion::activate() {
+void GleeEmotion::activate() {
   if (!face) return;
 
-  face->Expression.GoTo_Normal();
+  face->Expression.GoTo_Glee();
   face->Behavior.Clear();
-  face->Behavior.SetEmotion(eEmotions::Normal, 1.0);
+  face->Behavior.SetEmotion(eEmotions::Glee, 1.0);
 
   face->RandomBlink = false;
   face->RandomBehavior = false;

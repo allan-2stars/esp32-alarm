@@ -11,6 +11,7 @@
         "vector": "cpp",
         "memory": "cpp",
         "initializer_list": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "new": "cpp"
     }
 }

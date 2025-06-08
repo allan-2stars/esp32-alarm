@@ -51,7 +51,7 @@
 #define CHANNEL_GREEN  1
 #define CHANNEL_BLUE   2
 
-#define INACTIVITY_TIMEOUT 60000 // 1 min then sleep
+#define INACTIVITY_TIMEOUT 600000 // 1 min then sleep
 
 #define CHANNEL_LEFT_LED   3
 #define CHANNEL_TOP_LED  4

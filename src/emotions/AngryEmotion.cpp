@@ -1,11 +1,11 @@
-#include "ui/emotions/ScaredEmotion.h"
+#include "../include/emotions/AngryEmotion.h"
 
-void ScaredEmotion::activate() {
+void AngryEmotion::activate() {
   if (!face) return;
 
-  face->Expression.GoTo_Scared();
+  face->Expression.GoTo_Angry();
   face->Behavior.Clear();
-  face->Behavior.SetEmotion(eEmotions::Scared, 1.0);
+  face->Behavior.SetEmotion(eEmotions::Angry, 1.0);
 
   face->RandomBlink = false;
   face->RandomBehavior = false;

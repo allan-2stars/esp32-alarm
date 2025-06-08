@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Face.h>
-#include "ui/emotions/FaceEmotion.h"
+#include "emotions/FaceEmotion.h"
 
 #define NUM_EMOTIONS 12  // Expandable later
 
@@ -25,6 +25,8 @@ private:
   void addEmotion(FaceEmotion* emotion);
 
   void showEmotionByName(const String& name);
-
+  unsigned long returnToNormalAt = 0;  // ⏱ 0 = no scheduled return
+  void drawEmotionLabel();
+  bool isAnimating = false;
 
 };

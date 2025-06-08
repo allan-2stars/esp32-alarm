@@ -1,4 +1,4 @@
-#include "ui/emotions/FrustratedEmotion.h"
+#include "../include/emotions/FrustratedEmotion.h"
 
 void FrustratedEmotion::activate() {
   if (!face) return;
