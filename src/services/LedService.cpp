@@ -35,6 +35,8 @@ void LedService::stopAlarmLights() {
   ledcWrite(CHANNEL_RIGHT_LED, 0);
 }
 
+#include "config.h"
+
 void LedService::updateAlarmLights() {
   if (!isAlarmActive) return;
 
@@ -42,13 +44,13 @@ void LedService::updateAlarmLights() {
   unsigned long elapsed = now - alarmStartTime;
 
   int stage = 1;
-  if (elapsed >= 24000) stage = 5;
-  else if (elapsed >= 18000) stage = 4;
-  else if (elapsed >= 12000) stage = 3;
-  else if (elapsed >= 6000)  stage = 2;
+  if (elapsed >= ALARM_STAGE4_DURATION) stage = 5;
+  else if (elapsed >= ALARM_STAGE3_DURATION) stage = 4;
+  else if (elapsed >= ALARM_STAGE2_DURATION) stage = 3;
+  else if (elapsed >= ALARM_STAGE1_DURATION) stage = 2;
 
   if (stage <= 4) {
-    int fadePeriod = (stage < 4) ? 6000 : 3000;
+    int fadePeriod = (stage < 4) ? FADE_PERIOD_NORMAL : FADE_PERIOD_FAST;
     float phase = (now % fadePeriod) / (float)fadePeriod;
     int brightness = int(127.5 * (1.0 - cos(2 * PI * phase)));
 
@@ -56,9 +58,9 @@ void LedService::updateAlarmLights() {
     if (stage >= 2) setLedBrightness(CHANNEL_TOP_LED, brightness);
     if (stage >= 3) setLedBrightness(CHANNEL_RIGHT_LED, brightness);
   } else if (stage == 5) {
-    if (now - lastFlashUpdate >= 1000) {
+    if (now - lastFlashUpdate >= FLASH_TOGGLE_INTERVAL) {
       flashingState = !flashingState;
-      uint8_t level = flashingState ? 255 : 0;
+      uint8_t level = flashingState ? LED_MAX_BRIGHTNESS : 0;
       setLedBrightness(CHANNEL_LEFT_LED, level);
       setLedBrightness(CHANNEL_TOP_LED, level);
       setLedBrightness(CHANNEL_RIGHT_LED, level);
@@ -66,6 +68,7 @@ void LedService::updateAlarmLights() {
     }
   }
 }
+
 
 void LedService::setLedBrightness(int channel, int brightness) {
   ledcWrite(channel, brightness);

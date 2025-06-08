@@ -13,6 +13,7 @@ const std::vector<String> CommandSet::grateful = {
   "thanks",
   "you helped a lot",
   "you are amazing",
-  "i appreciate it"
+  "i appreciate it",
+  "you are awesome"
 };
 

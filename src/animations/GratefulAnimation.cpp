@@ -1,62 +1,69 @@
-// src/animations/GratefulAnimation.cpp
-#include "../include/animations/GreatfulAnimation.h"
-#include "Face.h"
+#include "animations/GratefulAnimation.h"
+#include "ui/RobotFaceUI.h"
+
+GratefulAnimation::GratefulAnimation() {}
 
 void GratefulAnimation::start(Face* f) {
   face = f;
-  step = 0;
-  stepStart = millis();
+  stage = GratefulStage::AWE;
+  stageStart = millis();
   finished = false;
-  face->Expression.GoTo_Awe();
+  showEmotion("Awe");
 }
 
 void GratefulAnimation::update(unsigned long now) {
   if (finished || !face) return;
 
-  switch (step) {
-    case 0:
-      if (now - stepStart > 1000) {
-        face->DoBlink();
-        step = 1;
-        stepStart = now;
-      }
+  switch (stage) {
+    case GratefulStage::AWE:
+      if (now - stageStart >= 1000) nextStage(now);
       break;
-    case 1:
-      if (now - stepStart > 200) {
-        face->Expression.GoTo_Happy();
-        step = 2;
-        stepStart = now;
-      }
+    case GratefulStage::TRANSITION:
+      face->DoBlink();
+      nextStage(now);
       break;
-    case 2:
-      if (now - stepStart > 2000) {
-        face->DoBlink();
-        step = 3;
-        stepStart = now;
-      }
+    case GratefulStage::HAPPY1:
+      showEmotion("Happy");
+      if (now - stageStart >= 2000) nextStage(now);
       break;
-    case 3:
-      if (now - stepStart > 200) {
-        face->DoBlink();
-        step = 4;
-        stepStart = now;
-      }
+    case GratefulStage::BLINK1:
+      face->DoBlink();
+      nextStage(now);
       break;
-    case 4:
-      if (now - stepStart > 200) {
-        face->Expression.GoTo_Happy();
-        step = 5;
-        stepStart = now;
-      }
+    case GratefulStage::HAPPY2:
+      showEmotion("Happy");
+      if (now - stageStart >= 2000) nextStage(now);
       break;
-    case 5:
-      if (now - stepStart > 2000) {
-        finished = true;
-      }
+    case GratefulStage::BLINK2:
+      face->DoBlink();
+      nextStage(now);
+      break;
+    case GratefulStage::DONE:
+      showEmotion("Normal");
+      finished = true;
       break;
   }
 }
 
+void GratefulAnimation::nextStage(unsigned long now) {
+  stage = static_cast<GratefulStage>(static_cast<int>(stage) + 1);
+  stageStart = now;
+}
+
 bool GratefulAnimation::isFinished() const {
   return finished;
+}
+
+void GratefulAnimation::showEmotion(const char* name) {
+  if (!face) return;
+  if (strcmp(name, "Awe") == 0) {
+    face->Expression.GoTo_Awe();
+    face->RandomBlink = false;
+  } else if (strcmp(name, "Happy") == 0) {
+    face->Expression.GoTo_Happy();
+    face->RandomBlink = false;
+  } else if (strcmp(name, "Normal") == 0) {
+    face->Expression.GoTo_Normal();
+    face->RandomBlink = true;
+  }
 }

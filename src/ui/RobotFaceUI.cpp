@@ -15,8 +15,8 @@
 #include "config.h"
 
 ////// Aniamtion
-#include "../include/animations/FaceAnimation.h"
-#include "../include/animations/GreatfulAnimation.h"
+#include "animations/FaceAnimation.h"
+
 
 FaceAnimation* currentAnimation = nullptr;
 // emotionCount tracks how many emotions were added via addEmotion()
@@ -91,8 +91,12 @@ void RobotFaceUI::reset() {
 }
 
 void RobotFaceUI::update() {
-  if (face) face->Update();
 
+  if (face) face->Update();
+  if (!gratefulAnimation.isFinished()) {
+    gratefulAnimation.update(millis());
+    return; // while animation is running, skip rest of update
+  }
   if (currentAnimation) {
     currentAnimation->update(millis());
     if (currentAnimation->isFinished()) {
@@ -121,9 +125,9 @@ void RobotFaceUI::showEmotionByName(const String& name) {
 }
 
 void RobotFaceUI::playGratefulAnimation() {
-  if (currentAnimation) delete currentAnimation;
-  currentAnimation = new GratefulAnimation();
-  currentAnimation->start(face);
+  if (!face) return;
+  Serial.println("🎭 Playing Grateful Animation");
+  gratefulAnimation.start(face);
 }
 
 void RobotFaceUI::drawEmotionLabel() {

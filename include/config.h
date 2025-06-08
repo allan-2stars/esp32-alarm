@@ -57,6 +57,22 @@
 #define CHANNEL_TOP_LED  4
 #define CHANNEL_RIGHT_LED  5
 
+//#### Alarm light stage durations (in milliseconds)
+#define ALARM_STAGE1_DURATION  10000
+#define ALARM_STAGE2_DURATION  20000
+#define ALARM_STAGE3_DURATION  30000
+#define ALARM_STAGE4_DURATION  40000
+
+// Fade timing
+#define FADE_PERIOD_NORMAL  3000
+#define FADE_PERIOD_FAST    1000
+
+// Flashing
+#define FLASH_TOGGLE_INTERVAL 500
+
+// Max LED brightness
+#define LED_MAX_BRIGHTNESS 255
+//###################################
 
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE

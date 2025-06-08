@@ -1,8 +1,13 @@
 #pragma once
-
+// External
+#include <Face.h>
 #include <Adafruit_SSD1306.h>
+// Internal
 #include "alarm.h"
 #include "config.h"
+#include "ui_state.h"
+#include "ui.h"
+// UI
 #include "ui/UIManager.h"
 #include "ui/BellUI.h"
 #include "ui/IdleUI.h"
@@ -10,6 +15,9 @@
 #include "ui/MelodyPreviewUI.h"
 #include "ui/SunMoonUI.h"
 #include "ui/AlarmConfigUI.h"
+#include "ui/MessageDisplayUI.h"
+#include "ui/RobotFaceUI.h"
+// Services
 #include "services/AlarmService.h"
 #include "services/MelodyService.h"
 #include "services/AlarmStorageService.h"
@@ -17,15 +25,13 @@
 #include "services/RGBLedService.h"
 #include "services/SleepManager.h"
 #include "services/AlarmPlayerService.h"
-
-#include "ui/MessageDisplayUI.h"
 #include "services/ButtonPressService.h"
-#include "ui/RobotFaceUI.h"
+// Commands
 #include "commands/CommandInput.h"
-#include "ui_state.h"
-#include "ui.h"
+//Animation
+#include "../include/animations/GratefulAnimation.h"
+#include "../include/animations/FaceAnimation.h"
 
-#include <Face.h>
 extern Face *face;
 // Global display
 extern Adafruit_SSD1306 display;
@@ -73,3 +79,5 @@ extern SleepManager sleepManager;
 // Robot
 extern RobotFaceUI robotFaceUI;
 extern void checkSerialCommand();
+// Animation
+extern GratefulAnimation gratefulAnimation;
