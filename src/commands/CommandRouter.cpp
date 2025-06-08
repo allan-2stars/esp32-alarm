@@ -8,12 +8,10 @@ void CommandRouter::handleCommand(const String& cmd) {
   for (const auto& phrase : CommandSet::greetings) {
     if (cmd == phrase) {
       Serial.println("✅ Greeting detected");
-
       // Only switch if not already in face screen
-      if (currentState != ROBOT_FACE_DISPLAY) {
+      if (uiManager.getCurrentState() == !ROBOT_FACE_DISPLAY) {
         uiManager.switchTo(ROBOT_FACE_DISPLAY);
       }
-
       return;
     }
   }
@@ -22,12 +20,10 @@ void CommandRouter::handleCommand(const String& cmd) {
   for (const auto& phrase : CommandSet::farewells) {
     if (cmd == phrase) {
       Serial.println("👋 Goodbye detected");
-
       // Only exit face mode if you're in it
       if (currentState == ROBOT_FACE_DISPLAY) {
         uiManager.switchTo(IDLE_SCREEN);
       }
-
       return;
     }
   }
@@ -36,13 +32,11 @@ void CommandRouter::handleCommand(const String& cmd) {
   for (const auto& phrase : CommandSet::grateful) {
     if (cmd == phrase) {
       Serial.println("🙏 Grateful command detected");
-
-      if (currentState == ROBOT_FACE_DISPLAY) {
+      if (uiManager.getCurrentState() == ROBOT_FACE_DISPLAY) {
         robotFaceUI.playGratefulAnimation();
       } else {
         Serial.println("⚠️ Ignored: Not in Robot Face screen");
       }
-
       return;
     }
   }

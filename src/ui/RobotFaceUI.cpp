@@ -98,19 +98,21 @@ void RobotFaceUI::update() {
     return; // while animation is running, skip rest of update
   }
 
-  if (currentAnimation) {
-    currentAnimation->update(millis());
-    if (currentAnimation->isFinished()) {
-      //delete currentAnimation;
-      currentAnimation = nullptr;
-      showEmotionByName("Normal");
-      drawEmotionLabel();
-    }
-    return;
-
-    
+    if (!skepticAnimation.isFinished()) {
+    skepticAnimation.update(millis());
+    return; // while animation is running, skip rest of update
   }
 
+  // if (currentAnimation) {
+  //   currentAnimation->update(millis());
+  //   if (currentAnimation->isFinished()) {
+  //     //delete currentAnimation;
+  //     currentAnimation = nullptr;
+  //     showEmotionByName("Normal");
+  //     drawEmotionLabel();
+  //   }
+  //   return;
+  // }
   // handle emotion timeout fallback if needed
 }
 
@@ -131,13 +133,13 @@ void RobotFaceUI::playGratefulAnimation() {
   if (!face) return;
   Serial.println("🎭 Playing Grateful Animation");
   gratefulAnimation.start(face);
-  currentAnimation = &gratefulAnimation;
+  //currentAnimation = &gratefulAnimation;
 }
 void RobotFaceUI::playSkepticAnimation() {
   if (!face) return;
   Serial.println("🎭 Playing Skeptic Animation");
   skepticAnimation.start(face);
-  currentAnimation = &skepticAnimation;
+  //currentAnimation = &skepticAnimation;
 }
 
 void RobotFaceUI::drawEmotionLabel() {

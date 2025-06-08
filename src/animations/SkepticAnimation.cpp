@@ -29,14 +29,14 @@ void SkepticAnimation::update(unsigned long now) {
       showEmotion("Suspicious");
       face->RandomBlink = true;
       face->RandomLook = true;
-      if (elapsed >= 2000) nextStage(now);
+      if (elapsed >= 1000) nextStage(now);
     case SkepticStage::TRANSITION:
       face->DoBlink();
       nextStage(now);
       break;
     case SkepticStage::ANNOYED:
       showEmotion("Annoyed");
-      if (elapsed >= 2000) nextStage(now);
+      if (elapsed >= 1500) nextStage(now);
       break;
     case SkepticStage::DONE:
       showEmotion("Normal");

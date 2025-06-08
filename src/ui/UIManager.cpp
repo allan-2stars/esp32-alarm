@@ -81,7 +81,9 @@ void UIManager::update() {
       }
       break;
     case ROBOT_FACE_DISPLAY:
+    
       robotFaceUI.update(); // new robot render.
+      
       break;
     default:
       break;
@@ -232,8 +234,7 @@ void UIManager::switchTo(UIState newState) {
   currentState = newState;
   lastInteraction = millis();  // reset timeout
 
-  resetAdjustRepeat();  // 🔄 Reset held state on UI transition
-
+  //resetAdjustRepeat();  // 🔄 Reset held state on UI transition
   switch (newState) {
     case IDLE_SCREEN:
       idleUI.update();
