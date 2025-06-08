@@ -85,3 +85,42 @@ void RobotFaceUI::update() {
     lastEmotionChange = millis();
   }
 }
+
+void RobotFaceUI::showEmotionByName(const String& name) {
+  for (int i = 0; i < emotionCount; ++i) {
+    if (String(emotions[i]->getName()).equalsIgnoreCase(name)) {
+      showEmotion(i);
+      return;
+    }
+  }
+
+  Serial.print("Emotion not found: ");
+  Serial.println(name);
+}
+
+void RobotFaceUI::playGratefulAnimation() {
+  // Step 1: Awe for 1 second
+  showEmotionByName("Awe");
+  delay(1000);
+
+  // Step 2: Blink
+  face->DoBlink();
+  delay(300); // Wait for blink to complete
+
+  // Step 3: Happy for 2 seconds
+  showEmotionByName("Happy");
+  delay(2000);
+
+  // Step 4: Blink twice
+  face->DoBlink();
+  delay(300);
+  face->DoBlink();
+  delay(300);
+
+  // Step 5: Stay Happy for 2 seconds
+  delay(2000);
+
+  // Step 6: Return to Normal
+  showEmotionByName("Normal");
+}
+

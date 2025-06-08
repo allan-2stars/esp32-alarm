@@ -13,7 +13,8 @@ public:
   void begin();
   void update();
   void reset();
-
+  void playGratefulAnimation();
+  
 private:
   Face* face;
   FaceEmotion* emotions[NUM_EMOTIONS];
@@ -22,4 +23,8 @@ private:
   int emotionCount = 0;
   void showEmotion(int index);  // ← define this method
   void addEmotion(FaceEmotion* emotion);
+
+  void showEmotionByName(const String& name);
+
+
 };

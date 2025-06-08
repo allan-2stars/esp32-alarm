@@ -55,38 +55,3 @@ void loop() {
 }
 
 
-void checkSerialCommand() {
-  if (Serial.available()) {
-    String command = Serial.readStringUntil('\n');
-    command.trim();
-
-    // Convert to lowercase for case-insensitive comparison
-    command.toLowerCase();
-
-    // Greeting triggers
-    if (command == "hello pebble" ||
-        command == "hi pebble" ||
-        command == "wake up pebble" ||
-        command == "show face" ||
-        command == "face on") {
-      Serial.println("Activating robot face.");
-      uiManager.switchTo(ROBOT_FACE_DISPLAY);
-    }
-
-    // Goodbye triggers
-    else if (command == "goodbye pebble" ||
-             command == "bye pebble" ||
-             command == "sleep now" ||
-             command == "hide face" ||
-             command == "face off") {
-      Serial.println("Exiting robot face.");
-      uiManager.switchTo(IDLE_SCREEN);
-    }
-
-    else {
-      Serial.print("Unknown command: ");
-      Serial.println(command);
-    }
-  }
-}
-

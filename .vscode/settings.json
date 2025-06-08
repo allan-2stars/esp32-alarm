@@ -10,6 +10,7 @@
         "unordered_set": "cpp",
         "vector": "cpp",
         "memory": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "typeinfo": "cpp"
     }
 }

@@ -21,6 +21,7 @@
 #include "ui/MessageDisplayUI.h"
 #include "services/ButtonPressService.h"
 #include "ui/RobotFaceUI.h"
+#include "commands/CommandInput.h"
 #include "ui_state.h"
 #include "ui.h"
 
@@ -71,10 +72,4 @@ extern SleepManager sleepManager;
 
 // Robot
 extern RobotFaceUI robotFaceUI;
-
-// Buttons Controll
-// extern ButtonPressService confirmLongPress;  // 3000 ms = 3 seconds
-// extern ButtonPressService confirmShortPress; 
-// extern ButtonPressService modePress;      // Short press (default threshold)
-// extern ButtonPressService adjustPress;
-
+extern void checkSerialCommand();

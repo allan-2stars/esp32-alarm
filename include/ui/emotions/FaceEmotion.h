@@ -6,7 +6,7 @@
 class FaceEmotion {
 public:
   virtual ~FaceEmotion() = default;
-
+  virtual const char* getName() const = 0;  // ✅ add this
   // Link the face instance to the emotion
   void attach(Face* f) {
     face = f;
