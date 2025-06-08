@@ -91,30 +91,34 @@ void RobotFaceUI::reset() {
 }
 
 void RobotFaceUI::update() {
-
-  if (face) face->Update();
-  if (!gratefulAnimation.isFinished()) {
-    gratefulAnimation.update(millis());
-    return; // while animation is running, skip rest of update
+  if (face) {
+    face->Update();
   }
 
-    if (!skepticAnimation.isFinished()) {
-    skepticAnimation.update(millis());
-    return; // while animation is running, skip rest of update
+  // --- Handle active animation ---
+  if (currentAnimation) {
+  currentAnimation->update(millis());
+
+  if (currentAnimation->isFinished()) {
+    currentAnimation = nullptr;
+
+    // ✅ Avoid flicker: only redraw if current emotion is not already Normal
+    if (String(emotions[currentEmotionIndex]->getName()).equalsIgnoreCase("Normal") == false) {
+      showEmotionByName("Normal");
+      drawEmotionLabel();
+    } else {
+      Serial.println("⚠️ Already Normal — skipping redraw.");
+    }
   }
 
-  // if (currentAnimation) {
-  //   currentAnimation->update(millis());
-  //   if (currentAnimation->isFinished()) {
-  //     //delete currentAnimation;
-  //     currentAnimation = nullptr;
-  //     showEmotionByName("Normal");
-  //     drawEmotionLabel();
-  //   }
-  //   return;
-  // }
-  // handle emotion timeout fallback if needed
+  return;
 }
+
+
+  // --- (Optional) Other robot face updates here ---
+  // e.g., blinking idle behavior, auto look, etc.
+}
+
 
 
 void RobotFaceUI::showEmotionByName(const String& name) {
@@ -129,18 +133,25 @@ void RobotFaceUI::showEmotionByName(const String& name) {
   Serial.println(name);
 }
 
+///////////// Animations /////////////
 void RobotFaceUI::playGratefulAnimation() {
   if (!face) return;
+  if (currentAnimation) return;  // Prevent interrupting current animation
+
   Serial.println("🎭 Playing Grateful Animation");
   gratefulAnimation.start(face);
-  //currentAnimation = &gratefulAnimation;
+  currentAnimation = &gratefulAnimation;
 }
 void RobotFaceUI::playSkepticAnimation() {
   if (!face) return;
+  if (currentAnimation) return;
+
   Serial.println("🎭 Playing Skeptic Animation");
   skepticAnimation.start(face);
-  //currentAnimation = &skepticAnimation;
+  currentAnimation = &skepticAnimation;
 }
+
+//////////////////////////////////////////////////
 
 void RobotFaceUI::drawEmotionLabel() {
   display.setTextSize(1);
@@ -159,3 +170,6 @@ void RobotFaceUI::drawEmotionLabel() {
   display.display();
 }
 
+bool RobotFaceUI::isAnimationRunning() const {
+  return currentAnimation && !currentAnimation->isFinished();
+}

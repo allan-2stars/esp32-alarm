@@ -30,4 +30,6 @@ private:
   void drawEmotionLabel();
   bool isAnimating = false;
 
+  bool isAnimationRunning() const;
+
 };
