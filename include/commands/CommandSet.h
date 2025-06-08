@@ -6,5 +6,6 @@ struct CommandSet {
   static const std::vector<String> greetings;
   static const std::vector<String> farewells;
   static const std::vector<String> grateful;
+  static const std::vector<String> skeptical;
 
 };

@@ -17,3 +17,7 @@ const std::vector<String> CommandSet::grateful = {
   "you are awesome"
 };
 
+const std::vector<String> CommandSet::skeptical = {
+ "really?", "seriously?", "you sure?", "doubt it", "hmph"
+};
+

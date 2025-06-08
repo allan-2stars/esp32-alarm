@@ -13,10 +13,10 @@ void GratefulAnimation::start(Face* f) {
 
 void GratefulAnimation::update(unsigned long now) {
   if (finished || !face) return;
-
+  unsigned long elapsed = now - stageStart;
   switch (stage) {
     case GratefulStage::AWE:
-      if (now - stageStart >= 1000) nextStage(now);
+      if (elapsed >= 1000) nextStage(now);
       break;
     case GratefulStage::TRANSITION:
       face->DoBlink();
@@ -24,7 +24,7 @@ void GratefulAnimation::update(unsigned long now) {
       break;
     case GratefulStage::HAPPY1:
       showEmotion("Happy");
-      if (now - stageStart >= 2000) nextStage(now);
+      if (elapsed >= 2000) nextStage(now);
       break;
     case GratefulStage::BLINK1:
       face->DoBlink();
@@ -32,7 +32,7 @@ void GratefulAnimation::update(unsigned long now) {
       break;
     case GratefulStage::HAPPY2:
       showEmotion("Happy");
-      if (now - stageStart >= 2000) nextStage(now);
+      if (elapsed >= 2000) nextStage(now);
       break;
     case GratefulStage::BLINK2:
       face->DoBlink();

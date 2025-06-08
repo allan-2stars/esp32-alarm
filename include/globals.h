@@ -29,8 +29,9 @@
 // Commands
 #include "commands/CommandInput.h"
 //Animation
-#include "../include/animations/GratefulAnimation.h"
-#include "../include/animations/FaceAnimation.h"
+#include "animations/GratefulAnimation.h"
+#include "animations/FaceAnimation.h"
+#include "animations/SkepticAnimation.h"
 
 extern Face *face;
 // Global display
@@ -81,3 +82,4 @@ extern RobotFaceUI robotFaceUI;
 extern void checkSerialCommand();
 // Animation
 extern GratefulAnimation gratefulAnimation;
+extern SkepticAnimation skepticAnimation;

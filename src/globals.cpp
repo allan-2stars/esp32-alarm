@@ -39,4 +39,6 @@ MessageDisplayUI messageDisplayUI;
 // instance RobotFaceUI
 RobotFaceUI robotFaceUI;  // This creates the actual instance
 GratefulAnimation gratefulAnimation;
+SkepticAnimation skepticAnimation;
+
 Face *face;

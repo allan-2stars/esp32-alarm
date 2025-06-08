@@ -47,6 +47,16 @@ void CommandRouter::handleCommand(const String& cmd) {
     }
   }
 
+  for (const auto& phrase : CommandSet::skeptical) {
+  if (cmd == phrase) {
+    Serial.println("🤨 Skeptical command detected");
+    if (uiManager.getCurrentState() == ROBOT_FACE_DISPLAY) {
+      robotFaceUI.playSkepticAnimation();
+    }
+    return;
+  }
+}
+
   // Other future command types go here...
 
   Serial.print("❓ Unknown command: ");
