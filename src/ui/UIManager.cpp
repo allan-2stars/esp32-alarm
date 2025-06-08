@@ -231,8 +231,10 @@ void UIManager::handleConfirm() {
 }
 
 void UIManager::switchTo(UIState newState) {
+  if (currentState == newState) return;
   currentState = newState;
-  lastInteraction = millis();  // reset timeout
+  lastInteraction = millis();
+  resetAllButtons();
 
   //resetAdjustRepeat();  // 🔄 Reset held state on UI transition
   switch (newState) {

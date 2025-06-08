@@ -27,46 +27,58 @@ void initButtons() {
 }
 
 void handleButtons() {
+  Serial.println("$handleButtons running");
+
+  // Read physical button states
   bool modeState = digitalRead(MODE_BUTTON_PIN) == LOW;
   bool adjustState = digitalRead(ADJUST_BUTTON_PIN) == LOW;
   bool confirmState = digitalRead(CONFIRM_BUTTON_PIN) == LOW;
 
-  // === Update press states with built-in debounce ===
-  confirmClassifier.update(confirmState);
+  Serial.print("modeState: "); Serial.println(modeState);
+  Serial.print("adjustState: "); Serial.println(adjustState);
+  Serial.print("confirmState: "); Serial.println(confirmState);
+
+  // === Update all classifiers ===
   modeClassifier.update(modeState);
   adjustClassifier.update(adjustState);
+  confirmClassifier.update(confirmState);
 
-  // ===================
-  // === Mode Button ===
-  // ===================
+  // === Handle Mode Button ===
   if (modeClassifier.wasReleased()) {
     unsigned long dur = modeClassifier.getHoldDuration();
+    Serial.print("Mode released, duration: "); Serial.println(dur);
+
     if (dur >= 2000) {
-      // future long press for mode
+      // Future long press logic
     } else if (dur >= 100) {
       uiManager.handleMode();
     }
-    modeClassifier.reset();  // ✅ important
+
+    modeClassifier.reset();
   }
 
+  // === Handle Adjust Button ===
+  static unsigned long adjustRepeatStart = 0;
+  static unsigned long lastAdjustRepeat = 0;
+  const unsigned long repeatDelay = 500;
+  const unsigned long repeatRate = 150;
 
-  // =====================
-  // === Adjust Button ===
-  // =====================
+  static bool adjustAllowed = false;
+  if (!adjustState) adjustAllowed = true;  // Mark it allowed once released
 
+  if (adjustClassifier.wasReleased() && adjustAllowed) {
+    unsigned long dur = adjustClassifier.getHoldDuration();
+    Serial.print("Adjust released, duration: "); Serial.println(dur);
 
-  if (adjustClassifier.wasReleased()) {
-  unsigned long dur = adjustClassifier.getHoldDuration();
-  if (dur >= 100 && dur < repeatDelay) {
-    if (adjustAllowed) {
+    if (dur >= 100 && dur < repeatDelay) {
       uiManager.handleAdjust();
     }
-  }
-  adjustAllowed = true;  // ✅ button was released, safe to use again
-  adjustClassifier.reset();
-  } else if (adjustState) {
-  // Held down
-  if (adjustAllowed) {
+
+    adjustRepeatStart = 0;
+    lastAdjustRepeat = 0;
+    adjustClassifier.reset();
+  } else if (adjustState && adjustAllowed) {
+    // Held down
     unsigned long now = millis();
     if (adjustRepeatStart == 0) {
       adjustRepeatStart = now;
@@ -75,38 +87,54 @@ void handleButtons() {
       uiManager.handleAdjust();
       lastAdjustRepeat = now;
     }
-  }
   } else {
+    // Not pressed anymore
     adjustRepeatStart = 0;
     lastAdjustRepeat = 0;
   }
 
-  // ===========================================
-  // --- Confirm (based on release duration) ---
-  // ===========================================
-  if (confirmClassifier.wasReleased()) {
-  unsigned long dur = confirmClassifier.getHoldDuration();
+  // === Handle Confirm Button ===
+  static bool confirmAllowed = false;
+  if (!confirmState) confirmAllowed = true;
 
-  UIState state = uiManager.getCurrentState();
-  if (dur >= 1500 && confirmAllowed) {
-   // long press in the future
-  } else if (dur >= 100) {
-//    if (state != ROBOT_FACE_DISPLAY) {
+  if (confirmClassifier.wasReleased() && confirmAllowed) {
+    unsigned long dur = confirmClassifier.getHoldDuration();
+    Serial.print("Confirm released, duration: "); Serial.println(dur);
+
+    if (dur >= 1500) {
+      Serial.println("Long press detected");
+
+      UIState state = uiManager.getCurrentState();
+      Serial.print("Current state: "); Serial.println(state);
+
+      if (state == ROBOT_FACE_DISPLAY) {
+        Serial.println("Switching to IDLE_SCREEN");
+        uiManager.switchTo(IDLE_SCREEN);
+      } else if (state == IDLE_SCREEN) {
+        Serial.println("Switching to ROBOT_FACE_DISPLAY");
+        uiManager.switchTo(ROBOT_FACE_DISPLAY);
+      } else {
+        Serial.println("Long press ignored in this state.");
+      }
+    } else if (dur >= 100) {
       uiManager.handleConfirm();
-//    }
+    } else {
+      Serial.println("Ignored tiny press");
+    }
+
+    confirmClassifier.reset();
   }
-
-  confirmAllowed = true;
-  confirmClassifier.reset();
-}
 }
 
-void resetAdjustRepeat() {
+void resetAllButtons() {
   adjustRepeatStart = 0;
   lastAdjustRepeat = 0;
   adjustAllowed = false;
-  confirmAllowed = false;  // ✅ must release before valid again
+  confirmAllowed = false;
+
   adjustClassifier.reset();
   confirmClassifier.reset();
+  modeClassifier.reset();     // ✅ Add this line
 }
+
 
