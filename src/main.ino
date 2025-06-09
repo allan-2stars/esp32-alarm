@@ -46,6 +46,7 @@ void loop() {
   alarmService.handleSnooze();
   uiManager.update();
   shockSensor.update();
+  
   if (shockSensor.isShocked()) {
     Serial.println("detected");
     ledcWrite(PWM_CHANNEL, 255);          // Full brightness
