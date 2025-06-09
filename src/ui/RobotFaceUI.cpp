@@ -74,7 +74,7 @@ void RobotFaceUI::begin() {
   }
 
   showEmotionByName("Normal");
-  drawEmotionLabel();
+  // drawEmotionLabel();
 }
 
 

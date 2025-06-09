@@ -27,16 +27,16 @@ void initButtons() {
 }
 
 void handleButtons() {
-  Serial.println("$handleButtons running");
+  // Serial.println("$handleButtons running");
 
   // Read physical button states
   bool modeState = digitalRead(MODE_BUTTON_PIN) == LOW;
   bool adjustState = digitalRead(ADJUST_BUTTON_PIN) == LOW;
   bool confirmState = digitalRead(CONFIRM_BUTTON_PIN) == LOW;
 
-  Serial.print("modeState: "); Serial.println(modeState);
-  Serial.print("adjustState: "); Serial.println(adjustState);
-  Serial.print("confirmState: "); Serial.println(confirmState);
+  // Serial.print("modeState: "); Serial.println(modeState);
+  // Serial.print("adjustState: "); Serial.println(adjustState);
+  // Serial.print("confirmState: "); Serial.println(confirmState);
 
   // === Update all classifiers ===
   modeClassifier.update(modeState);
@@ -46,7 +46,7 @@ void handleButtons() {
   // === Handle Mode Button ===
   if (modeClassifier.wasReleased()) {
     unsigned long dur = modeClassifier.getHoldDuration();
-    Serial.print("Mode released, duration: "); Serial.println(dur);
+    //Serial.print("Mode released, duration: "); Serial.println(dur);
 
     if (dur >= 2000) {
       // Future long press logic
@@ -68,7 +68,7 @@ void handleButtons() {
 
   if (adjustClassifier.wasReleased() && adjustAllowed) {
     unsigned long dur = adjustClassifier.getHoldDuration();
-    Serial.print("Adjust released, duration: "); Serial.println(dur);
+    //Serial.print("Adjust released, duration: "); Serial.println(dur);
 
     if (dur >= 100 && dur < repeatDelay) {
       uiManager.handleAdjust();
@@ -99,27 +99,27 @@ void handleButtons() {
 
   if (confirmClassifier.wasReleased() && confirmAllowed) {
     unsigned long dur = confirmClassifier.getHoldDuration();
-    Serial.print("Confirm released, duration: "); Serial.println(dur);
+    //Serial.print("Confirm released, duration: "); Serial.println(dur);
 
     if (dur >= 1500) {
-      Serial.println("Long press detected");
+     // Serial.println("Long press detected");
 
       UIState state = uiManager.getCurrentState();
-      Serial.print("Current state: "); Serial.println(state);
+      //Serial.print("Current state: "); Serial.println(state);
 
       if (state == ROBOT_FACE_DISPLAY) {
-        Serial.println("Switching to IDLE_SCREEN");
+        //Serial.println("Switching to IDLE_SCREEN");
         uiManager.switchTo(IDLE_SCREEN);
       } else if (state == IDLE_SCREEN) {
-        Serial.println("Switching to ROBOT_FACE_DISPLAY");
+        //Serial.println("Switching to ROBOT_FACE_DISPLAY");
         uiManager.switchTo(ROBOT_FACE_DISPLAY);
       } else {
-        Serial.println("Long press ignored in this state.");
+        //Serial.println("Long press ignored in this state.");
       }
     } else if (dur >= 100) {
       uiManager.handleConfirm();
     } else {
-      Serial.println("Ignored tiny press");
+      //Serial.println("Ignored tiny press");
     }
 
     confirmClassifier.reset();

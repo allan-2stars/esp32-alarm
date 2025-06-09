@@ -23,8 +23,8 @@
 #define TOUCH_WAKE_PIN T3 // GPIO15
 
 #define MODE_BUTTON_PIN     33
-#define ADJUST_BUTTON_PIN   5
-#define CONFIRM_BUTTON_PIN  4
+#define ADJUST_BUTTON_PIN   27
+#define CONFIRM_BUTTON_PIN  34
 
 
 #define UI_TIMEOUT_MS  30000  // 30 seconds back to Idle screen
