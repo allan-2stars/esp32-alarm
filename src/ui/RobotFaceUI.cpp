@@ -53,7 +53,7 @@ void RobotFaceUI::begin() {
 
   // Clear old animation if still active
   if (currentAnimation) {
-    delete currentAnimation;
+    /// Never delete currentAnimation — it's owned by emotions[]
     currentAnimation = nullptr;
   }
 
@@ -105,7 +105,7 @@ void RobotFaceUI::update() {
     // ✅ Avoid flicker: only redraw if current emotion is not already Normal
     if (String(emotions[currentEmotionIndex]->getName()).equalsIgnoreCase("Normal") == false) {
       showEmotionByName("Normal");
-      drawEmotionLabel();
+      //drawEmotionLabel();
     } else {
       Serial.println("⚠️ Already Normal — skipping redraw.");
     }
@@ -150,6 +150,16 @@ void RobotFaceUI::playSkepticAnimation() {
   skepticAnimation.start(face);
   currentAnimation = &skepticAnimation;
 }
+
+void RobotFaceUI::playSleepAnimation() {
+  if (!face) return;
+  if (currentAnimation) return;
+
+  Serial.println("🎭 Playing Sleep Animation");
+  sleepAnimation.start(face);
+  currentAnimation = &sleepAnimation;
+}
+
 
 //////////////////////////////////////////////////
 

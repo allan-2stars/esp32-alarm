@@ -32,6 +32,9 @@
 #include "animations/GratefulAnimation.h"
 #include "animations/FaceAnimation.h"
 #include "animations/SkepticAnimation.h"
+#include "animations/SleepAnimation.h"
+// Sensors
+#include "sensors/ShockSensor.h"
 
 extern Face *face;
 // Global display
@@ -80,6 +83,11 @@ extern SleepManager sleepManager;
 // Robot
 extern RobotFaceUI robotFaceUI;
 extern void checkSerialCommand();
+
 // Animation
 extern GratefulAnimation gratefulAnimation;
 extern SkepticAnimation skepticAnimation;
+extern SleepAnimation sleepAnimation;
+
+// Sensors
+extern ShockSensor shockSensor;

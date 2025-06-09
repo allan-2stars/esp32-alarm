@@ -40,5 +40,9 @@ MessageDisplayUI messageDisplayUI;
 RobotFaceUI robotFaceUI;  // This creates the actual instance
 GratefulAnimation gratefulAnimation;
 SkepticAnimation skepticAnimation;
+SleepAnimation sleepAnimation;
 
 Face *face;
+
+// Sensors
+ShockSensor shockSensor;

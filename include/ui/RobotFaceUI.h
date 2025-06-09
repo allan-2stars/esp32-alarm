@@ -15,6 +15,8 @@ public:
   void reset();
   void playGratefulAnimation();
   void playSkepticAnimation();
+  void playSleepAnimation();
+
   
 private:
   Face* face;

@@ -42,14 +42,31 @@ void CommandRouter::handleCommand(const String& cmd) {
   }
 
   for (const auto& phrase : CommandSet::skeptical) {
-  if (cmd == phrase) {
-    Serial.println("🤨 Skeptical command detected");
-    if (uiManager.getCurrentState() == ROBOT_FACE_DISPLAY) {
-      robotFaceUI.playSkepticAnimation();
+    if (cmd == phrase) {
+      Serial.println("🤨 Skeptical command detected");
+      if (uiManager.getCurrentState() == ROBOT_FACE_DISPLAY) {
+        robotFaceUI.playSkepticAnimation();
+      }
+      else {
+        Serial.println("⚠️ Ignored: Not in Robot Face screen");
+      }
+      return;
     }
-    return;
   }
-}
+
+  for (const auto& phrase : CommandSet::sleepy) {
+    if (cmd == phrase) {
+      Serial.println("😴 Sleep command detected");
+      if (uiManager.getCurrentState() == ROBOT_FACE_DISPLAY) {
+        robotFaceUI.playSleepAnimation();
+      }
+      else {
+        Serial.println("⚠️ Ignored: Not in Robot Face screen");
+      }
+      return;
+    }
+  }
+
 
   // Other future command types go here...
 

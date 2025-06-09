@@ -21,3 +21,11 @@ const std::vector<String> CommandSet::skeptical = {
  "really?", "seriously?", "you sure?", "doubt it", "hmph"
 };
 
+const std::vector<String> CommandSet::sleepy = {
+  "go to sleep",
+  "time to sleep",
+  "bedtime",
+  "sleep mode",
+  "good night",
+  "night"
+};

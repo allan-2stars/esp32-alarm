@@ -18,6 +18,9 @@ void LedService::begin() {
   ledcSetup(CHANNEL_RIGHT_LED, 5000, 8);
   ledcAttachPin(LED_RIGHT_PIN, CHANNEL_RIGHT_LED);
 
+  ledcSetup(PWM_CHANNEL, 5000, 8);
+  ledcAttachPin(LED_PIN, PWM_CHANNEL);
+
   stopAlarmLights();
 }
 
