@@ -37,5 +37,12 @@ AlarmPlayerService alarmPlayerService;
 MessageDisplayUI messageDisplayUI;
 
 // instance RobotFaceUI
-RobotFaceUI robotFaceUI(display);  // This creates the actual instance
+RobotFaceUI robotFaceUI;  // This creates the actual instance
+GratefulAnimation gratefulAnimation;
+SkepticAnimation skepticAnimation;
+SleepAnimation sleepAnimation;
 
+Face *face;
+
+// Sensors
+ShockSensor shockSensor;

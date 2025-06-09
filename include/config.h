@@ -10,9 +10,9 @@
 //
 // ####### Config For Wokwi / Real ESP32 #######
 //
-//#define RESET_BUTTON_PIN 14   // Real ESP32
-#define RESET_BUTTON_PIN 32  // Wokwi
-#define DHTPIN 14   //Wokwi
+#define RESET_BUTTON_PIN 14   // Real ESP32
+// #define RESET_BUTTON_PIN 32  // Wokwi
+//#define DHTPIN 14   //Wokwi
 #define DHTTYPE DHT22   //Wokwi
 #define BUZZER_PIN  2
 #define RED_PIN    18   // Wokwi
@@ -20,11 +20,13 @@
 #define BLUE_PIN   23   
 /// ###############################
 
-#define TOUCH_WAKE_PIN T3 // GPIO15
+// Sensors
+#define TOUCH_WAKE_PIN T3 // GPIO15 integrated
+#define SHOCK_SENSOR_PIN 32
 
 #define MODE_BUTTON_PIN     33
-#define ADJUST_BUTTON_PIN   5
-#define CONFIRM_BUTTON_PIN  4
+#define ADJUST_BUTTON_PIN   27
+#define CONFIRM_BUTTON_PIN  34
 
 
 #define UI_TIMEOUT_MS  30000  // 30 seconds back to Idle screen
@@ -51,12 +53,28 @@
 #define CHANNEL_GREEN  1
 #define CHANNEL_BLUE   2
 
-#define INACTIVITY_TIMEOUT 60000 // 1 min then sleep
+#define INACTIVITY_TIMEOUT 600000 // 1 min then sleep
 
 #define CHANNEL_LEFT_LED   3
 #define CHANNEL_TOP_LED  4
 #define CHANNEL_RIGHT_LED  5
 
+//#### Alarm light stage durations (in milliseconds)
+#define ALARM_STAGE1_DURATION  10000
+#define ALARM_STAGE2_DURATION  20000
+#define ALARM_STAGE3_DURATION  30000
+#define ALARM_STAGE4_DURATION  40000
+
+// Fade timing
+#define FADE_PERIOD_NORMAL  3000
+#define FADE_PERIOD_FAST    1000
+
+// Flashing
+#define FLASH_TOGGLE_INTERVAL 500
+
+// Max LED brightness
+#define LED_MAX_BRIGHTNESS 255
+//###################################
 
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE

@@ -1,8 +1,13 @@
 #pragma once
-
+// External
+#include <Face.h>
 #include <Adafruit_SSD1306.h>
+// Internal
 #include "alarm.h"
 #include "config.h"
+#include "ui_state.h"
+#include "ui.h"
+// UI
 #include "ui/UIManager.h"
 #include "ui/BellUI.h"
 #include "ui/IdleUI.h"
@@ -10,6 +15,9 @@
 #include "ui/MelodyPreviewUI.h"
 #include "ui/SunMoonUI.h"
 #include "ui/AlarmConfigUI.h"
+#include "ui/MessageDisplayUI.h"
+#include "ui/RobotFaceUI.h"
+// Services
 #include "services/AlarmService.h"
 #include "services/MelodyService.h"
 #include "services/AlarmStorageService.h"
@@ -17,13 +25,18 @@
 #include "services/RGBLedService.h"
 #include "services/SleepManager.h"
 #include "services/AlarmPlayerService.h"
-
-#include "ui/MessageDisplayUI.h"
 #include "services/ButtonPressService.h"
-#include "ui/RobotFaceUI.h"
-#include "ui_state.h"
-#include "ui.h"
+// Commands
+#include "commands/CommandInput.h"
+//Animation
+#include "animations/GratefulAnimation.h"
+#include "animations/FaceAnimation.h"
+#include "animations/SkepticAnimation.h"
+#include "animations/SleepAnimation.h"
+// Sensors
+#include "sensors/ShockSensor.h"
 
+extern Face *face;
 // Global display
 extern Adafruit_SSD1306 display;
 
@@ -69,10 +82,12 @@ extern SleepManager sleepManager;
 
 // Robot
 extern RobotFaceUI robotFaceUI;
+extern void checkSerialCommand();
 
-// Buttons Controll
-// extern ButtonPressService confirmLongPress;  // 3000 ms = 3 seconds
-// extern ButtonPressService confirmShortPress; 
-// extern ButtonPressService modePress;      // Short press (default threshold)
-// extern ButtonPressService adjustPress;
+// Animation
+extern GratefulAnimation gratefulAnimation;
+extern SkepticAnimation skepticAnimation;
+extern SleepAnimation sleepAnimation;
 
+// Sensors
+extern ShockSensor shockSensor;

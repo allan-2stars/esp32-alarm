@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "globals.h"
 #include "melodies.h"
+#include "buttons.h"
 
 extern MelodyService melodyService;
 extern AlarmStorageService alarmStorageService;
@@ -80,9 +81,12 @@ void UIManager::update() {
       }
       break;
     case ROBOT_FACE_DISPLAY:
+    
       robotFaceUI.update(); // new robot render.
-    break;
-
+      
+      break;
+    default:
+      break;
     }
   }
 
@@ -114,7 +118,8 @@ void UIManager::handleMode() {
       lastSnoozed = true;
       showMessage(" Snoozed\n for 10 mins", IDLE_SCREEN, 2000);
       break;
-
+    case ROBOT_FACE_DISPLAY:
+      return;
     default:
       // Toggle between IDLE and OVERVIEW
       switchTo(currentState == IDLE_SCREEN ? ALARM_OVERVIEW : IDLE_SCREEN);
@@ -130,8 +135,6 @@ void UIManager::handleAdjust() {
   lastInteraction = millis();
 
     // Prioritize MESSAGE_DISPLAY scroll behavior
-  Serial.println("temporaryScreenDuration");
-  Serial.println(temporaryScreenDuration);
   if (uiState == MESSAGE_DISPLAY && temporaryScreenDuration == 0) {
     messageDisplayUI.scrollUp();
     return;
@@ -157,8 +160,6 @@ void UIManager::handleAdjust() {
     case MELODY_PREVIEW:
       tempAlarm.melody = (tempAlarm.melody + 1) % MELODY_COUNT;
       previewMelodyIndex = tempAlarm.melody;
-      Serial.println("preview Melody index: ");
-      Serial.print(previewMelodyIndex);
       alarmPlayerService.playAlarm(tempAlarm, false, false);
       break;
 
@@ -166,6 +167,8 @@ void UIManager::handleAdjust() {
       snoozeUntil = time(nullptr) + 600;
       lastSnoozed = true;
       showMessage(" Snoozed\n for 10 mins", IDLE_SCREEN, 3000);
+      break;
+    case ROBOT_FACE_DISPLAY:
       break;
 
     default:
@@ -204,7 +207,6 @@ void UIManager::handleConfirm() {
           delete alarmConfigUI;
           alarmConfigUI = nullptr;
           showMessage(" Alarm Set!", ALARM_OVERVIEW, 2000);
-          Serial.println("Alarm set message should show.");
         }
       }
       break;
@@ -221,17 +223,20 @@ void UIManager::handleConfirm() {
       lastSnoozed = false;
       showMessage(" Alarm Stopped", IDLE_SCREEN, 3000);
       break;
-
+    case ROBOT_FACE_DISPLAY:
+      break;
     default:
     break;
   }
 }
 
 void UIManager::switchTo(UIState newState) {
+  if (currentState == newState) return;
   currentState = newState;
-  lastInteraction = millis();  // reset timeout
-  Serial.printf("Switching UI to: %d\n", newState);
+  lastInteraction = millis();
+  resetAllButtons();
 
+  //resetAdjustRepeat();  // 🔄 Reset held state on UI transition
   switch (newState) {
     case IDLE_SCREEN:
       idleUI.update();
@@ -252,13 +257,14 @@ void UIManager::switchTo(UIState newState) {
       // Just allow rendering via uiManager.update()
       break;
     case ROBOT_FACE_DISPLAY:
-    Serial.println("in robot face screen.");
+      robotFaceUI.begin();
       break;
     default:
-    break;
-
+      break;
   }
 }
+
+
 
 UIState UIManager::getCurrentState() const {
   return currentState;
