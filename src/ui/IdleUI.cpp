@@ -55,8 +55,14 @@ void IdleUI::update() {
     display.drawBitmap(0, 0, wifiIcon, 8, 8, TEXT_COLOR);
 
     struct tm timeinfo;
-    sunMoonUI.updateAndDraw(display, timeinfo.tm_hour);
-
+   
+    if (getLocalTime(&timeinfo)) {
+      sunMoonUI.updateAndDraw(display, timeinfo.tm_hour);
+    }
+    else {
+      Serial.println("not getting the real time.");
+    }
+    
     // Time
     display.setTextSize(2);
     display.setCursor(5, HEADER_HEIGHT);

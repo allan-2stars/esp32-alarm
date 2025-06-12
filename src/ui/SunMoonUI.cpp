@@ -10,11 +10,12 @@ void SunMoonUI::begin() {
 }
 
 void SunMoonUI::updateAndDraw(Adafruit_SSD1306 &display, int hour) {
-  int imageWidth = 18;
-  int imageHeight = 18;
+  Serial.printf("current hour is: %d", hour);
+  int imageWidth = 25;
+  int imageHeight = 25;
   int x = SCREEN_WIDTH - imageWidth;
   int y = 0;
-  if (hour >= 6 && hour < 16) {
+  if (hour >= 6 && hour < 18) {
     // Animate sun
     if (millis() - lastSunAnimTime > 200) { // rotate image every 200 milliseconds
       sunFrameIndex = (sunFrameIndex + 1) % SUN_FRAME_COUNT;
@@ -28,7 +29,7 @@ void SunMoonUI::updateAndDraw(Adafruit_SSD1306 &display, int hour) {
       lastMoonAnimTime = millis();
     }
     if (moonVisible) {
-      display.drawBitmap(x, y, moon_icon_18x18, imageWidth, imageHeight, TEXT_COLOR);
+      display.drawBitmap(x, y, moon_icon_25x25, imageWidth, imageHeight, TEXT_COLOR);
     }
   }
 }
