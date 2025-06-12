@@ -1,7 +1,7 @@
-#ifndef ALARM_H
-#define ALARM_H
+#pragma once
 
 #include <Arduino.h>
+#include "config.h"
 
 enum AlarmType {
   ONE_TIME,
@@ -24,6 +24,7 @@ enum AlarmField {
 
 struct Alarm {
   bool enabled;
+  uint16_t version = SCREEN_ALARM_VERSION;
   AlarmType type;
   int hour, minute, year, month, day;
   bool repeatDays[7];
@@ -31,11 +32,9 @@ struct Alarm {
   String name;
 };
 
-extern Alarm alarms[3];
+extern Alarm alarms[MAX_SCREEN_ALARMS];
 extern int lastTriggerMinute;
 extern bool alarmActive;
 
 bool isFieldVisible(AlarmType type, AlarmField field);
 void checkAndTriggerAlarms();
-
-#endif

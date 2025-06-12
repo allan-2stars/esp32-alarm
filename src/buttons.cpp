@@ -1,187 +1,140 @@
 #include <Arduino.h>
 #include "buttons.h"
-#include "alarm.h"
-#include "ui.h"
-#include "melody_engine.h"
-#include "melodies.h"
-#include "utils.h"
 #include "config.h"
 #include "globals.h"
 
-extern Alarm alarms[3];
-extern Alarm tempAlarm;
-extern int selectedAlarmIndex;
-extern AlarmField selectedField;
-extern int currentRepeatDayIndex;
-extern UIState uiState;
+// Define per-button handlers
+#include "services/ButtonHoldClassifier.h"
 
-unsigned long lastModePress = 0;
-unsigned long lastAdjustPress = 0;
-unsigned long lastConfirmPress = 0;
-unsigned long modeButtonPressTime = 0;
-unsigned long lastInteractionTime = 0;
-//int previewMelodyIndex = 0;
+ButtonHoldClassifier confirmClassifier;
+ButtonHoldClassifier modeClassifier;
+ButtonHoldClassifier adjustClassifier;
 
-int lastTriggerMinute = -1;
-bool alarmActive = false;
-unsigned int snoozeDurationSec = 600;  // 10 minutes snooze time
+static unsigned long adjustRepeatStart = 0;
+static unsigned long lastAdjustRepeat = 0;
+const unsigned long repeatDelay = 500;    // Initial hold before repeat
+const unsigned long repeatRate  = 150;    // Repeat every 150ms
+bool adjustAllowed = true;  // Must release Adjust at least once before it's allowed again
+bool confirmAllowed = true;
+
+
+
+void initButtons() {
+  pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(ADJUST_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(CONFIRM_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+}
 
 void handleButtons() {
-  unsigned long now = millis();
+  // Serial.println("$handleButtons running");
 
-  // MODE button with short/long press support
-  //Checks if the button is currently being pressed (active LOW logic)
-  bool modePressed = digitalRead(MODE_BUTTON_PIN) == LOW;
-  //Detects the moment the button is first pressed down
-  if (modePressed && modeButtonPressTime == 0) {
-    //Starts a timer (using millis()) to track how long the button is held
-    modeButtonPressTime = now;
+  // Read physical button states
+  bool modeState = digitalRead(MODE_BUTTON_PIN) == LOW;
+  bool adjustState = digitalRead(ADJUST_BUTTON_PIN) == LOW;
+  bool confirmState = digitalRead(CONFIRM_BUTTON_PIN) == LOW;
+
+  // Serial.print("modeState: "); Serial.println(modeState);
+  // Serial.print("adjustState: "); Serial.println(adjustState);
+  // Serial.print("confirmState: "); Serial.println(confirmState);
+
+  // === Update all classifiers ===
+  modeClassifier.update(modeState);
+  adjustClassifier.update(adjustState);
+  confirmClassifier.update(confirmState);
+
+  // === Handle Mode Button ===
+  if (modeClassifier.wasReleased()) {
+    unsigned long dur = modeClassifier.getHoldDuration();
+    //Serial.print("Mode released, duration: "); Serial.println(dur);
+
+    if (dur >= 2000) {
+      // Future long press logic
+    } else if (dur >= 100) {
+      uiManager.handleMode();
+    }
+
+    modeClassifier.reset();
   }
-  //Detects the moment the button is released
-  if (!modePressed && modeButtonPressTime > 0) {
-    //Calculates how long the button was held
-    unsigned long duration = now - modeButtonPressTime;
-    stopMelody();
 
-    if (uiState == ALARM_CONFIG) {
-      if (selectedField == ALARM_REPEAT_DAYS && duration > 1000) {
-        for (int i = 0; i < 7; i++) tempAlarm.repeatDays[i] = false;
+  // === Handle Adjust Button ===
+  static unsigned long adjustRepeatStart = 0;
+  static unsigned long lastAdjustRepeat = 0;
+  const unsigned long repeatDelay = 500;
+  const unsigned long repeatRate = 150;
+
+  static bool adjustAllowed = false;
+  if (!adjustState) adjustAllowed = true;  // Mark it allowed once released
+
+  if (adjustClassifier.wasReleased() && adjustAllowed) {
+    unsigned long dur = adjustClassifier.getHoldDuration();
+    //Serial.print("Adjust released, duration: "); Serial.println(dur);
+
+    if (dur >= 100 && dur < repeatDelay) {
+      uiManager.handleAdjust();
+    }
+
+    adjustRepeatStart = 0;
+    lastAdjustRepeat = 0;
+    adjustClassifier.reset();
+  } else if (adjustState && adjustAllowed) {
+    // Held down
+    unsigned long now = millis();
+    if (adjustRepeatStart == 0) {
+      adjustRepeatStart = now;
+      lastAdjustRepeat = now;
+    } else if (now - adjustRepeatStart >= repeatDelay && now - lastAdjustRepeat >= repeatRate) {
+      uiManager.handleAdjust();
+      lastAdjustRepeat = now;
+    }
+  } else {
+    // Not pressed anymore
+    adjustRepeatStart = 0;
+    lastAdjustRepeat = 0;
+  }
+
+  // === Handle Confirm Button ===
+  static bool confirmAllowed = false;
+  if (!confirmState) confirmAllowed = true;
+
+  if (confirmClassifier.wasReleased() && confirmAllowed) {
+    unsigned long dur = confirmClassifier.getHoldDuration();
+    //Serial.print("Confirm released, duration: "); Serial.println(dur);
+
+    if (dur >= 1500) {
+     // Serial.println("Long press detected");
+
+      UIState state = uiManager.getCurrentState();
+      //Serial.print("Current state: "); Serial.println(state);
+
+      if (state == ROBOT_FACE_DISPLAY) {
+        //Serial.println("Switching to IDLE_SCREEN");
+        uiManager.switchTo(IDLE_SCREEN);
+      } else if (state == IDLE_SCREEN) {
+        //Serial.println("Switching to ROBOT_FACE_DISPLAY");
+        uiManager.switchTo(ROBOT_FACE_DISPLAY);
       } else {
-        do {
-          selectedField = (AlarmField)((selectedField + 1) % 10);
-        } while (!isFieldVisible(tempAlarm.type, selectedField));
+        //Serial.println("Long press ignored in this state.");
       }
-    } else if(uiState == MELODY_PREVIEW) {
-      uiState = ALARM_CONFIG;
-      selectedField = ALARM_MELODY;
-      drawAlarmConfig();
-    } else if (uiState == ALARM_RINGING) {
-      alarmActive = false;
-      stopMelody();
-      lastSnoozed = true;
-      snoozeUntil = time(nullptr) + snoozeDurationSec;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    }else {
-      uiState = (uiState == IDLE_SCREEN) ? ALARM_OVERVIEW : IDLE_SCREEN;
+    } else if (dur >= 100) {
+      uiManager.handleConfirm();
+    } else {
+      //Serial.println("Ignored tiny press");
     }
 
-
-    lastInteractionTime = now;
-    modeButtonPressTime = 0;
+    confirmClassifier.reset();
   }
+}
 
-  // ADJUST button
-  if (digitalRead(ADJUST_BUTTON_PIN) == LOW && now - lastAdjustPress > 200) {
-    //stopMelody();
-    lastAdjustPress = now;
-    Alarm &a = tempAlarm;
-    if (uiState == ALARM_OVERVIEW) {
-      selectedAlarmIndex = (selectedAlarmIndex + 1) % 3;
-    } else if (uiState == ALARM_CONFIG) {
-        Serial.print("Adjusting field: ");
-        Serial.println(selectedField);
+void resetAllButtons() {
+  adjustRepeatStart = 0;
+  lastAdjustRepeat = 0;
+  adjustAllowed = false;
+  confirmAllowed = false;
 
-      switch (selectedField) {
-
-
-        case ALARM_TYPE: a.type = (AlarmType)((a.type + 1) % 3); break;
-        case ALARM_TIME_HOUR: a.hour = (a.hour + 1) % 24; break;
-        case ALARM_TIME_MIN: a.minute = (a.minute + 1) % 60; break;
-        case ALARM_DATE_YEAR:{
-          int currentYear = getCurrentYear();
-          Serial.println("Current year: ");
-          Serial.print(currentYear);
-          a.year = (a.year >= currentYear + 10) ? currentYear : a.year + 1;
-        }break;
-        case ALARM_DATE_MONTH:
-          a.month = (a.month % 12) + 1;
-          break;
-        case ALARM_DATE_DAY:  {
-          int maxDay = getMaxDay(a.year, a.month);
-          a.day = (a.day % maxDay) + 1;
-        }break;
-
-        case ALARM_REPEAT_DAYS: currentRepeatDayIndex = (currentRepeatDayIndex + 1) % 7; break;
-        case ALARM_ENABLED: a.enabled = !a.enabled; break;
-        case ALARM_MELODY:
-          uiState = MELODY_PREVIEW;
-            previewMelodyIndex = alarms[selectedAlarmIndex].melody;
-            // Start melody playback for first entry
-            startMelodyPreview(
-              getMelodyData(previewMelodyIndex),
-              getMelodyLength(previewMelodyIndex),
-              getMelodyTempo(previewMelodyIndex),
-              BUZZER_PIN);
-          lastAdjustPress = millis();  // avoid double-trigger
-          break;
-      }
-    }
-    else if (uiState == MELODY_PREVIEW) {
-      previewMelodyIndex = (previewMelodyIndex + 1) % MELODY_COUNT;
-            Serial.println("else if index:");
-      Serial.println(previewMelodyIndex);
-      startMelodyPreview(
-        getMelodyData(previewMelodyIndex),
-        getMelodyLength(previewMelodyIndex),
-        getMelodyTempo(previewMelodyIndex),
-        BUZZER_PIN);
-    }
-    else if (uiState == ALARM_RINGING) {
-      alarmActive = false;
-      stopMelody();
-      lastSnoozed = true;
-      snoozeUntil = time(nullptr) + snoozeDurationSec;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-    }
-
-    lastInteractionTime = now;
-  }
-
-  // CONFIRM button
-  if (digitalRead(CONFIRM_BUTTON_PIN) == LOW && now - lastConfirmPress > 200) {
-    stopMelody();
-    lastConfirmPress = now;
-    if (uiState == ALARM_OVERVIEW) {
-      tempAlarm = alarms[selectedAlarmIndex];
-      
-    if ((tempAlarm.year == 0 || tempAlarm.month == 0 || tempAlarm.day == 0) && isTimeAvailable()) {
-      setAlarmToCurrentTime(tempAlarm);
-    }
-      uiState = ALARM_CONFIG;
-      selectedField = ALARM_TYPE;
-    } else if (uiState == ALARM_CONFIG) {
-      if (selectedField == ALARM_REPEAT_DAYS) {
-        tempAlarm.repeatDays[currentRepeatDayIndex] = !tempAlarm.repeatDays[currentRepeatDayIndex];
-      }else {
-        alarms[selectedAlarmIndex] = tempAlarm;
-        uiState = IDLE_SCREEN;
-      }
-    } else if (uiState == MELODY_PREVIEW) {
-      tempAlarm.melody = previewMelodyIndex;
-      uiState = ALARM_CONFIG;
-      selectedField = ALARM_MELODY;
-      drawAlarmConfig();
-    }else if (uiState == ALARM_RINGING) {
-      alarmActive = false;
-      stopMelody();
-      lastSnoozed = false;
-      uiState = ALARM_SNOOZE_MESSAGE;
-      messageDisplayStart = millis();
-
-    }
-
-
-    lastInteractionTime = now;
-  }
-
-  // Timeout to Idle
-  if (now - lastInteractionTime > UI_TIMEOUT_MS && uiState != IDLE_SCREEN) {
-    uiState = IDLE_SCREEN;
-  }
-
-
+  adjustClassifier.reset();
+  confirmClassifier.reset();
+  modeClassifier.reset();     // ✅ Add this line
 }
 
 

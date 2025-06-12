@@ -1,23 +1,6 @@
-#ifndef UI_H
-#define UI_H
 
-#include "alarm.h"
+#pragma once
+#include <Adafruit_SSD1306.h>
 
-enum UIState {
-  IDLE_SCREEN,
-  ALARM_OVERVIEW,
-  ALARM_CONFIG,
-  MELODY_PREVIEW,
-  ALARM_RINGING,  // New Ringing Screen
-  ALARM_SNOOZE_MESSAGE
-};
+void initDisplay(Adafruit_SSD1306 &display);
 
-extern UIState uiState;
-
-void drawIdleScreen();
-void drawAlarmOverview();
-void drawAlarmConfig();
-void drawMelodyPreview(int selectedIndex);
-void drawSnoozeMessage(bool wasSnoozed);
-
-#endif
