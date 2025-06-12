@@ -22,12 +22,14 @@
 
 // Sensors
 #define TOUCH_WAKE_PIN T3 // GPIO15 integrated
-#define SHOCK_SENSOR_PIN 4
+//#define SHOCK_SENSOR_PIN 4
+#define SHOCK_SENSOR_PIN 0 // Wokwi
 
 #define MODE_BUTTON_PIN     33
-#define ADJUST_BUTTON_PIN   27
-#define CONFIRM_BUTTON_PIN  34
-
+// #define ADJUST_BUTTON_PIN   27
+// #define CONFIRM_BUTTON_PIN  34
+#define ADJUST_BUTTON_PIN   5 // Wokwi
+#define CONFIRM_BUTTON_PIN  4 // Wokwi
 
 #define UI_TIMEOUT_MS  30000  // 30 seconds back to Idle screen
 #define CHECK_INTERVAL 6000 //check connection timeout

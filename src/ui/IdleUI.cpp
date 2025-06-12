@@ -6,6 +6,7 @@
 #include "config.h"
 #include "services/AlarmService.h"
 #include <WiFi.h>
+#include "globals.h"
 
 extern AlarmService alarmService;
 
@@ -53,23 +54,8 @@ void IdleUI::update() {
     else if (wifiStrength > -80) wifiIcon = wifi_1;
     display.drawBitmap(0, 0, wifiIcon, 8, 8, TEXT_COLOR);
 
-    // Animate Sun or Moon
-    static int sunFrame = 0;
-    static unsigned long lastFrameTime = 0;
-    unsigned long now = millis();
     struct tm timeinfo;
-    if (getLocalTime(&timeinfo)) {
-        int hour = timeinfo.tm_hour;
-        if (hour >= 6 && hour < 18) {
-            if (now - lastFrameTime > 200) {
-                sunFrame = (sunFrame + 1) % 5;
-                lastFrameTime = now;
-            }
-            display.drawBitmap(SCREEN_WIDTH - 16, 0, sun_frames[sunFrame], 16, 16, TEXT_COLOR);
-        } else {
-            display.drawBitmap(SCREEN_WIDTH - 16, 0, moon_icon, 16, 16, TEXT_COLOR);
-        }
-    }
+    sunMoonUI.updateAndDraw(display, timeinfo.tm_hour);
 
     // Time
     display.setTextSize(2);

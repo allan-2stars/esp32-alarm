@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "config.h"
 #include "secrets.h"
+#include "globals.h"
 #include "ui.h"
 #include <WiFi.h>
 #include <WiFiManager.h>
@@ -149,13 +150,15 @@ void initNTP(){
 
   if (!timeSynced) {
     Serial.println("NTP sync failed.");
-    display.clearDisplay();
-    display.setCursor(10, 20);
-    display.println("Time sync failed.");
-    display.setCursor(10, 30);
-    display.println("Check WiFi or reset.");
-    display.display();
-    while (true); // Halt execution until reset
+    uiManager.showMessage("Time sync failed, check Wifi or reset.", IDLE_SCREEN, 3);
+    // display.clearDisplay();
+    // display.setTextColor(TEXT_COLOR);
+    // display.setCursor(10, 20);
+    // display.println("Time sync failed.");
+    // display.setCursor(10, 30);
+    // display.println("Check WiFi or reset.");
+    // display.display();
+    //while (true); // Halt execution until reset
   }
 
   Serial.println("Time synced!");

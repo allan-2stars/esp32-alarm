@@ -45,15 +45,15 @@ void loop() {
   alarmService.checkAlarms();
   alarmService.handleSnooze();
   uiManager.update();
-  shockSensor.update();
+  //shockSensor.update();
   
-  if (shockSensor.isShocked()) {
-    Serial.println("detected");
-    ledcWrite(PWM_CHANNEL, 255);          // Full brightness
-  } else {
-    ledcWrite(PWM_CHANNEL, 0);     
-    Serial.println("Not detected");       // LED off
-  }
+  // if (shockSensor.isShocked()) {
+  //   Serial.println("detected");
+  //   ledcWrite(PWM_CHANNEL, 255);          // Full brightness
+  // } else {
+  //   ledcWrite(PWM_CHANNEL, 0);     
+  //   Serial.println("Not detected");       // LED off
+  // }
 
   if (uiManager.getCurrentState() != ALARM_RINGING &&
       millis() - lastInteraction > INACTIVITY_TIMEOUT) {

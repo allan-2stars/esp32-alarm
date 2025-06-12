@@ -2,7 +2,7 @@
 #include "icons.h"
 #include "config.h"
 
-#define SUN_FRAME_COUNT 5
+#define SUN_FRAME_COUNT 3
 
 void SunMoonUI::begin() {
   lastSunAnimTime = millis();
@@ -10,13 +10,17 @@ void SunMoonUI::begin() {
 }
 
 void SunMoonUI::updateAndDraw(Adafruit_SSD1306 &display, int hour) {
-  if (hour >= 6 && hour < 18) {
+  int imageWidth = 18;
+  int imageHeight = 18;
+  int x = SCREEN_WIDTH - imageWidth;
+  int y = 0;
+  if (hour >= 6 && hour < 16) {
     // Animate sun
-    if (millis() - lastSunAnimTime > 200) {
+    if (millis() - lastSunAnimTime > 200) { // rotate image every 200 milliseconds
       sunFrameIndex = (sunFrameIndex + 1) % SUN_FRAME_COUNT;
       lastSunAnimTime = millis();
     }
-    display.drawBitmap(SCREEN_WIDTH - 16, 0, sun_frames[sunFrameIndex], 16, 16, TEXT_COLOR);
+    display.drawBitmap(x, y, sun_frames[sunFrameIndex], imageWidth, imageHeight, TEXT_COLOR);
   } else {
     // Animate moon
     if (millis() - lastMoonAnimTime > 500) {
@@ -24,7 +28,7 @@ void SunMoonUI::updateAndDraw(Adafruit_SSD1306 &display, int hour) {
       lastMoonAnimTime = millis();
     }
     if (moonVisible) {
-      display.drawBitmap(SCREEN_WIDTH - 16, 0, moon_icon, 16, 16, TEXT_COLOR);
+      display.drawBitmap(x, y, moon_icon_18x18, imageWidth, imageHeight, TEXT_COLOR);
     }
   }
 }
