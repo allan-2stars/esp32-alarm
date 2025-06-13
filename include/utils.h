@@ -20,5 +20,5 @@ const char* getAlarmTypeLabel(AlarmType type);
 const char* getMelodyName(int melodyIndex);
 
 
-// utils.h
+void setScreenContract(int contractVolume);
 String getRepeatDaysString(bool repeatDays[7]);

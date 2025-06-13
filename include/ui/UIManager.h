@@ -20,6 +20,9 @@ public:
   void handleMode();
   void handleAdjust();
   void handleConfirm();
+  // handle screen contrast
+  void handleContrast();
+  void setScreenContrast(int contrastVolume);
   void switchTo(UIState state);
   UIState getCurrentState() const;
   // to show some temp message on the screen

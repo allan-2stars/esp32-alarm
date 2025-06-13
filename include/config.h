@@ -2,6 +2,7 @@
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
+#define SCREEN_CONTRAST 255
 
 #define OLED_RESET -1
 #define SDA_PIN 16
@@ -25,6 +26,7 @@
 //#define SHOCK_SENSOR_PIN 4
 #define SHOCK_SENSOR_PIN 0 // Wokwi
 
+#define SCREEN_CONTRAST_PIN 21
 #define MODE_BUTTON_PIN     33
 // #define ADJUST_BUTTON_PIN   27
 // #define CONFIRM_BUTTON_PIN  34
@@ -42,7 +44,7 @@
 #define WEB_ALARM_VERSION    0xB2B2
 
 // this is the 3 brightest LED on top
-#define LED_LEFT_PIN 35
+#define LED_LEFT_PIN 32
 #define LED_TOP_PIN 22
 #define LED_RIGHT_PIN 25
 
