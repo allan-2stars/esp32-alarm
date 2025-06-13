@@ -25,7 +25,6 @@
 #include "services/RGBLedService.h"
 #include "services/SleepManager.h"
 #include "services/AlarmPlayerService.h"
-#include "services/ButtonPressService.h"
 // Commands
 #include "commands/CommandInput.h"
 //Animation
