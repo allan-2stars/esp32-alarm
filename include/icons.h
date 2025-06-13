@@ -8,7 +8,7 @@ void drawBellIcon(Adafruit_SSD1306 &display, int x, int y);
 void drawBellSlashIcon(Adafruit_SSD1306 &display, int x, int y);
 
 extern const unsigned char wake_up_91x35[];
-//extern const uint8_t doraemon[];
+extern const unsigned char bell_ringing_39x35[];
 extern const unsigned char doraemon[];
 // Wi-Fi animation frames
 extern const unsigned char wifi_1[];
