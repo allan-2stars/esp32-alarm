@@ -55,7 +55,7 @@ void IdleUI::update() {
     drawTemperatureAndHumidity();
 
     // Alarm status icon
-    display.drawBitmap(86, HEADER_HEIGHT + 22, alarmService.anyAlarmEnabled() ? bellIcon : bellSlashIcon, 8, 8, TEXT_COLOR);
+    display.drawBitmap(100, HEADER_HEIGHT + 22, alarmService.anyAlarmEnabled() ? bellIcon : bellSlashIcon, 8, 8, TEXT_COLOR);
 
     // Date
     drawDate(currentDate);
@@ -68,11 +68,12 @@ void IdleUI::update() {
 void IdleUI::drawTemperatureAndHumidity(){
   float temp = getTemperature();
   float hum = getHumidity();
+  // Serial.println(temp);
   display.setTextSize(1);
   display.setCursor(0, HEADER_HEIGHT + 22);
   display.printf("T:%s H:%s",
-    isnan(temp) ? "--" : String(lastTempShown, 1).c_str(),
-    isnan(hum) ? "--" : String(lastHumShown, 1).c_str()
+    isnan(temp) ? "--" : String(temp, 1).c_str(),
+    isnan(hum) ? "--" : String(hum, 1).c_str()
   );
 
 }

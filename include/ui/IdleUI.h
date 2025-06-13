@@ -13,8 +13,6 @@ private:
     Adafruit_SSD1306 &display;
     String lastTimeShown = "";
     String lastDateShown = "";
-    float lastTempShown = -99;
-    float lastHumShown = -99;
 
     void drawTime(const String &currentTime);
     void drawDate(const String &currentDate);
