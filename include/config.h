@@ -25,7 +25,11 @@
 #define TOUCH_WAKE_PIN T3 // GPIO15 integrated
 //#define SHOCK_SENSOR_PIN 4
 #define SHOCK_SENSOR_PIN 0 // Wokwi
-#define SERVO_PIN 13 // for open the door
+#define SERVO_PIN 13
+#define PIR_PIN 5
+#define SERVO_HOURLY_ANGLE 90
+#define SERVO_MOTION_ANGLE 15
+
 
 #define SCREEN_CONTRAST_PIN 21
 #define MODE_BUTTON_PIN     33
