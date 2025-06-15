@@ -13,6 +13,7 @@ void setup() {
   initBuzzer();
   initAHT10();
   initDisplay(display);
+  uiManager.setScreenContrast(SCREEN_CONTRAST);
 
   if (!connectWifi()) {
     display.clearDisplay();

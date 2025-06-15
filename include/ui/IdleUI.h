@@ -13,12 +13,9 @@ private:
     Adafruit_SSD1306 &display;
     String lastTimeShown = "";
     String lastDateShown = "";
-    float lastTempShown = -1000;
-    float lastHumShown = -1000;
 
     void drawTime(const String &currentTime);
     void drawDate(const String &currentDate);
-    void drawTemperature(float temp);
-    void drawHumidity(float hum);
+    void drawTemperatureAndHumidity();
     void drawIcons();
 };

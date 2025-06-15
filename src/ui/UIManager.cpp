@@ -16,6 +16,8 @@ extern AlarmPlayerService alarmPlayerService;
 
 unsigned long temporaryScreenStart = 0;
 unsigned long temporaryScreenDuration = 0;
+int offsetValue = 60;
+int contrastValue = 0;
 
 
 UIManager::UIManager(Adafruit_SSD1306 &display)
@@ -228,6 +230,20 @@ void UIManager::handleConfirm() {
     default:
     break;
   }
+}
+
+void UIManager::setScreenContrast(int contrastValue){
+  display.ssd1306_command(SSD1306_SETCONTRAST); // Set the contrast mode
+  display.ssd1306_command(contrastValue); // Set the contrast value (e.g., 128)
+}
+
+void UIManager::handleContrast(){
+  Serial.print("SSD contrast set: ");
+
+  contrastValue = (contrastValue + offsetValue) % 255;
+  display.ssd1306_command(SSD1306_SETCONTRAST);
+  display.ssd1306_command(contrastValue); 
+  Serial.println(contrastValue);
 }
 
 void UIManager::switchTo(UIState newState) {
