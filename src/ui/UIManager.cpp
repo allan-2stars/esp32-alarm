@@ -16,7 +16,7 @@ extern AlarmPlayerService alarmPlayerService;
 
 unsigned long temporaryScreenStart = 0;
 unsigned long temporaryScreenDuration = 0;
-int offsetValue = 30;
+int offsetValue = 60;
 int contrastValue = 0;
 
 
