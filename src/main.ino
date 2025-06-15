@@ -25,6 +25,8 @@ void setup() {
   }
 
   initNTP();
+  servoController.begin();
+  servoController.setExcludedHours({0, 1, 2, 3, 4, 5, 6, 22, 23});  // Example: no servo turn at midnight or late night
 
   alarmService.begin();
   melodyService.begin();
@@ -46,6 +48,11 @@ void loop() {
   alarmService.checkAlarms();
   alarmService.handleSnooze();
   uiManager.update();
+
+  //
+
+  servoController.update();
+
   //shockSensor.update();
   
   // if (shockSensor.isShocked()) {

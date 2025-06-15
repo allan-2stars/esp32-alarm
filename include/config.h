@@ -33,10 +33,9 @@
 
 #define SCREEN_CONTRAST_PIN 21
 #define MODE_BUTTON_PIN     33
-// #define ADJUST_BUTTON_PIN   27
-// #define CONFIRM_BUTTON_PIN  34
-#define ADJUST_BUTTON_PIN   5 // Wokwi
-#define CONFIRM_BUTTON_PIN  4 // Wokwi
+#define ADJUST_BUTTON_PIN   27
+#define CONFIRM_BUTTON_PIN  34
+
 
 #define UI_TIMEOUT_MS  30000  // 30 seconds back to Idle screen
 #define CHECK_INTERVAL 6000 //check connection timeout

@@ -34,6 +34,8 @@
 #include "animations/SleepAnimation.h"
 // Sensors
 #include "sensors/ShockSensor.h"
+#include "sensors/ServoMotionController.h"
+
 
 extern Face *face;
 // Global display
@@ -90,3 +92,4 @@ extern SleepAnimation sleepAnimation;
 
 // Sensors
 extern ShockSensor shockSensor;
+extern ServoMotionController servoController;

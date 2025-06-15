@@ -46,3 +46,4 @@ Face *face;
 
 // Sensors
 ShockSensor shockSensor;
+ServoMotionController servoController;
