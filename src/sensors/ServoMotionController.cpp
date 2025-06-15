@@ -42,7 +42,8 @@ void ServoMotionController::checkHourlyTrigger() {
 }
 
 void ServoMotionController::checkPIRMotion() {
-  if (digitalRead(PIR_PIN) == HIGH && millis() - lastMotionTime > 5000) {
+  if (digitalRead(PIR_PIN) == HIGH && millis() - lastMotionTime > 2000) {
+    Serial.println("moved..");
     turnServoTo(SERVO_MOTION_ANGLE);
     lastMotionTime = millis();
   }
@@ -50,6 +51,7 @@ void ServoMotionController::checkPIRMotion() {
 
 void ServoMotionController::turnServoTo(int angle) {
   servo.write(angle);
-  delay(500);         // Small hold time
+  Serial.println("turned");
+  delay(5000);         // Small hold time
   servo.write(0);     // Return to base position
 }
