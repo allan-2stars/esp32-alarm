@@ -74,7 +74,7 @@
     [ "btn3:1.r", "bb1:2b.i", "black", [ "h10.4", "v57.6", "h115.2" ] ],
     [ "btn2:1.r", "bb1:2b.h", "black", [ "h48.8", "v-48", "h19.2", "v38.4" ] ],
     [ "btn1:1.r", "bb1:2b.g", "black", [ "h29.6", "v-19.2" ] ],
-    [ "oled1:GND", "bb1:2t.a", "black", [ "v-38.4", "h105.6" ] ],
+    [ "oled1:GND", "bb1:2t.a", "black", [ "v-57.6", "h115.2" ] ],
     [ "oled1:VCC", "bb1:1t.a", "red", [ "v-76.8", "h86.55" ] ],
     [ "dht1:VCC", "bb1:1b.g", "red", [ "h57.6", "v28.8", "h144" ] ],
     [ "dht1:GND", "oled1:GND", "black", [ "v0" ] ],
@@ -101,7 +101,7 @@
     [ "pir1:VCC", "oled1:VCC", "red", [ "v19.2", "h57.6" ] ],
     [ "pir1:GND", "oled1:GND", "black", [ "v28.8", "h9.34" ] ],
     [ "btn2:2.l", "esp:27", "violet", [ "h-86.4", "v58" ] ],
-    [ "bz1:1", "oled1:GND", "black", [ "v28.8", "h163.2" ] ],
+    [ "bz1:1", "oled1:GND", "black", [ "v28.8", "h105.6", "v-86.4" ] ],
     [ "esp:34", "btn1:2.l", "violet", [ "h-57.45", "v-57.6" ] ],
     [
       "esp:5",
